@@ -582,6 +582,8 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 .lci.fill{fill:currentColor}
 .grip .lci{width:1.15em;height:1.15em;vertical-align:middle}
 .prio .lci,.badge .lci{width:1em;height:1em}
+button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:100%}
+#ctiles .tile[aria-pressed="true"]{outline:3px solid var(--forest);outline-offset:1px}
 </style>
 
 <div class="wrap">
@@ -616,7 +618,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v25<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v26<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -930,9 +932,9 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
   <h2>チェック一覧</h2>
   <div class="tiles" id="ctiles"></div>
   <div class="note" style="margin:0 0 8px">ここでチェックしても、ほかのタブにも同じ内容が反映されます。</div>
-  <h3 class="sh">見たいブース</h3><div id="cbooth"></div>
-  <h3 class="sh">買う物・買った物</h3><div id="cbuy"></div>
-  <h3 class="sh">ブース別に使った金額</h3><div id="cspend"></div>
+  <h3 class="sh" id="h-cbooth">見たいブース</h3><div id="cbooth"></div>
+  <h3 class="sh" id="h-cbuy">買う物・買った物</h3><div id="cbuy"></div>
+  <h3 class="sh" id="h-cspend">ブース別に使った金額</h3><div id="cspend"></div>
 </section>
 </div>
 
@@ -1919,13 +1921,16 @@ function renderPack(){
   $('plist').querySelectorAll('[data-px]').forEach(c=>c.onclick=()=>{S.pack=S.pack.filter(x=>x.id!=c.dataset.px);save();render()});
 }
 /* ---- check overview (reads the same state as the other tabs) ---- */
+let ckView='booth';
 function renderCheck(){
   const ks=starList(),seen=ks.filter(doneOf).length;
   const boughtExtra=memos.filter(m=>m.yen!=null&&!S.wants.some(w=>String(w.memoId)===String(m.id)));
   const wd=S.wants.filter(w=>w.got).length,wt=S.wants.length+boughtExtra.length,wb=wd+boughtExtra.length;
   const pd=S.pack.filter(p=>p.done).length;
-  const tile=(label,a,b)=>`<div class="tile ${b&&a===b?'full':''}"><small>${label}</small><b>${a}/${b}</b><div class="bar"><i style="width:${b?a/b*100:0}%"></i></div></div>`;
-  $('ctiles').innerHTML=tile('見たブース',seen,ks.length)+tile('買った物',wb,wt);
+  const tile=(label,a,b,v)=>`<button type="button" class="tile ${b&&a===b?'full':''}" data-cv="${v}" aria-pressed="${ckView===v}"><small>${label}</small><b>${a}/${b}</b><div class="bar"><i style="width:${b?a/b*100:0}%"></i></div></button>`;
+  $('ctiles').innerHTML=tile('見たブース',seen,ks.length,'booth')+tile('買った物',wb,wt,'buy');
+  $('ctiles').querySelectorAll('[data-cv]').forEach(b=>b.onclick=()=>{ckView=b.dataset.cv;renderCheck()});
+  [['cbooth','booth'],['h-cbooth','booth'],['cbuy','buy'],['h-cbuy','buy'],['cspend','buy'],['h-cspend','buy']].forEach(([id,v])=>{$(id).hidden=ckView!==v});
   $('cbooth').innerHTML=ks.length?ks.flatMap((k,i)=>{const d=doneOf(k);return ckBrands(k).map(bn=>`<div class="ck ${d?'done':''}"><input class="chk" type="checkbox" data-cb="${k}" ${d?'checked':''} aria-label="${esc(BY[k].name)}を見た"><span class="ord">${i+1}</span>${badge(k)}<div class="nm">${esc(bn)}</div><span class="mk">${d?'✔':''}</span></div>`)}).join(''):'<div class="empty">見たいブースを選ぶとここに並びます。</div>';
   const wrow=w=>`<div class="ck ${w.got?'done':''}"><input class="chk" type="checkbox" data-cw="${w.id}" ${w.got?'checked':''} aria-label="${esc(w.name)}を買った"><div class="nm">${esc(w.name)}<span class="sub">${w.got?'実際 '+yen(w.actual!=null?w.actual:w.yen):(w.yen?'予定 '+yen(w.yen):'予算未入力')}${w.booth&&BY[w.booth]?' ／ '+w.booth+' '+esc(w.sub||brandOf(w.booth)):''}</span></div><span class="mk">${w.got?'✔':''}</span></div>`;
   const xrow=m=>`<div class="ck done"><span style="width:26px;flex:none"></span><div class="nm">${esc(m.text||'写真メモ')}<span class="sub">予定外 ${yen(m.yen)} ／ ${m.booth} ${esc(m.sub||brandOf(m.booth))}</span></div><span class="mk">✔</span></div>`;
