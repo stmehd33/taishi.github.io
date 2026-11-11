@@ -599,19 +599,19 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
     <button role="tab" id="t-notes" aria-selected="false" data-tab="notes">メモ</button>
     <button role="tab" id="t-pack" aria-selected="false" data-tab="pack">持ち物<span class="n" id="n-pack"></span></button>
     <button role="tab" id="t-events" aria-selected="false" data-tab="events">イベント</button>
-    <button role="tab" id="t-check" aria-selected="false" data-tab="check">チェック</button>
   </div>
   <div class="tbar">
     <button role="tab" id="t-home" aria-selected="true" data-tab="home">ホーム</button>
     <button role="tab" id="t-map" aria-selected="false" data-tab="map">マップ</button>
     <button role="tab" id="t-plan" aria-selected="false" data-tab="plan">優先順位<span class="n" id="n-plan">0</span></button>
     <button role="tab" id="t-wants" aria-selected="false" data-tab="wants">欲しい物<span class="n" id="n-wants">0</span></button>
+    <button role="tab" id="t-check" aria-selected="false" data-tab="check">チェック</button>
     <button role="tab" id="t-more" aria-selected="false" aria-expanded="false" aria-controls="tmore" type="button">その他</button>
   </div>
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v17<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v18<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -997,7 +997,7 @@ function show(tab){
   for(const t of ['home','plan','wants','booths','map','memo','sched','events','notes','pack','check','guide','spend','haul']){
     $(t).hidden=t!==tab; const tb=$('t-'+t);if(tb)tb.setAttribute('aria-selected',t===tab);
   }
-  const SEC=['memo','notes','pack','events','check'];
+  const SEC=['memo','notes','pack','events'];
   $('t-more').setAttribute('aria-selected',SEC.includes(tab));$('tabs').classList.remove('open');$('t-more').setAttribute('aria-expanded','false');
   placeMap(tab);if(_bs)setBSearch(true);
   window.scrollTo({top:0});
