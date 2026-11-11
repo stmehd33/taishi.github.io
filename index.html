@@ -618,7 +618,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v27<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v28<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -2120,7 +2120,7 @@ function renderHome(){
   const latest=YEAR_KEYS[YEAR_KEYS.length-1];
   $('ynote').innerHTML=`<b>${EVENT.year}年 ${esc(EVENT.name)}</b>（${esc(EVENT.dates)} ／ ${esc(EVENT.place)}）を表示中${CUR_YEAR<latest?'。<b>過去の記録</b>です':''}。`+(YEAR_KEYS.length===1?'<br>来年度版を作ると、ここに年が増えて、過去の年の記録もそのまま残ります。':'');
   const ks=starList(),seen=ks.filter(doneOf).length,B=+S.budget||0,sp=spentTotal();
-  const tile=(l,a,b,go)=>`<button type="button" class="tile ${b&&a===b?'full':''} ${homeOpen===go?'on':''}" data-ht="${go}" aria-expanded="${homeOpen===go}" style="font:inherit;color:inherit;cursor:pointer"><small>${l} ${go==='haul'?'›':(homeOpen===go?'▴':'▾')}</small><b>${a}/${b}</b><div class="bar"><i style="width:${b?a/b*100:0}%"></i></div></button>`;
+  const tile=(l,a,b,go)=>`<button type="button" class="tile ${b&&a===b?'full':''} ${homeOpen===go?'on':''}" data-ht="${go}" aria-expanded="${homeOpen===go}" style="font:inherit;color:inherit;cursor:pointer"><small>${l} ${homeOpen===go?'▴':'▾'}</small><b>${a}/${b}</b><div class="bar"><i style="width:${b?a/b*100:0}%"></i></div></button>`;
   $('htiles').innerHTML=tile('ブース',seen,ks.length,'booth')+tile('戦利品',S.wants.filter(w=>w.got).length,S.wants.length,'haul');
   {const sk=starList(),gt=S.wants.filter(w=>w.got),g=st=>sk.filter(k=>stOf(k)===st);
    const sec=(t,n,body,empty,go)=>`<div class="hbox"><div class="hh"><b>${t}</b><span>${n}</span>${go?`<button type="button" class="chip" data-hgo="${go}">全部 ›</button>`:''}</div><div class="hbody">${body||`<div class="note" style="margin:6px 0">${empty}</div>`}</div></div>`;
@@ -2131,7 +2131,7 @@ function renderHome(){
    $('hlists').innerHTML=homeOpen==='booth'?bx:homeOpen==='haul'?hx:'';
    bindBRows($('hlists'));
    $('hlists').querySelectorAll('[data-hgo]').forEach(b=>b.onclick=()=>{show(b.dataset.hgo);render()})}
-  $('htiles').querySelectorAll('[data-ht]').forEach(b=>b.onclick=()=>{if(b.dataset.ht==='haul'){show('haul');render();window.scrollTo({top:0});return}homeOpen=homeOpen===b.dataset.ht?null:b.dataset.ht;renderHome()});
+  $('htiles').querySelectorAll('[data-ht]').forEach(b=>b.onclick=()=>{homeOpen=homeOpen===b.dataset.ht?null:b.dataset.ht;renderHome()});
   if(document.activeElement!==$('hbudget'))$('hbudget').value=fmtYen(B);
   {const op=S.wants.filter(w=>!w.got),sm=i=>op.filter(w=>intentOf(w)===i).reduce((a,w)=>a+(+w.yen||0),0),must=sm('must'),maybe=sm('maybe'),skip=sm('skip');
    let msg='';if(B){const lf2=B-sp;if(must>lf2)msg=`<div class="hw-warn ng">「絶対買う」だけで予算を ${yen(must-lf2)} 超えます</div>`;else if(must+maybe>lf2)msg=`<div class="hw-warn">「悩み中」も全部買うと ${yen(must+maybe-lf2)} 超えます</div>`}
