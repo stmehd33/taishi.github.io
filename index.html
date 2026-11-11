@@ -1235,7 +1235,7 @@ $('w-img').addEventListener('change',()=>{const n=$('w-img').files.length;$('w-i
 $('wform').addEventListener('submit',async e=>{
   e.preventDefault();
   const name=$('w-name').value.trim();if(!name){$('w-name').focus();return}
-  const rawB=$('w-booth').value.trim();let booth=resolveBooth(rawB);$('w-bmsg').textContent='';
+  const rawB=$('w-booth').value.trim();let booth=resolveBooth(rawB);$('w-bmsg').textContent='';if(booth&&!$('w-sub').value){const ms=subMatch(rawB,booth);if(ms)fillSub('w-sub','w-subbox',booth,ms)}
   const newId=Date.now(),imgFiles=[...$('w-img').files];
   S.wants.push({id:newId,name,brand:booth?($('w-sub').value||shortName(booth)):rawB,yen:ynum($('w-yen').value)||0,booth,sub:$('w-sub').value||'',prio:+$('w-prio').value,intent:['','must','maybe','skip'][+$('w-prio').value],got:false});
   let newStar=false;if(booth){if(!S.stars[booth]){S.stars[booth]={done:false,prio:2};newStar=true}const sb=$('w-sub').value;if(sb){S.subStars=S.subStars||{};(S.subStars[booth]=S.subStars[booth]||{})[sb]=true}}
@@ -2238,6 +2238,7 @@ function attachBoothPicker(id){
   res.addEventListener('click',e=>{const b=e.target.closest('[data-n]');if(!b)return;inp.value=b.dataset.n;inp.dispatchEvent(new Event('input',{bubbles:true}));inp.dispatchEvent(new Event('change',{bubbles:true}));pan.hidden=true;btn.setAttribute('aria-expanded',false);btn.textContent='🔍 名前で探して選ぶ ▾';toast('✔ '+b.dataset.n+' を選びました')});
 }
 function boothFind(t){t=String(t||'').trim().toLowerCase();if(!t)return[];return BOOTHS.filter(b=>b.n.startsWith(t)||b.name.toLowerCase().includes(t)).slice(0,8)}
+function subMatch(t,k){t=String(t||'').trim().toLowerCase();if(!t||!BY[k])return'';const l=subsOf(k);return l.find(s=>s.toLowerCase()===t)||(l.filter(s=>s.toLowerCase().includes(t)).length===1?l.filter(s=>s.toLowerCase().includes(t))[0]:'')}
 function resolveBooth(v){v=String(v||'').trim();if(!v)return'';if(BY[v])return v;const al=(EVENT.alias||{})[v];if(al&&BY[al])return al;const hit=boothFind(v);return hit.length===1?hit[0].n:''}
 function bindCombo(id){
   const inp=$(id);if(!inp)return;
@@ -2246,9 +2247,10 @@ function bindCombo(id){
     if(!v){box.innerHTML='';return}
     if(BY[v]){box.innerHTML=`<div class="bcok">✔ <b>${esc(v)}</b>　${esc(BY[v].name.replace(/（.*$/,''))}</div>`;return}
     const hit=boothFind(v);
-    box.innerHTML=hit.length?hit.map(b=>`<button type="button" class="bp-it" data-n="${b.n}"><b>${b.n}</b> ${esc(b.name.replace(/（.*$/,'').slice(0,40))}</button>`).join(''):'<div class="note" style="margin:4px 0">一覧にありません。</div>'};
+    const items=[];hit.forEach(b=>{const q=v.toLowerCase(),ms=/^\d+$/.test(v)?[]:subsOf(b.n).filter(s=>s.toLowerCase().includes(q));if(ms.length)ms.forEach(s=>items.push({b,s}));else items.push({b,s:''})});
+    box.innerHTML=items.length?items.slice(0,12).map(({b,s})=>`<button type="button" class="bp-it" data-n="${b.n}" data-s="${esc(s)}"><b>${b.n}</b> ${s?esc(s)+' <small>（'+esc(b.name.replace(/（.*$/,'').slice(0,24))+'）</small>':esc(b.name.replace(/（.*$/,'').slice(0,40))}</button>`).join(''):'<div class="note" style="margin:4px 0">一覧にありません。</div>'};
   inp.addEventListener('input',draw);inp._draw=draw;
-  box.addEventListener('click',e=>{const b=e.target.closest('[data-n]');if(!b)return;inp.value=b.dataset.n;inp.dispatchEvent(new Event('input',{bubbles:true}));inp.dispatchEvent(new Event('change',{bubbles:true}))});
+  box.addEventListener('click',e=>{const b=e.target.closest('[data-n]');if(!b)return;inp.value=b.dataset.n;inp.dispatchEvent(new Event('input',{bubbles:true}));inp.dispatchEvent(new Event('change',{bubbles:true}));const sv=b.dataset.s;if(sv){const sl=$(id.replace('-booth','-sub'));if(sl){const fix=()=>{sl.value=sv;sl.dispatchEvent(new Event('change',{bubbles:true}))};fix();setTimeout(fix,0)}}});
   if(inp.form)inp.form.addEventListener('reset',()=>setTimeout(draw,0));
   draw();
 }
