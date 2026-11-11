@@ -293,7 +293,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--forest)}
 .tabs.open .tmore{display:grid}
 .tabs button{min-height:50px;padding:8px 0 4px;font-size:12px;letter-spacing:-.04em}
 .tabs button#t-more[aria-selected="true"]{background:#5b5b4d;color:#fff}
-.tabs button#t-more::after{content:" ▴";font-size:10px}.tabs.open button#t-more::after{content:" ▾"}
+.tabs button#t-more::after{content:"";display:inline-block;width:12px;height:12px;margin-left:3px;vertical-align:-2px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='3'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='m18%2015-6-6-6%206'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='3'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='m18%2015-6-6-6%206'/%3E%3C/svg%3E") center/contain no-repeat}.tabs.open button#t-more::after{-webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='3'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='m6%209%206%206%206-6'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='3'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='m6%209%206%206%206-6'/%3E%3C/svg%3E")}
 body{padding-bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 #toast{bottom:calc(120px + env(safe-area-inset-bottom,0px))}
 html[data-layout="pc"] .tabs{position:sticky;left:auto;bottom:auto;transform:none;width:auto;max-width:none;display:grid;border-top:0;padding:0}
@@ -577,6 +577,11 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 .dayseg{display:flex;gap:6px}.dsw[aria-pressed="true"]{background:var(--forest-ink);color:var(--forest);opacity:1}
 /* 写真メモ機能は表示しない（データは残す） */
 #t-memo,#bd-buy,#bd-photo,#pi-buy,#pi-photo,#haul-photo,[data-wbuy]{display:none!important}
+
+.lci{display:inline-block;width:1.1em;height:1.1em;vertical-align:-.2em;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.lci.fill{fill:currentColor}
+.grip .lci{width:1.15em;height:1.15em;vertical-align:middle}
+.prio .lci,.badge .lci{width:1em;height:1em}
 </style>
 
 <div class="wrap">
@@ -611,7 +616,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v19<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v21<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -2342,6 +2347,32 @@ addEventListener('resize',fitAll);addEventListener('orientationchange',fitAll);a
 document.addEventListener('click',()=>setTimeout(fitAll,60),true);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitAll);
 setTimeout(fitAll,0);
+})();
+
+/* アイコンは Lucide（https://lucide.dev ・ISCライセンス）のSVGを埋め込み。記号文字を自動でアイコンに置き換える */
+(function(){
+const P={"star": "<path d=\"M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z\" />", "check": "<path d=\"M20 6 9 17l-5-5\" />", "x": "<path d=\"M18 6 6 18\" /> <path d=\"m6 6 12 12\" />", "pencil": "<path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\" /> <path d=\"m15 5 4 4\" />", "chevron-down": "<path d=\"m6 9 6 6 6-6\" />", "chevron-up": "<path d=\"m18 15-6-6-6 6\" />", "chevron-right": "<path d=\"m9 18 6-6-6-6\" />", "grip-vertical": "<circle cx=\"9\" cy=\"12\" r=\"1\" /> <circle cx=\"9\" cy=\"5\" r=\"1\" /> <circle cx=\"9\" cy=\"19\" r=\"1\" /> <circle cx=\"15\" cy=\"12\" r=\"1\" /> <circle cx=\"15\" cy=\"5\" r=\"1\" /> <circle cx=\"15\" cy=\"19\" r=\"1\" />", "rotate-ccw": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" />", "rotate-cw": "<path d=\"M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8\" /> <path d=\"M21 3v5h-5\" />", "undo-2": "<path d=\"M9 14 4 9l5-5\" /> <path d=\"M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11\" />", "plus": "<path d=\"M5 12h14\" /> <path d=\"M12 5v14\" />", "minus": "<path d=\"M5 12h14\" />"};
+const MAP={'★':['star',1],'☆':['star',0],'✔':['check'],'✕':['x'],'✎':['pencil'],'▾':['chevron-down'],'▴':['chevron-up'],'▸':['chevron-right'],'›':['chevron-right'],'≡':['grip-vertical'],'⟲':['rotate-ccw'],'⟳':['rotate-cw'],'↩':['undo-2'],'＋':['plus'],'－':['minus']};
+const RE=/[★☆✔✕✎▾▴▸›≡⟲⟳↩＋－]/;
+const SKIP='option,script,style,textarea,select,title,svg,noscript';
+function mk(g){const m=MAP[g],t=document.createElement('template');t.innerHTML='<svg class="lci'+(m[1]?' fill':'')+'" viewBox="0 0 24 24" aria-hidden="true">'+P[m[0]]+'</svg>';return t.content.firstChild}
+function okMinus(s,i){return /^\s*－\s*$/.test(s)||s.slice(i+1,i+4)===' 縮小'}
+function convText(n){
+  const s=n.nodeValue;if(!RE.test(s))return;const p=n.parentNode;if(!p||(p.closest&&p.closest(SKIP)))return;
+  const f=document.createDocumentFragment();let buf='',hit=false;
+  for(let i=0;i<s.length;i++){const c=s[i];
+    if(MAP[c]&&(c!=='－'||okMinus(s,i))){if(buf){f.appendChild(document.createTextNode(buf));buf=''}f.appendChild(mk(c));hit=true}
+    else buf+=c}
+  if(!hit)return;if(buf)f.appendChild(document.createTextNode(buf));p.replaceChild(f,n)}
+function conv(root){
+  if(root.nodeType===3){convText(root);return}
+  if(root.nodeType!==1)return;
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),L=[];let n;while(n=w.nextNode())if(RE.test(n.nodeValue))L.push(n);
+  L.forEach(convText)}
+conv(document.body);
+new MutationObserver(ms=>{for(const m of ms){
+  if(m.type==='characterData'){convText(m.target)}
+  else m.addedNodes.forEach(conv)}}).observe(document.body,{childList:true,subtree:true,characterData:true});
 })();
 </script>
 </body></html>
