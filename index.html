@@ -695,7 +695,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
     <div class="full" id="w-subbox" hidden><label for="w-sub">ブース内のどの店？（複数の店・ブランドが入っています）</label><select id="w-sub"></select></div>
     <div class="full"><label for="w-name">② 品名・メモ（ざっくりでOK）</label><input type="text" id="w-name" placeholder="例：焚き火台、簡単に立てれるテント" autocomplete="off"></div>
     <div class="full"><label for="w-yen">③ 予算（円・空欄でOK）</label><input type="text" data-comma id="w-yen" inputmode="numeric" pattern="[0-9,]*" autocomplete="off" placeholder="5000"></div>
-    <div class="full"><label class="wadd" for="w-img">📷 写真・スクショを添付（任意）</label><input type="file" id="w-img" accept="image/*" multiple hidden><div class="note" id="w-imsg" style="margin:2px 0 0"></div></div>
+    <div class="full"><label>写真・スクショを添付（任意）</label><div class="wth-row"><label class="wadd">📷 写真をとる<input type="file" accept="image/*" capture="environment" data-cam="w-img" hidden></label><label class="wadd" for="w-img">🖼 フォトアルバム</label></div><input type="file" id="w-img" accept="image/*" multiple hidden><div class="note" id="w-imsg" style="margin:2px 0 0"></div></div>
     <div class="full"><label for="w-prio">買うかどうか</label>
       <select id="w-prio"><option value="1">絶対買う</option><option value="2" selected>悩み中</option><option value="3">我慢</option></select></div>
     <div class="full"><button class="btn" type="submit">リストに追加</button></div>
@@ -763,7 +763,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
   <div class="sum" id="mtotal"></div>
   <div id="mhead"></div>
   <form class="form" id="mform">
-    <div class="full"><label for="m-file">写真（買った物など。スマホではカメラが開きます）</label><input type="file" id="m-file" accept="image/*" multiple></div>
+    <div class="full"><label>写真（買った物など）</label><div class="wth-row"><label class="wadd">📷 写真をとる<input type="file" accept="image/*" capture="environment" data-cam="m-file" hidden></label><label class="wadd" for="m-file">🖼 フォトアルバム</label></div><input type="file" id="m-file" accept="image/*" multiple hidden><div class="note" id="m-fn" style="margin:2px 0 0"></div></div>
     <div class="full"><label for="m-booth">ブース（番号か名前）</label><input type="text" id="m-booth" placeholder="例：403 か UNIFLAME"><div class="note" id="m-bname" hidden></div></div>
     <div class="full" id="m-subbox" hidden><label for="m-sub">ブース内のどの店？</label><select id="m-sub"></select></div>
     <div class="full" id="m-wantbox" hidden><label for="m-want">買った欲しい物（任意・選ぶと「買った」になります。ブース未定の物も選べます）</label><select id="m-want"></select></div>
@@ -1089,6 +1089,7 @@ function bindBRows(el){
   el.querySelectorAll('[data-bs]').forEach(x=>x.onclick=()=>setSt(x.dataset.bs,x.dataset.st));
   el.querySelectorAll('[data-bb]').forEach(x=>x.onclick=()=>goBooth(x.dataset.bb,x.dataset.b));
 }
+document.addEventListener('change',e=>{const c=e.target;if(!c||!c.dataset||!c.dataset.cam)return;const t=document.getElementById(c.dataset.cam);if(!t)return;try{const dt=new DataTransfer();[...t.files,...c.files].forEach(f=>dt.items.add(f));t.files=dt.files}catch(x){}c.value='';t.dispatchEvent(new Event('change',{bubbles:true}))});
 const planOpen=new Set();
 function renderPlan(){
   const ks=starList(), el=$('plan');
@@ -1101,13 +1102,14 @@ function renderPlan(){
   let h=`<h2>優先順位</h2><div class="sum"><div>見たいブース<b>${ks.length}</b></div><div>見終わった<b>${done}</b></div></div><div class="note" style="margin:0 0 8px">左の「≡」をつかんで上下にドラッグすると、入れ替えられます。左の数字がマップのピン番号です。行の左端の色は、ブースに行く優先度（赤＝高、黄＝中、灰＝低）です。</div><button class="btn sub2" id="opt-open" type="button" style="width:100%;margin:0 0 8px">⚡ 効率よく回るルートを提案（マップで見る）</button><div class="board" id="board">`;
   ks.forEach((k,i)=>{const d=doneOf(k),ws=openWants(k);
     const sub=ws.length?ws.map(w=>esc(w.name)+(w.yen?' '+yen(w.yen):'')).join('、'):'商品未定';
-    h+=`<div class="plank bp${boothPrio(k)} ${d?'done':''}" data-k="${k}"><button class="grip" data-grip="${k}" aria-label="${esc(BY[k].name)}を並べ替え（上下キーでも動かせます）">≡</button><span class="ord">${i+1}</span>${badge(k)}<div class="nm" data-tog="${k}" role="button" tabindex="0" aria-expanded="${planOpen.has(k)}"><b class="pn">${esc(shortName(k))}</b>${Object.keys((S.subStars||{})[k]||{}).length?`<span class="sub">回りたい：${Object.keys(S.subStars[k]).map(esc).join('、')}</span>`:''}<span class="sub">${planOpen.has(k)?'▾':'▸'} ${sub}</span></div><button class="seenbtn" type="button" data-seen="${k}" aria-label="${esc(BY[k].name)}を${d?'見てないに戻す':'見たにする'}">${d?'↩ 戻す':'✔ 見た'}</button><button class="x" data-unstar="${k}" aria-label="外す">✕</button>${planOpen.has(k)?`<div class="wlp">${ws.length?ws.map(w=>`<div class="wlpi"><span class="prio p${w.prio}">${({1:'絶対',2:'悩み',3:'我慢'})[w.prio]||''}</span>${esc(w.name)}<span class="wlpy">${w.yen?yen(w.yen):'予算未入力'}${w.sub?' ／ 店：'+esc(w.sub):''}</span></div>`).join(''):'<div class="wlpi">このブースの欲しい物はまだありません。</div>'}</div>`:''}</div>`;
+    h+=`<div class="plank bp${boothPrio(k)} ${d?'done':''}" data-k="${k}"><button class="grip" data-grip="${k}" aria-label="${esc(BY[k].name)}を並べ替え（上下キーでも動かせます）">≡</button><span class="ord">${i+1}</span>${badge(k)}<div class="nm" data-tog="${k}" role="button" tabindex="0" aria-expanded="${planOpen.has(k)}"><b class="pn">${esc(shortName(k))}</b>${Object.keys((S.subStars||{})[k]||{}).length?`<span class="sub">回りたい：${Object.keys(S.subStars[k]).map(esc).join('、')}</span>`:''}<span class="sub">${planOpen.has(k)?'▾':'▸'} ${sub}</span></div><button class="seenbtn" type="button" data-seen="${k}" aria-label="${esc(BY[k].name)}を${d?'見てないに戻す':'見たにする'}">${d?'↩ 戻す':'✔ 見た'}</button><button class="x" data-unstar="${k}" aria-label="外す">✕</button>${planOpen.has(k)?`<div class="wlp">${ws.length?ws.map(w=>`<div class="wlpi"><span class="prio p${w.prio}">${({1:'絶対',2:'悩み',3:'我慢'})[w.prio]||''}</span>${esc(w.name)}<span class="wlpy">${w.yen?yen(w.yen):'予算未入力'}${w.sub?' ／ 店：'+esc(w.sub):''}</span>${wImgs(w.id).length?`<div class="wth-row">${wImgs(w.id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wvp="${x.id}">`).join('')}</div>`:''}</div>`).join(''):'<div class="wlpi">このブースの欲しい物はまだありません。</div>'}</div>`:''}</div>`;
   });
   h+='</div>';
   h+=`<div class="tools" style="margin-top:16px"><button class="btn sub2" id="copyplan">一覧をコピー</button>${RT?'<button class="btn" id="planroute">🧭 優先順位の道順をマップで見る</button>':''}</div><div class="note" id="copymsg"></div>`;
   el.innerHTML=h;
   el.querySelectorAll('[data-done]').forEach(c=>c.onchange=()=>{if(c.checked)S.seen[c.dataset.done]=true;else delete S.seen[c.dataset.done];save();renderPlan()});
   setupDrag();bindOpt();
+  el.querySelectorAll('[data-wvp]').forEach(m=>m.onclick=e=>{e.stopPropagation();wViewer(m.dataset.wvp,renderPlan)});
   el.querySelectorAll('[data-tog]').forEach(n=>{const f=()=>{const k=n.dataset.tog;planOpen.has(k)?planOpen.delete(k):planOpen.add(k);renderPlan()};n.onclick=f;n.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();f()}}});
   el.querySelectorAll('[data-seen]').forEach(b=>b.onclick=()=>setSt(b.dataset.seen,doneOf(b.dataset.seen)?'none':'done'));
   el.querySelectorAll('[data-unstar]').forEach(c=>c.onclick=()=>{const _sn=snapState();const k=c.dataset.unstar;delete S.stars[k],delete (S.subStars||{})[k];
@@ -1231,6 +1233,7 @@ function renderWants(){
   $('wlist').querySelectorAll('[data-wbuy]').forEach(c=>c.onclick=()=>{const w=S.wants.find(x=>x.id==c.dataset.wbuy);memoFilter=null;memoAdd=true;show('memo');render();renderMemo();$('m-booth').value=w.booth||'';updMB();$('m-want').value=String(w.id);pickWant();$('mform').scrollIntoView({behavior:'smooth'})});
   $('wlist').querySelectorAll('[data-wdel]').forEach(c=>c.onclick=()=>{S.wants=S.wants.filter(x=>x.id!=c.dataset.wdel);wDelImgs(c.dataset.wdel);save();render()});
 }
+(()=>{const f=$('m-file'),n=$('m-fn');if(f&&n){const u=()=>{n.textContent=f.files.length?f.files.length+'枚 選択中':''};f.addEventListener('change',u);if(f.form)f.form.addEventListener('reset',()=>setTimeout(u,0))}})();
 commaInput($('budget'));commaInput($('hbudget'));
 $('budget').addEventListener('input',()=>{S.budget=numOf($('budget'));save();renderWants()});
 $('w-booth').addEventListener('input',()=>fillSub('w-sub','w-subbox',$('w-booth').value.trim()));
@@ -1445,20 +1448,20 @@ function wantBlock(k,br){
   const ws=S.wants.filter(w=>!w.got&&w.booth===k&&(br==null||w.sub===br));
   const seg=(cur,attr)=>Object.keys(INT).map(i=>`<button type="button" class="chip wint wi-${i}" ${attr} data-i="${i}" aria-pressed="${cur===i}">${INT[i][0]}</button>`).join('');
   const cards=ws.map(w=>`<div class="wcard"><div class="wtop"><b class="wnm">${esc(w.name)}${w.sub&&br==null?`<small> ／ ${esc(w.sub)}</small>`:''}</b><button class="x" data-wdel2="${w.id}" aria-label="この物を削除">✕</button></div>
-    <div class="wth-row">${wImgs(w.id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wv="${x.id}">`).join('')}<label class="wadd">📷 画像を追加<input type="file" accept="image/*" multiple data-wfile="${w.id}" hidden></label></div>
+    <div class="wth-row">${wImgs(w.id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wv="${x.id}">`).join('')}<label class="wadd">📷 写真をとる<input type="file" accept="image/*" capture="environment" data-wfile="${w.id}" hidden></label><label class="wadd">🖼 フォトアルバム<input type="file" accept="image/*" multiple data-wfile="${w.id}" hidden></label></div>
     <div class="wrow"><label class="wy">金額 ¥<input type="text" data-comma inputmode="numeric" pattern="[0-9,]*" autocomplete="off" data-wyen="${w.id}" value="${fmtY2(w.yen||'')}" placeholder="未入力"></label></div>
     <div class="wseg">${seg(intentOf(w),`data-wi="${w.id}"`)}</div></div>`).join('');
   return `<div class="wblock"><div class="wh">🛍 ここで買いたい物</div>${cards||'<div class="note" style="margin:4px 0">まだありません。下から追加できます。</div>'}
   <details class="wnew"><summary>＋ 買いたい物を追加（スクショ・写真・金額）</summary>
    <input type="text" id="wn-name" placeholder="品名（空欄でも画像だけで追加できます）" autocomplete="off">
-   <label class="wadd" style="display:inline-flex;margin-top:6px">🖼 スクショ・写真を選ぶ／撮る<input type="file" id="wn-file" accept="image/*" multiple hidden></label><span class="note" id="wn-fn" style="margin:0 0 0 6px"></span>
+   <span class="wth-row" style="margin:6px 0 0"><label class="wadd">📷 写真をとる<input type="file" accept="image/*" capture="environment" data-cam="wn-file" hidden></label><label class="wadd" for="wn-file">🖼 フォトアルバム</label></span><input type="file" id="wn-file" accept="image/*" multiple hidden><span class="note" id="wn-fn" style="margin:0 0 0 6px"></span>
    <label class="wy" style="margin-top:6px">金額 ¥<input type="text" data-comma id="wn-yen" inputmode="numeric" pattern="[0-9,]*" autocomplete="off" placeholder="未入力でOK"></label>
    <div class="wseg" id="wn-seg">${seg('maybe','')}</div>
    <button class="btn" id="wn-add" type="button" style="margin-top:8px;width:100%">リストに追加</button></details></div>`;
 }
 function bprioRow(k){const p=boothPrio(k);return `<div class="bst" style="margin:8px 0 2px"><span class="note" style="margin:0 4px 0 0;align-self:center">ブースに行く優先度</span>${[[1,'高'],[2,'中'],[3,'低']].map(([v,l])=>`<button type="button" class="chip" data-bp="${v}" aria-pressed="${p===v}">${l}</button>`).join('')}</div>`}
 function bindBPrio(k,re){document.querySelectorAll('#pinfo [data-bp]').forEach(b=>b.onclick=()=>{if(S.stars[k])S.stars[k].prio=+b.dataset.bp;save();render();re()})}
-function wRow(id){return `<div class="wth-row">${wImgs(id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wvi="${x.id}">`).join('')}<label class="wadd">📷 画像を追加<input type="file" accept="image/*" multiple data-wfile="${id}" hidden></label></div>`}
+function wRow(id){return `<div class="wth-row">${wImgs(id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wvi="${x.id}">`).join('')}<label class="wadd">📷 写真をとる<input type="file" accept="image/*" capture="environment" data-wfile="${id}" hidden></label><label class="wadd">🖼 フォトアルバム<input type="file" accept="image/*" multiple data-wfile="${id}" hidden></label></div>`}
 function wDelImgs(id){const del=wImgs(id);wimgs=wimgs.filter(x=>String(x.wantId)!==String(id));del.forEach(x=>{try{idbTx('readwrite',s=>s.delete(x.id))}catch(e){}})}
 async function wSaveImgs(wid,files){let n=0;for(const f of files){try{const img=await shrink(f);const rec={id:'wi'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),kind:'wimg',wantId:wid,img,ts:Date.now()};wimgs.push(rec);await idbTx('readwrite',s=>s.put(rec));n++}catch(e){}}return n}
 function wViewer(id,re){const x=wimgs.find(v=>v.id===id);if(!x)return;const o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:12px';
@@ -2223,7 +2226,7 @@ $('go-day').onclick=()=>{UI.day=dayOn()?'off':'on';uiSave();applyUI();toast(dayO
 applyUI();setInterval(()=>{applyUI();if(document.body.classList.contains('daymode')&&typeof render==='function')try{renderHome()}catch(e){}},60000);
 (function(){const o=$('offst');if(!o)return;
  if(!('serviceWorker' in navigator)){o.textContent='📴 オフライン保存：この環境では使えません（電波が弱いときは、先に一度開いておいてください）';return}
- navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{o.textContent='📴 オフライン保存：準備OK／版 v9（一度開いたあと、電波がなくても開けます）'}).catch(()=>{o.textContent='📴 オフライン保存：この環境では使えません（電波が弱いときは、先に一度開いておいてください）'})})();
+ navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{o.textContent='📴 オフライン保存：準備OK／版 v10（一度開いたあと、電波がなくても開けます）'}).catch(()=>{o.textContent='📴 オフライン保存：この環境では使えません（電波が弱いときは、先に一度開いておいてください）'})})();
 
 /* ブース番号の入力欄：番号を直接入れる／「名前で探す」（普段は閉じている）で選ぶ */
 function attachBoothPicker(id){
