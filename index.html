@@ -572,6 +572,8 @@ body.daymode .nextc .acts{gap:10px}
 body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 .dayoff{font:inherit;font-size:12px;font-weight:700;color:var(--forest-ink);background:transparent;border:1.5px solid currentColor;border-radius:999px;padding:0 10px;min-height:32px;opacity:.9}
 .dayseg{display:flex;gap:6px}.dsw[aria-pressed="true"]{background:var(--forest-ink);color:var(--forest);opacity:1}
+/* 写真メモ機能は表示しない（データは残す） */
+#t-memo,#bd-buy,#bd-photo,#pi-buy,#pi-photo,#haul-photo,[data-wbuy]{display:none!important}
 </style>
 
 <div class="wrap">
@@ -608,7 +610,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v12<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v13<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
