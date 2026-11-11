@@ -607,6 +607,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 </nav>
 
 <section id="home">
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v11<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -2224,9 +2225,9 @@ function dayOn(){return UI.day==='on'||(UI.day!=='off'&&isExpoDay())}
 function applyUI(){document.body.classList.toggle('daymode',dayOn());document.body.classList.toggle('sub',$('home').hidden||dayOn());document.body.classList.toggle('morning',isExpoDay()&&new Date(Date.now()+9*36e5).getUTCHours()<10);$('go-day').setAttribute('aria-pressed',dayOn());$('go-day').textContent=dayOn()?'☀ 当日モード：オン':'☀ 当日モード'}
 $('go-day').onclick=()=>{UI.day=dayOn()?'off':'on';uiSave();applyUI();toast(dayOn()?'当日モード：予算入力や説明を隠しました':'当日モードを切りました')};
 applyUI();setInterval(()=>{applyUI();if(document.body.classList.contains('daymode')&&typeof render==='function')try{renderHome()}catch(e){}},60000);
-(function(){const o=$('offst');if(!o)return;
+(function(){const o=$('offst');if(!o)return;const vs=$('verst');
  if(!('serviceWorker' in navigator)){o.textContent='📴 オフライン保存：この環境では使えません（電波が弱いときは、先に一度開いておいてください）';return}
- navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{o.textContent='📴 オフライン保存：準備OK／版 v10（一度開いたあと、電波がなくても開けます）'}).catch(()=>{o.textContent='📴 オフライン保存：この環境では使えません（電波が弱いときは、先に一度開いておいてください）'})})();
+ navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{o.textContent='📴 オフライン保存：準備OK（一度開いたあと、電波がなくても開けます）';if(vs)vs.textContent=' ／ 📴 オフライン準備OK'}).catch(()=>{o.textContent='📴 オフライン保存：この環境では使えません（電波が弱いときは、先に一度開いておいてください）'})})();
 
 /* ブース番号の入力欄：番号を直接入れる／「名前で探す」（普段は閉じている）で選ぶ */
 function attachBoothPicker(id){
