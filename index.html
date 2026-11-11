@@ -618,7 +618,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v28<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v29<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -702,12 +702,12 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
   <div class="dayseg" id="wsw" style="margin:0 0 10px"><button class="chip" type="button" data-wv="want" aria-pressed="true">欲しい物</button><button class="chip" type="button" data-wv="haul" aria-pressed="false">戦利品</button><button class="chip" type="button" data-wv="consider" aria-pressed="false">検討</button></div>
   <div id="wv-want">
   <form class="form" id="wform">
-    <div class="full"><label for="w-booth">① ブース（番号か名前）　※未定なら空欄のまま追加できます</label><input type="text" id="w-booth" placeholder="未定なら空欄のままでOK（例：403 / UNIFLAME）" autocomplete="off">
+    <div class="full"><label for="w-booth">① ブース（番号か名前）　※未定なら空欄のまま追加できます</label><input type="text" id="w-booth" placeholder="例：403 か UNIFLAME（未定なら空欄）" autocomplete="off">
     <div class="note" id="w-bmsg" style="margin:2px 0 0"></div></div>
     <div class="full" id="w-subbox" hidden><label for="w-sub">ブース内のどの店？（複数の店・ブランドが入っています）</label><select id="w-sub"></select></div>
     <div class="full"><label for="w-name">② 品名・メモ（ざっくりでOK）</label><input type="text" id="w-name" placeholder="例：焚き火台、簡単に立てれるテント" autocomplete="off"></div>
     <div class="full"><label for="w-yen">③ 予算（円・空欄でOK）</label><input type="text" data-comma id="w-yen" inputmode="numeric" pattern="[0-9,]*" autocomplete="off" placeholder="5000"></div>
-    <div class="full"><label>写真・スクショを添付（任意）</label><div class="wth-row"><span class="pkpair"><label class="wadd">写真<input type="file" accept="image/*" capture="environment" data-cam="w-img" hidden></label><label class="wadd" for="w-img">アルバム</label></span></div><input type="file" id="w-img" accept="image/*" multiple hidden><div class="note" id="w-imsg" style="margin:2px 0 0"></div></div>
+    <div class="full"><label>写真・スクショを添付（任意）</label><div class="wth-row"><span class="pkpair"><label class="wadd">写真<input type="file" accept="image/*" capture="environment" data-cam="w-img" hidden></label><label class="wadd" for="w-img">アルバム</label></span></div><input type="file" id="w-img" accept="image/*" multiple hidden><div class="note" id="w-imsg" style="margin:2px 0 0"></div><div class="wth-row" id="w-prev"></div></div>
     <div class="full"><label for="w-prio">買うかどうか</label>
       <select id="w-prio"><option value="1">絶対買う</option><option value="2" selected>悩み中</option><option value="3">我慢</option></select></div>
     <div class="full"><button class="btn" type="submit" id="w-submit">リストに追加</button> <button class="btn sub2" type="button" id="w-cancel" hidden>編集をやめる</button></div>
@@ -1258,7 +1258,7 @@ function startEdit(id){const w=S.wants.find(x=>x.id==id);if(!w)return;editW=w.id
   $('w-booth').value=w.booth||w.brand||'';$('w-booth').dispatchEvent(new Event('input',{bubbles:true}));
   if(w.booth)fillSub('w-sub','w-subbox',w.booth,w.sub||'');
   $('w-name').value=w.name;$('w-yen').value=w.yen?(+w.yen).toLocaleString('en-US'):'';$('w-prio').value=String(w.prio||2);
-  $('w-img').value='';$('w-imsg').textContent='';$('w-submit').textContent='変更を保存';$('w-cancel').hidden=false;
+  $('w-img').value='';wPrev();$('w-imsg').textContent='';$('w-submit').textContent='変更を保存';$('w-cancel').hidden=false;
   $('wform').scrollIntoView({behavior:'smooth',block:'start'});toast('✎ 編集中：直して「変更を保存」を押してください')}
 function endEdit(){editW=null;$('w-submit').textContent='リストに追加';$('w-cancel').hidden=true}
 function boothSwitch(nb){
@@ -1266,12 +1266,21 @@ function boothSwitch(nb){
   const list=S.wants.filter(x=>x.booth===nb&&x.id!==ew.id&&!x.got);
   endEdit();
   if(list.length===1){startEdit(list[0].id);return}
-  $('w-name').value='';$('w-yen').value='';$('w-prio').value='2';$('w-img').value='';$('w-imsg').textContent='';
+  $('w-name').value='';$('w-yen').value='';$('w-prio').value='2';$('w-img').value='';wPrev();$('w-imsg').textContent='';
   toast(list.length?`ブース ${nb} は欲しい物が${list.length}件あります。下のリストから選ぶか、新規で追加してください`:'編集をやめて、このブースの新規追加に切り替えました')}
 $('w-booth').addEventListener('input',()=>{const v=$('w-booth').value.trim();if(BY[v])boothSwitch(resolveBooth(v))});
 $('w-booth').addEventListener('change',()=>boothSwitch(resolveBooth($('w-booth').value.trim())));
 $('w-cancel').onclick=()=>{endEdit();$('wform').reset();$('w-prio').value='2';$('w-imsg').textContent='';fillSub('w-sub','w-subbox','')};
-$('w-img').addEventListener('change',()=>{const n=$('w-img').files.length;$('w-imsg').textContent=n?n+'枚 選択中':''});
+let wPrevUrls=[];
+function wPrev(){const box=$('w-prev'),inp=$('w-img');if(!box)return;wPrevUrls.forEach(u=>URL.revokeObjectURL(u));wPrevUrls=[];box.innerHTML='';
+  const fs=[...inp.files];$('w-imsg').textContent=fs.length?fs.length+'枚 選択中（登録前の確認）':'';
+  fs.forEach((f,i)=>{const u=URL.createObjectURL(f);wPrevUrls.push(u);const w=document.createElement('div');w.style.cssText='position:relative;display:inline-block';
+    w.innerHTML='<img class="wth" alt="選択した写真" style="width:96px;height:96px"><button type="button" class="x" aria-label="この写真を外す" style="position:absolute;top:-6px;right:-6px;width:28px;height:28px;min-height:0;padding:0;border-radius:14px;background:var(--surface);border:2px solid var(--ink)">✕</button>';
+    w.querySelector('img').src=u;
+    w.querySelector('button').onclick=()=>{try{const dt=new DataTransfer();fs.forEach((x,j)=>{if(j!==i)dt.items.add(x)});inp.files=dt.files}catch(e){inp.value=''}wPrev()};
+    box.appendChild(w)})}
+$('w-img').addEventListener('change',wPrev);
+$('wform').addEventListener('reset',()=>setTimeout(wPrev,0));
 $('wform').addEventListener('submit',async e=>{
   e.preventDefault();
   const name=$('w-name').value.trim();if(!name){$('w-name').focus();return}
