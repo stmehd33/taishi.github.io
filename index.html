@@ -731,6 +731,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
   <div class="optbox" id="optbar" hidden></div>
   <div class="routebar" id="routebar" hidden>
     <div class="rb-row" style="margin-bottom:6px"><button class="btn" id="rb-toggle" type="button" aria-expanded="false" style="flex:1">🔍 検索・現在地・道順 ▾</button><button class="chip" id="rot-l" aria-label="マップを左に90度回す">⟲</button><button class="chip" id="rot-r" aria-label="マップを右に90度回す">⟳</button><button class="chip" id="map-fs" type="button">⛶ 全画面</button></div>
+    <div class="rb-row" id="clr-row" style="margin-bottom:6px" hidden><button class="chip" id="here-clear2" type="button" hidden>📍 現在地を消す ✕</button><button class="chip" id="route-clear2" type="button" hidden>🎯 目的地を消す ✕</button></div>
     <div id="rb-body" hidden>
       <div class="rb-row"><input id="here-in" type="text" inputmode="text" autocomplete="off" enterkeyhint="search" placeholder="ブース番号かブース名で検索（例 301）" aria-label="ブース番号かブース名で検索"><button class="btn" id="map-search" type="button">🔍 検索</button></div>
       <div id="srch-res" style="margin-bottom:8px"></div>
@@ -1581,8 +1582,10 @@ function rtMarks(){
   if(hereK)mk(hereK,'here','現在地 '+nameOf(hereK));
   if(goalK&&goalK!==hereK)mk(goalK,'goal','行き先 '+goalK);
 }
+function rtClr(){try{const hs=!!hereK,gs=!!(goalK||allMode||routeOverride);$('here-clear2').hidden=!hs;$('route-clear2').hidden=!gs;$('clr-row').hidden=!(hs||gs)}catch(e){}}
+document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#here-clear2,#route-clear2');if(!t)return;const o=$(t.id==='here-clear2'?'here-clear':'route-clear');if(o)o.click()});
 function rtDraw(noScroll){
-  rsvg.innerHTML='';rtMarks();const msg=$('route-msg');
+  rsvg.innerHTML='';rtMarks();rtClr();const msg=$('route-msg');
   if(allMode){drawAll(noScroll);return}
   if(!hereK||!goalK){msg.textContent=hereK?'行き先のブースをマップでタップして、「ここへの道順」を押してください。':'まず、今いる近くのブース番号を入れて「現在地」を押してください。';return}
   if(hereK===goalK){msg.textContent='もうそのブースの近くです。';return}
