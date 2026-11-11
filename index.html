@@ -474,6 +474,7 @@ body.daymode .tile,body.daymode .hbox .chip,body.daymode .hbody button{min-heigh
 .wnm{font-size:16px;line-height:1.35}
 .wth-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}
 .wth{width:72px;height:72px;object-fit:cover;border-radius:8px;border:2px solid var(--line);cursor:pointer}
+.pkpair{display:inline-flex;gap:0}.pkpair .wadd{min-height:36px;padding:0 16px;border:2px solid var(--forest);border-style:solid;border-radius:0;font-size:14px}.pkpair .wadd:first-child{border-radius:8px 0 0 8px;border-right-width:1px}.pkpair .wadd:last-child{border-radius:0 8px 8px 0;border-left-width:1px}
 .wadd{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;border:2px dashed var(--forest);border-radius:8px;color:var(--forest);font-weight:700;font-size:14px;cursor:pointer}
 .wy{display:flex;align-items:center;gap:6px;font-weight:700}
 .wy input{width:130px;min-height:44px;font-size:18px;text-align:right}
@@ -607,7 +608,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v11<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v12<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -696,7 +697,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
     <div class="full" id="w-subbox" hidden><label for="w-sub">ブース内のどの店？（複数の店・ブランドが入っています）</label><select id="w-sub"></select></div>
     <div class="full"><label for="w-name">② 品名・メモ（ざっくりでOK）</label><input type="text" id="w-name" placeholder="例：焚き火台、簡単に立てれるテント" autocomplete="off"></div>
     <div class="full"><label for="w-yen">③ 予算（円・空欄でOK）</label><input type="text" data-comma id="w-yen" inputmode="numeric" pattern="[0-9,]*" autocomplete="off" placeholder="5000"></div>
-    <div class="full"><label>写真・スクショを添付（任意）</label><div class="wth-row"><label class="wadd">📷 写真をとる<input type="file" accept="image/*" capture="environment" data-cam="w-img" hidden></label><label class="wadd" for="w-img">🖼 フォトアルバム</label></div><input type="file" id="w-img" accept="image/*" multiple hidden><div class="note" id="w-imsg" style="margin:2px 0 0"></div></div>
+    <div class="full"><label>写真・スクショを添付（任意）</label><div class="wth-row"><span class="pkpair"><label class="wadd">写真<input type="file" accept="image/*" capture="environment" data-cam="w-img" hidden></label><label class="wadd" for="w-img">アルバム</label></span></div><input type="file" id="w-img" accept="image/*" multiple hidden><div class="note" id="w-imsg" style="margin:2px 0 0"></div></div>
     <div class="full"><label for="w-prio">買うかどうか</label>
       <select id="w-prio"><option value="1">絶対買う</option><option value="2" selected>悩み中</option><option value="3">我慢</option></select></div>
     <div class="full"><button class="btn" type="submit">リストに追加</button></div>
@@ -764,7 +765,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
   <div class="sum" id="mtotal"></div>
   <div id="mhead"></div>
   <form class="form" id="mform">
-    <div class="full"><label>写真（買った物など）</label><div class="wth-row"><label class="wadd">📷 写真をとる<input type="file" accept="image/*" capture="environment" data-cam="m-file" hidden></label><label class="wadd" for="m-file">🖼 フォトアルバム</label></div><input type="file" id="m-file" accept="image/*" multiple hidden><div class="note" id="m-fn" style="margin:2px 0 0"></div></div>
+    <div class="full"><label>写真（買った物など）</label><div class="wth-row"><span class="pkpair"><label class="wadd">写真<input type="file" accept="image/*" capture="environment" data-cam="m-file" hidden></label><label class="wadd" for="m-file">アルバム</label></span></div><input type="file" id="m-file" accept="image/*" multiple hidden><div class="note" id="m-fn" style="margin:2px 0 0"></div></div>
     <div class="full"><label for="m-booth">ブース（番号か名前）</label><input type="text" id="m-booth" placeholder="例：403 か UNIFLAME"><div class="note" id="m-bname" hidden></div></div>
     <div class="full" id="m-subbox" hidden><label for="m-sub">ブース内のどの店？</label><select id="m-sub"></select></div>
     <div class="full" id="m-wantbox" hidden><label for="m-want">買った欲しい物（任意・選ぶと「買った」になります。ブース未定の物も選べます）</label><select id="m-want"></select></div>
@@ -1449,20 +1450,20 @@ function wantBlock(k,br){
   const ws=S.wants.filter(w=>!w.got&&w.booth===k&&(br==null||w.sub===br));
   const seg=(cur,attr)=>Object.keys(INT).map(i=>`<button type="button" class="chip wint wi-${i}" ${attr} data-i="${i}" aria-pressed="${cur===i}">${INT[i][0]}</button>`).join('');
   const cards=ws.map(w=>`<div class="wcard"><div class="wtop"><b class="wnm">${esc(w.name)}${w.sub&&br==null?`<small> ／ ${esc(w.sub)}</small>`:''}</b><button class="x" data-wdel2="${w.id}" aria-label="この物を削除">✕</button></div>
-    <div class="wth-row">${wImgs(w.id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wv="${x.id}">`).join('')}<label class="wadd">📷 写真をとる<input type="file" accept="image/*" capture="environment" data-wfile="${w.id}" hidden></label><label class="wadd">🖼 フォトアルバム<input type="file" accept="image/*" multiple data-wfile="${w.id}" hidden></label></div>
+    <div class="wth-row">${wImgs(w.id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wv="${x.id}">`).join('')}<span class="pkpair"><label class="wadd">写真<input type="file" accept="image/*" capture="environment" data-wfile="${w.id}" hidden></label><label class="wadd">アルバム<input type="file" accept="image/*" multiple data-wfile="${w.id}" hidden></label></span></div>
     <div class="wrow"><label class="wy">金額 ¥<input type="text" data-comma inputmode="numeric" pattern="[0-9,]*" autocomplete="off" data-wyen="${w.id}" value="${fmtY2(w.yen||'')}" placeholder="未入力"></label></div>
     <div class="wseg">${seg(intentOf(w),`data-wi="${w.id}"`)}</div></div>`).join('');
   return `<div class="wblock"><div class="wh">🛍 ここで買いたい物</div>${cards||'<div class="note" style="margin:4px 0">まだありません。下から追加できます。</div>'}
   <details class="wnew"><summary>＋ 買いたい物を追加（スクショ・写真・金額）</summary>
    <input type="text" id="wn-name" placeholder="品名（空欄でも画像だけで追加できます）" autocomplete="off">
-   <span class="wth-row" style="margin:6px 0 0"><label class="wadd">📷 写真をとる<input type="file" accept="image/*" capture="environment" data-cam="wn-file" hidden></label><label class="wadd" for="wn-file">🖼 フォトアルバム</label></span><input type="file" id="wn-file" accept="image/*" multiple hidden><span class="note" id="wn-fn" style="margin:0 0 0 6px"></span>
+   <span class="wth-row" style="margin:6px 0 0"><span class="pkpair"><label class="wadd">写真<input type="file" accept="image/*" capture="environment" data-cam="wn-file" hidden></label><label class="wadd" for="wn-file">アルバム</label></span></span><input type="file" id="wn-file" accept="image/*" multiple hidden><span class="note" id="wn-fn" style="margin:0 0 0 6px"></span>
    <label class="wy" style="margin-top:6px">金額 ¥<input type="text" data-comma id="wn-yen" inputmode="numeric" pattern="[0-9,]*" autocomplete="off" placeholder="未入力でOK"></label>
    <div class="wseg" id="wn-seg">${seg('maybe','')}</div>
    <button class="btn" id="wn-add" type="button" style="margin-top:8px;width:100%">リストに追加</button></details></div>`;
 }
 function bprioRow(k){const p=boothPrio(k);return `<div class="bst" style="margin:8px 0 2px"><span class="note" style="margin:0 4px 0 0;align-self:center">ブースに行く優先度</span>${[[1,'高'],[2,'中'],[3,'低']].map(([v,l])=>`<button type="button" class="chip" data-bp="${v}" aria-pressed="${p===v}">${l}</button>`).join('')}</div>`}
 function bindBPrio(k,re){document.querySelectorAll('#pinfo [data-bp]').forEach(b=>b.onclick=()=>{if(S.stars[k])S.stars[k].prio=+b.dataset.bp;save();render();re()})}
-function wRow(id){return `<div class="wth-row">${wImgs(id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wvi="${x.id}">`).join('')}<label class="wadd">📷 写真をとる<input type="file" accept="image/*" capture="environment" data-wfile="${id}" hidden></label><label class="wadd">🖼 フォトアルバム<input type="file" accept="image/*" multiple data-wfile="${id}" hidden></label></div>`}
+function wRow(id){return `<div class="wth-row">${wImgs(id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wvi="${x.id}">`).join('')}<span class="pkpair"><label class="wadd">写真<input type="file" accept="image/*" capture="environment" data-wfile="${id}" hidden></label><label class="wadd">アルバム<input type="file" accept="image/*" multiple data-wfile="${id}" hidden></label></span></div>`}
 function wDelImgs(id){const del=wImgs(id);wimgs=wimgs.filter(x=>String(x.wantId)!==String(id));del.forEach(x=>{try{idbTx('readwrite',s=>s.delete(x.id))}catch(e){}})}
 async function wSaveImgs(wid,files){let n=0;for(const f of files){try{const img=await shrink(f);const rec={id:'wi'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),kind:'wimg',wantId:wid,img,ts:Date.now()};wimgs.push(rec);await idbTx('readwrite',s=>s.put(rec));n++}catch(e){}}return n}
 function wViewer(id,re){const x=wimgs.find(v=>v.id===id);if(!x)return;const o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:12px';
