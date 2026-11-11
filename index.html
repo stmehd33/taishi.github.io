@@ -499,6 +499,7 @@ body.daymode .tile,body.daymode .hbox .chip,body.daymode .hbody button{min-heigh
 .bp-res{max-height:240px;overflow:auto;margin-top:6px;display:flex;flex-direction:column;gap:4px}
 .bp-it{text-align:left;min-height:46px;padding:6px 10px;border:2px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;cursor:pointer}
 .bp-it b{margin-right:6px;color:var(--forest)}
+.bcres{display:flex;flex-direction:column;gap:4px;margin-top:4px}.bcok{padding:6px 10px;border:2px solid var(--forest);border-radius:8px;background:color-mix(in srgb,var(--forest) 10%,var(--bg));font-weight:700}
 
 .optbox{border:2px solid var(--forest);border-radius:10px;background:var(--surface);padding:10px;margin-bottom:10px}
 .optrow{display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px solid var(--line)}
@@ -684,12 +685,13 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 <section id="plan" hidden></section>
 
 <section id="wants" hidden>
-  <h2>欲しいもの</h2>
+  <h2>欲しい物・戦利品</h2>
+  <div class="dayseg" id="wsw" style="margin:0 0 10px"><button class="chip" type="button" data-wv="want" aria-pressed="true">欲しい物</button><button class="chip" type="button" data-wv="haul" aria-pressed="false">戦利品</button></div>
+  <div id="wv-want">
   <form class="form" id="wform">
     <div class="full"><label for="w-name">品名・メモ（ざっくりでOK。ブースだけ決まっている時は「ブース」で★）</label><input type="text" id="w-name" placeholder="例：焚き火台、簡単に立てれるテント" autocomplete="off"></div>
-    <div class="full"><label for="w-brand">ブランド・店名（未定なら空欄。買ってから入れられます）</label><input type="text" id="w-brand" placeholder="例：未定" autocomplete="off"></div>
     <div><label for="w-yen">予算（円・空欄でOK）</label><input type="text" data-comma id="w-yen" inputmode="numeric" pattern="[0-9,]*" autocomplete="off" placeholder="5000"></div>
-    <div><label for="w-booth">ブース番号（未定なら空欄）</label><input type="text" id="w-booth" inputmode="numeric" placeholder="例：403">
+    <div class="full"><label for="w-booth">ブース（番号か名前。未定なら空欄）</label><input type="text" id="w-booth" placeholder="例：403 か UNIFLAME">
     <div class="note" id="w-bmsg" style="margin:2px 0 0"></div></div>
     <div class="full" id="w-subbox" hidden><label for="w-sub">ブース内のどの店？（このブースは複数の店が入っています）</label><select id="w-sub"></select></div>
     <div class="full"><label for="w-prio">買うかどうか</label>
@@ -703,6 +705,12 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
   </div>
   <div class="sum" id="wsum"></div>
   <div id="wlist"></div>
+  </div>
+  <div id="wv-haul" hidden>
+    <div class="note" id="haul-sum" style="margin:0 0 8px"></div>
+    <div id="haul-list"></div>
+    <div class="tools" style="margin-top:12px"><button class="chip" id="haul-photo" type="button">買った物の写真を見る ›</button><button class="chip" id="haul-wants" type="button">欲しい物リストへ ›</button></div>
+  </div>
 </section>
 
 <section id="booths" hidden>
@@ -731,6 +739,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
   <div class="optbox" id="optbar" hidden></div>
   <div class="routebar" id="routebar" hidden>
     <div class="rb-row" style="margin-bottom:6px"><button class="btn" id="rb-toggle" type="button" aria-expanded="false" style="flex:1">🔍 検索・現在地・道順 ▾</button><button class="chip" id="rot-l" aria-label="マップを左に90度回す">⟲</button><button class="chip" id="rot-r" aria-label="マップを右に90度回す">⟳</button><button class="chip" id="map-fs" type="button">⛶ 全画面</button></div>
+    <div class="rb-row" id="clr-row" style="margin-bottom:6px" hidden><button class="chip" id="here-clear2" type="button" hidden>📍 現在地を消す ✕</button><button class="chip" id="route-clear2" type="button" hidden>🎯 目的地を消す ✕</button></div>
     <div id="rb-body" hidden>
       <div class="rb-row"><input id="here-in" type="text" inputmode="text" autocomplete="off" enterkeyhint="search" placeholder="ブース番号かブース名で検索（例 301）" aria-label="ブース番号かブース名で検索"><button class="btn" id="map-search" type="button">🔍 検索</button></div>
       <div id="srch-res" style="margin-bottom:8px"></div>
@@ -753,8 +762,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
   <div id="mhead"></div>
   <form class="form" id="mform">
     <div class="full"><label for="m-file">写真（買った物など。スマホではカメラが開きます）</label><input type="file" id="m-file" accept="image/*" multiple></div>
-    <div><label for="m-booth">ブース番号</label><input type="text" id="m-booth" inputmode="numeric" placeholder="例：403"></div>
-    <div><label>&nbsp;</label><div class="note" id="m-bname" style="margin:0;padding-top:10px">未選択</div></div>
+    <div class="full"><label for="m-booth">ブース（番号か名前）</label><input type="text" id="m-booth" placeholder="例：403 か UNIFLAME"><div class="note" id="m-bname" hidden></div></div>
     <div class="full" id="m-subbox" hidden><label for="m-sub">ブース内のどの店？</label><select id="m-sub"></select></div>
     <div class="full" id="m-wantbox" hidden><label for="m-want">買った欲しい物（任意・選ぶと「買った」になります。ブース未定の物も選べます）</label><select id="m-want"></select></div>
     <div class="full"><label for="m-yen">使った金額（円）。入れると予算から引かれます</label><input type="text" data-comma id="m-yen" inputmode="numeric" pattern="[0-9,]*" autocomplete="off" placeholder="例：5800"></div>
@@ -843,10 +851,18 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 </section>
 
 <section id="events" hidden>
-  <h2>イベントリスト</h2>
+  <h2>イベント</h2>
+  <div class="dayseg" id="evsw" style="margin:0 0 10px"><button class="chip" type="button" data-evv="list" aria-pressed="true">イベントリスト</button><button class="chip" type="button" data-evv="perk" aria-pressed="false">ブース限定情報</button></div>
+  <div id="ev-list">
   <div class="note" style="margin:0 0 6px">見たいイベントは「☆ 気になる」を押すと印が付きます（もう一度押すと外れます）。公式サイト（2026/11/8時点）の情報です。変更の可能性があるので、当日は会場の案内も確認してください。</div>
   <div class="tools" id="evday"></div>
   <div id="evlist"></div>
+  </div>
+  <div id="ev-perk" hidden>
+    <div class="note" id="pk-note" style="margin:0 0 6px"></div>
+    <div class="tools" id="pkf"></div>
+    <div id="pklist"></div>
+  </div>
 </section>
 
 <section id="consider" hidden>
@@ -861,13 +877,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 
 
 
-<section id="haul" hidden>
-  <button class="chip" id="haul-back" type="button">‹ ホームにもどる</button>
-  <h2 style="margin-top:10px">戦利品</h2>
-  <div class="note" id="haul-sum" style="margin:0 0 8px"></div>
-  <div id="haul-list"></div>
-  <div class="tools" style="margin-top:12px"><button class="chip" id="haul-photo" type="button">買った物の写真を見る ›</button><button class="chip" id="haul-wants" type="button">欲しい物リストへ ›</button></div>
-</section>
+<section id="haul" hidden></section>
 
 <section id="spend" hidden>
   <button class="chip" id="sp-back" type="button">‹ ホームにもどる</button>
@@ -883,8 +893,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
   <h2>メモ</h2>
   <form class="form" id="nform">
     <div class="full"><label for="n-text">メモ</label><textarea id="n-text" placeholder="例：気になった商品、あとで調べたいこと、待ち合わせ場所"></textarea></div>
-    <div><label for="n-booth">ブース番号（任意）</label><input type="text" id="n-booth" inputmode="numeric" placeholder="例：403"></div>
-    <div><label>&nbsp;</label><div class="note" id="n-bname" style="margin:0;padding-top:10px"></div></div>
+    <div class="full"><label for="n-booth">ブース（番号か名前・任意）</label><input type="text" id="n-booth" placeholder="例：403 か UNIFLAME"><div class="note" id="n-bname" hidden></div></div>
     <div class="full" id="n-subbox" hidden><label for="n-sub">ブース内のどの店？</label><select id="n-sub"></select></div>
     <div class="full"><button class="btn" type="submit" id="n-save">メモを保存</button> <button class="btn sub2" type="button" id="n-cancel" hidden>編集をやめる</button><div class="note" id="n-msg"></div></div>
   </form>
@@ -918,6 +927,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 <script>document.documentElement.lang="ja"</script>
 <script src="data-2026.js"></script>
 <script src="route-2026.js"></script>
+<script src="perks-2026.js"></script>
 <script>
 /* 年度の選択: URLの #y2026 → 保存した選択 → 最新年 の順 */
 const YEAR_KEYS=Object.keys(YEARS).map(Number).sort((a,b)=>a-b);
@@ -966,7 +976,11 @@ function placeMap(tab){
 let bview=null;
 function setBSearch(o){const b=$('bsearch-btn'),p=$('bsearch');if(!b||!p)return;p.hidden=!o;b.setAttribute('aria-expanded',o);b.textContent='🔍 ブース検索 '+(o?'▴':'▾');if(o)setTimeout(()=>{try{$('q').focus({preventScroll:true})}catch(e){}},50)}
 function setBView_old(v){bview=v;document.querySelectorAll('#booths [data-bvw]').forEach(e=>e.hidden=e.dataset.bvw!==v);document.querySelectorAll('#bviews [data-bv]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.bv===v))}
+let wview='want';
+function applyWV(){const w=wview==='haul';if($('wv-want'))$('wv-want').hidden=w;if($('wv-haul'))$('wv-haul').hidden=!w;document.querySelectorAll('#wsw [data-wv]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.wv===wview))}
 function show(tab){
+  if(tab==='haul'){wview='haul';tab='wants'}
+  if(tab==='wants')applyWV();
   if(tab!=='map'&&typeof routeOverride!=='undefined'&&routeOverride){routeOverride=null;if($('optbar'))$('optbar').hidden=true}
   {let dn=false;try{dn=dayOn()}catch(e){}document.body.classList.toggle('sub',tab!=='home'||dn)}
   if(tab==='seenp')tab='booths';
@@ -1021,7 +1035,7 @@ function toggleGuide(on){const p=$('guide-pop'),b=$('go-guide');if(on===undefine
 $('go-guide').onclick=()=>toggleGuide();
 $('t-more').onclick=e=>{e.stopPropagation();const o=$('tabs').classList.toggle('open');$('t-more').setAttribute('aria-expanded',o)};
 document.addEventListener('click',e=>{if(!e.target.closest('#tabs')&&$('tabs').classList.contains('open')){$('tabs').classList.remove('open');$('t-more').setAttribute('aria-expanded','false')}});
-document.querySelectorAll('.tabs button[data-tab]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.tab==='memo'){memoFilter=null;memoAdd=true}show(b.dataset.tab);render();if(b.dataset.tab==='memo')renderMemo()}));
+document.querySelectorAll('.tabs button[data-tab]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.tab==='memo'){memoFilter=null;memoAdd=true}if(b.dataset.tab==='wants')wview='want';show(b.dataset.tab);render();if(b.dataset.tab==='memo')renderMemo()}));
 
 /* plan */
 const PL={1:'高',2:'中',3:'低'};
@@ -1217,8 +1231,8 @@ $('w-booth').addEventListener('input',()=>fillSub('w-sub','w-subbox',$('w-booth'
 $('wform').addEventListener('submit',e=>{
   e.preventDefault();
   const name=$('w-name').value.trim();if(!name){$('w-name').focus();return}
-  let booth=$('w-booth').value.trim();if(booth&&!BY[booth]){$('w-bmsg').textContent='そのブース番号は一覧にありません。';$('w-booth').focus();return}$('w-bmsg').textContent='';
-  S.wants.push({id:Date.now(),name,brand:$('w-brand').value.trim(),yen:ynum($('w-yen').value)||0,booth,sub:$('w-sub').value||'',prio:+$('w-prio').value,intent:['','must','maybe','skip'][+$('w-prio').value],got:false});
+  const rawB=$('w-booth').value.trim();let booth=resolveBooth(rawB);$('w-bmsg').textContent='';
+  S.wants.push({id:Date.now(),name,brand:booth?($('w-sub').value||shortName(booth)):rawB,yen:ynum($('w-yen').value)||0,booth,sub:$('w-sub').value||'',prio:+$('w-prio').value,intent:['','must','maybe','skip'][+$('w-prio').value],got:false});
   save();$('wform').reset();$('w-prio').value='2';fillSub('w-sub','w-subbox','');render();toast('✔ リストに追加しました');
 });
 
@@ -1581,8 +1595,10 @@ function rtMarks(){
   if(hereK)mk(hereK,'here','現在地 '+nameOf(hereK));
   if(goalK&&goalK!==hereK)mk(goalK,'goal','行き先 '+goalK);
 }
+function rtClr(){try{const hs=!!hereK,gs=!!(goalK||allMode||routeOverride);$('here-clear2').hidden=!hs;$('route-clear2').hidden=!gs;$('clr-row').hidden=!(hs||gs)}catch(e){}}
+document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#here-clear2,#route-clear2');if(!t)return;const o=$(t.id==='here-clear2'?'here-clear':'route-clear');if(o)o.click()});
 function rtDraw(noScroll){
-  rsvg.innerHTML='';rtMarks();const msg=$('route-msg');
+  rsvg.innerHTML='';rtMarks();rtClr();const msg=$('route-msg');
   if(allMode){drawAll(noScroll);return}
   if(!hereK||!goalK){msg.textContent=hereK?'行き先のブースをマップでタップして、「ここへの道順」を押してください。':'まず、今いる近くのブース番号を入れて「現在地」を押してください。';return}
   if(hereK===goalK){msg.textContent='もうそのブースの近くです。';return}
@@ -1713,7 +1729,7 @@ function shrink(file){return new Promise((res,rej)=>{const u=URL.createObjectURL
       c.getContext('2d').drawImage(im,0,0,c.width,c.height);const d=c.toDataURL('image/jpeg',q);if(d.length<185000||mx===560){res(d);return}}
   };
   im.onerror=()=>{URL.revokeObjectURL(u);rej()};im.src=u})}
-function updMB(){const v=$('m-booth').value.trim();fillSub('m-sub','m-subbox',v);$('m-bname').textContent=BY[v]?BY[v].name:(v?'ブース番号が見つかりません':'未選択');
+function updMB(){try{$('m-booth')._draw()}catch(e){}const v=$('m-booth').value.trim();fillSub('m-sub','m-subbox',v);$('m-bname').textContent=BY[v]?BY[v].name:(v?'ブース番号が見つかりません':'未選択');
   const cur=$('m-want').value,all=S.wants.filter(w=>!w.got),ws=[...all.filter(w=>BY[v]&&w.booth===v),...all.filter(w=>!(BY[v]&&w.booth===v))];$('m-wantbox').hidden=!ws.length;
   $('m-want').innerHTML='<option value="">選ばない</option>'+ws.map(w=>`<option value="${w.id}">${esc(w.name)}${w.brand?' ／ '+esc(w.brand):''}${w.yen?'（予定 '+yen(w.yen)+'）':''}</option>`).join('');
   if(cur&&ws.some(w=>String(w.id)===cur))$('m-want').value=cur}
@@ -1724,8 +1740,8 @@ function pickWant(){const w=S.wants.find(x=>String(x.id)===$('m-want').value);if
 $('m-want').addEventListener('change',pickWant);
 $('m-booth').addEventListener('input',updMB);
 $('mform').addEventListener('submit',async e=>{
-  e.preventDefault();const k=$('m-booth').value.trim(),fs=[...$('m-file').files],txt=$('m-text').value.trim();
-  if(!BY[k]){$('m-msg').textContent='ブース番号を入れてください。';return}
+  e.preventDefault();const k=resolveBooth($('m-booth').value),fs=[...$('m-file').files],txt=$('m-text').value.trim();
+  if(!BY[k]){$('m-msg').textContent='ブースを選んでください（番号か名前を入れて、出てきた候補を押します）。';return}
   if(!fs.length&&!txt){$('m-msg').textContent='写真かメモのどちらかを入れてください。';return}
   $('m-msg').textContent='保存中…';
   try{
@@ -1794,8 +1810,8 @@ function renderEvents(){
   $('evday').querySelectorAll('[data-ef]').forEach(b=>b.onclick=()=>{evFilter=b.dataset.ef;renderEvents()});
   const list=evs.filter(e=>evFilter==='all'||(evFilter==='none'?!e.day:e.day===evFilter)).sort((a,b)=>{const ix=x=>x.day?EVENT.days.findIndex(d=>d.key===x.day):99;return ix(a)-ix(b)||(a.start||'99').localeCompare(b.start||'99')});
   $('evlist').innerHTML=list.length?list.map(e=>{const add=S.sched.find(s=>s.evId===e.id);
-    return `<div class="ck ${add?'done':''}" style="align-items:flex-start"><span class="stime" style="padding-top:2px">${e.start||'--:--'}</span><div class="nm"><b>${esc(e.title)}</b><span class="sub">${dayLabel(e.day)} ／ ${esc(e.place||'')}</span>${e.note?`<span class="sub">${esc(e.note)}</span>`:''}</div>
-      <button class="btn ${add?'sub2':''}" data-ev="${e.id}" style="padding:8px 10px;font-size:13px;min-height:44px;flex:none">${add?'★ 気になる':'☆ 気になる'}</button></div>`}).join(''):'<div class="empty">この日のイベントは登録されていません。</div>';
+    return `<div class="ck" style="align-items:flex-start;${add?'border-left:6px solid var(--forest);':''}"><span class="stime" style="padding-top:2px">${e.start||'--:--'}</span><div class="nm"><b>${esc(e.title)}</b><span class="sub">${dayLabel(e.day)} ／ ${esc(e.place||'')}</span>${e.note?`<span class="sub">${esc(e.note)}</span>`:''}</div>
+      <button class="btn ${add?'':'sub2'}" aria-pressed="${!!add}" data-ev="${e.id}" style="padding:8px 10px;font-size:13px;min-height:44px;flex:none">${add?'★ 気になる':'☆ 気になる'}</button></div>`}).join(''):'<div class="empty">この日のイベントは登録されていません。</div>';
   $('evlist').querySelectorAll('[data-ev]').forEach(b=>b.onclick=()=>{
     const e=evs.find(x=>x.id===b.dataset.ev),ex=S.sched.find(s=>s.evId===e.id);
     if(ex)S.sched=S.sched.filter(s=>s.evId!==e.id);   /* もう一度押すと取り消し */
@@ -1803,6 +1819,21 @@ function renderEvents(){
     if(!ex)S.sched.push({id:uid(),evId:e.id,day:e.day||EVENT.days.find(d=>d.key!=='prev').key,time:e.start||'',text:e.title+(e.place?'（'+e.place+'）':''),done:false});
     save();renderEvents();renderSched();renderEvMarks();renderEvAlert()});
 }
+
+/* ---- ブース別の限定情報 ---- */
+let evview='list',pkFilter='all';
+const PK_T={gacha:'🎰 ガチャ・くじ',first:'🆕 先行・初出し・限定',sale:'💴 特価・割引',gift:'🎁 プレゼント・特典',exp:'🛵 体験'};
+function applyEV(){const p=evview==='perk';if($('ev-list'))$('ev-list').hidden=p;if($('ev-perk'))$('ev-perk').hidden=!p;document.querySelectorAll('#evsw [data-evv]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.evv===evview))}
+function renderPerks(){
+  if(!$('pklist')||!window.PERKS)return;
+  const M=window.PERKS_META||{},all=window.PERKS;
+  $('pk-note').innerHTML='更新：'+esc(M.updated||'')+'　'+esc(M.note||'');
+  $('pkf').innerHTML=[['all','すべて'],...Object.entries(PK_T)].map(([k,l])=>`<button class="chip" type="button" data-pk="${k}" aria-pressed="${pkFilter===k}">${l}</button>`).join('');
+  $('pkf').querySelectorAll('[data-pk]').forEach(b=>b.onclick=()=>{pkFilter=b.dataset.pk;renderPerks()});
+  const list=all.filter(x=>pkFilter==='all'||x.type===pkFilter);
+  $('pklist').innerHTML=list.length?list.map(x=>`<div class="ck" style="align-items:flex-start"><div class="nm"><span class="sub" style="font-weight:700">${PK_T[x.type]||''}</span><b>${esc(x.title)}</b><span class="sub">${esc(x.brand)}${x.booth?' ／ ブース '+esc(x.booth):' ／ ブース番号の記載なし'}</span><span class="sub">${esc(x.detail)}</span>${x.cond?`<span class="sub">条件：${esc(x.cond)}</span>`:''}<span class="sub">出典：<a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.src)} ↗</a></span>${x.booth?'':''}<span class="sub"><a class="ig" href="${igUrl(x.brand.replace(/（.*$/,''))}" target="_blank" rel="noopener noreferrer">📷 Instagramを探す</a></span></div>${x.booth&&BY[x.booth]?badge(x.booth):''}</div>`).join(''):`<div class="empty">この種類の情報は、2026年の公式情報では見つかっていません。</div>`;
+}
+document.querySelectorAll('#evsw [data-evv]').forEach(b=>b.onclick=()=>{evview=b.dataset.evv;applyEV();window.scrollTo({top:0})});
 /* ---- packing ---- */
 const SUG=[['🔌 電源・充電',['モバイルバッテリー','ポータブル電源','スマホ充電ケーブル']],
  ['💳 支払い・移動',['ETCカード','クレジットカード']],
@@ -1893,8 +1924,8 @@ function renderEntry(skip){renderTickets();
   const fb=firstBoothName(),yellow=fb&&P.yellow.some(n=>fb.includes(n)),dd=EVENT.days.find(d=>d.key===e.day);
   $('e-big').innerHTML=!e.day?'<small>入場日を選んでください</small>':curNo?`<small>${dd?esc(dd.label):''} 整理番号</small>${esc(curNo)}番`:'<small>整理番号を入れてください</small>';
   const area=!fb?`<span class="entry-area area-y">指定ブースの列</span><span class="entry-area area-b">優先入場の列</span>`
-    :yellow?`<span class="entry-area area-y">${P.yellowName}</span>（最初のブース：${esc(BY[starList()[0]].name.replace(/（.*$/,''))}）`
-    :`<span class="entry-area area-b">${P.blueName}</span>（最初のブース：${esc(BY[starList()[0]].name.replace(/（.*$/,'').slice(0,24))}）`;
+    :yellow?`<span class="entry-area area-y">${P.yellowName}</span><span class="entry-first" style="display:block;margin-top:2px">（最初のブース：${esc(BY[starList()[0]].name.replace(/（.*$/,''))}）</span>`
+    :`<span class="entry-area area-b">${P.blueName}</span><span class="entry-first" style="display:block;margin-top:2px">（最初のブース：${esc(BY[starList()[0]].name.replace(/（.*$/,'').slice(0,24))}）</span>`;
   $('e-sub').innerHTML=`<b>集合 ${dd?dd.md+' ':''}${P.time}</b>　${area}`;
 }
 $('e-no').addEventListener('input',()=>{const e=S.entry=S.entry||{nos:{},day:''};e.nos=e.nos||{};if(e.day){e.nos[e.day]=$('e-no').value.trim();save();renderEntry()}});
@@ -1974,14 +2005,14 @@ function evTick(){
 setInterval(evTick,30000);
 /* ---- notes ---- */
 let noteEdit=null;
-function nbName(){fillSub('n-sub','n-subbox',$('n-booth').value.trim());const v=$('n-booth').value.trim();$('n-bname').textContent=BY[v]?BY[v].name:(v?'ブース番号が見つかりません':'')}
+function nbName(){try{$('n-booth')._draw()}catch(e){}fillSub('n-sub','n-subbox',$('n-booth').value.trim());const v=$('n-booth').value.trim();$('n-bname').textContent=BY[v]?BY[v].name:(v?'ブース番号が見つかりません':'')}
 $('n-booth').addEventListener('input',nbName);
 $('n-q').addEventListener('input',renderNotes);
 $('n-cancel').onclick=()=>{noteEdit=null;$('nform').reset();nbName();renderNotes()};
 $('nform').addEventListener('submit',e=>{e.preventDefault();
-  const t=$('n-text').value.trim(),b=$('n-booth').value.trim();
+  const t=$('n-text').value.trim(),b=resolveBooth($('n-booth').value);
   if(!t){$('n-text').focus();return}
-  if(b&&!BY[b]){$('n-msg').textContent='そのブース番号は一覧にありません。';return}
+  if($('n-booth').value.trim()&&!b){$('n-msg').textContent='そのブースは一覧にありません。候補を押して選んでください。';return}
   $('n-msg').textContent='';
   if(noteEdit){const n=S.notes.find(x=>String(x.id)===String(noteEdit));if(n){n.text=t;n.booth=b;n.sub=$('n-sub').value||'';n.edited=Date.now()}noteEdit=null}
   else S.notes.unshift({id:uid(),text:t,booth:b,sub:$('n-sub').value||'',ts:Date.now()});
@@ -2036,7 +2067,7 @@ function renderHome(){
   const latest=YEAR_KEYS[YEAR_KEYS.length-1];
   $('ynote').innerHTML=`<b>${EVENT.year}年 ${esc(EVENT.name)}</b>（${esc(EVENT.dates)} ／ ${esc(EVENT.place)}）を表示中${CUR_YEAR<latest?'。<b>過去の記録</b>です':''}。`+(YEAR_KEYS.length===1?'<br>来年度版を作ると、ここに年が増えて、過去の年の記録もそのまま残ります。':'');
   const ks=starList(),seen=ks.filter(doneOf).length,B=+S.budget||0,sp=spentTotal();
-  const tile=(l,a,b,go)=>`<button type="button" class="tile ${b&&a===b?'full':''} ${homeOpen===go?'on':''}" data-ht="${go}" aria-expanded="${homeOpen===go}" style="font:inherit;color:inherit;cursor:pointer"><small>${l} ${homeOpen===go?'▴':'▾'}</small><b>${a}/${b}</b><div class="bar"><i style="width:${b?a/b*100:0}%"></i></div></button>`;
+  const tile=(l,a,b,go)=>`<button type="button" class="tile ${b&&a===b?'full':''} ${homeOpen===go?'on':''}" data-ht="${go}" aria-expanded="${homeOpen===go}" style="font:inherit;color:inherit;cursor:pointer"><small>${l} ${go==='haul'?'›':(homeOpen===go?'▴':'▾')}</small><b>${a}/${b}</b><div class="bar"><i style="width:${b?a/b*100:0}%"></i></div></button>`;
   $('htiles').innerHTML=tile('ブース',seen,ks.length,'booth')+tile('戦利品',S.wants.filter(w=>w.got).length,S.wants.length,'haul');
   {const sk=starList(),gt=S.wants.filter(w=>w.got),g=st=>sk.filter(k=>stOf(k)===st);
    const sec=(t,n,body,empty,go)=>`<div class="hbox"><div class="hh"><b>${t}</b><span>${n}</span>${go?`<button type="button" class="chip" data-hgo="${go}">全部 ›</button>`:''}</div><div class="hbody">${body||`<div class="note" style="margin:6px 0">${empty}</div>`}</div></div>`;
@@ -2047,7 +2078,7 @@ function renderHome(){
    $('hlists').innerHTML=homeOpen==='booth'?bx:homeOpen==='haul'?hx:'';
    bindBRows($('hlists'));
    $('hlists').querySelectorAll('[data-hgo]').forEach(b=>b.onclick=()=>{show(b.dataset.hgo);render()})}
-  $('htiles').querySelectorAll('[data-ht]').forEach(b=>b.onclick=()=>{homeOpen=homeOpen===b.dataset.ht?null:b.dataset.ht;renderHome()});
+  $('htiles').querySelectorAll('[data-ht]').forEach(b=>b.onclick=()=>{if(b.dataset.ht==='haul'){show('haul');render();window.scrollTo({top:0});return}homeOpen=homeOpen===b.dataset.ht?null:b.dataset.ht;renderHome()});
   if(document.activeElement!==$('hbudget'))$('hbudget').value=fmtYen(B);
   {const op=S.wants.filter(w=>!w.got),sm=i=>op.filter(w=>intentOf(w)===i).reduce((a,w)=>a+(+w.yen||0),0),must=sm('must'),maybe=sm('maybe'),skip=sm('skip');
    let msg='';if(B){const lf2=B-sp;if(must>lf2)msg=`<div class="hw-warn ng">⚠ 「絶対買う」だけで予算を ${yen(must-lf2)} 超えます</div>`;else if(must+maybe>lf2)msg=`<div class="hw-warn">「悩み中」も全部買うと ${yen(must+maybe-lf2)} 超えます</div>`}
@@ -2069,13 +2100,13 @@ function renderHaul(){
   const got=S.wants.filter(w=>w.got),open=S.wants.filter(w=>!w.got);
   const sum=got.reduce((a,w)=>a+(+(w.actual!=null?w.actual:w.yen)||0),0);
   $('haul-sum').textContent=S.wants.length?`買った ${got.length} / 欲しい物 ${S.wants.length}　・　戦利品の合計 ${yen(sum)}`:'まだ欲しい物がありません。「欲しい物」で登録し、買ったら「買った」を付けると、ここに並びます。';
-  const row=w=>`<div class="ck ${w.got?'done':''}"><div class="nm">${esc(w.name)}<span class="sub">${[w.brand,w.booth&&BY[w.booth]?w.booth+' '+BY[w.booth].name.replace(/（.*$/,''):'',w.got?(w.actual!=null?yen(w.actual):'金額未入力'):(w.yen?'予算 '+yen(w.yen):'')].filter(Boolean).map(esc).join(' ／ ')}</span></div></div>`;
+  const row=w=>`<div class="ck"><div class="nm">${esc(w.name)}<span class="sub">${[w.brand,w.booth&&BY[w.booth]?w.booth+' '+BY[w.booth].name.replace(/（.*$/,''):'',w.got?((EVENT.days.find(v=>v.key===recDay(w))||{}).label||'')+' '+(w.actual!=null?yen(w.actual):'金額未入力'):(w.yen?'予算 '+yen(w.yen):'')].filter(Boolean).map(esc).join(' ／ ')}</span></div></div>`;
   $('haul-list').innerHTML=(got.length?'<h3 class="sh">買った物</h3>'+got.map(row).join(''):'')+(open.length?'<h3 class="sh">まだ買っていない</h3>'+open.map(row).join(''):'');
 }
-$('haul-back').onclick=()=>{show('home');render()};
+document.querySelectorAll('#wsw [data-wv]').forEach(b=>b.onclick=()=>{wview=b.dataset.wv;applyWV();window.scrollTo({top:0})});
 $('haul-photo').onclick=()=>{memoFilter=null;memoAdd=false;show('memo');render();renderMemo()};
-$('haul-wants').onclick=()=>{show('wants');render()};
-function render(){renderEvMarks();renderEvAlert();renderSeen();renderHaul();renderEntry();renderHome();renderSpend();if(!$('consider').hidden&&document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.coy)renderConsiderSummary();else renderConsider();renderNotes();renderPlan();renderWants();renderBooths();renderMap();renderSched();renderEvents();renderPack();renderCheck()}
+$('haul-wants').onclick=()=>{wview='want';applyWV();window.scrollTo({top:0})};
+function render(){renderEvMarks();renderEvAlert();renderSeen();renderHaul();renderEntry();renderHome();renderSpend();if(!$('consider').hidden&&document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.coy)renderConsiderSummary();else renderConsider();renderNotes();renderPlan();renderWants();renderBooths();renderMap();renderSched();renderEvents();renderPerks();renderPack();renderCheck()}
 
 /* ================= クラウド同期（claude.ai の db 機能。使えない時は端末内のみ） =================
    自分専用の領域 data/users/<id>/ に保存するので、同じアカウントなら PC とスマホで同じ内容になる。
@@ -2198,7 +2229,22 @@ function attachBoothPicker(id){
   q.addEventListener('input',draw);
   res.addEventListener('click',e=>{const b=e.target.closest('[data-n]');if(!b)return;inp.value=b.dataset.n;inp.dispatchEvent(new Event('input',{bubbles:true}));inp.dispatchEvent(new Event('change',{bubbles:true}));pan.hidden=true;btn.setAttribute('aria-expanded',false);btn.textContent='🔍 名前で探して選ぶ ▾';toast('✔ '+b.dataset.n+' を選びました')});
 }
-attachBoothPicker('w-booth');attachBoothPicker('m-booth');
+function boothFind(t){t=String(t||'').trim().toLowerCase();if(!t)return[];return BOOTHS.filter(b=>b.n.startsWith(t)||b.name.toLowerCase().includes(t)).slice(0,8)}
+function resolveBooth(v){v=String(v||'').trim();if(!v)return'';if(BY[v])return v;const al=(EVENT.alias||{})[v];if(al&&BY[al])return al;const hit=boothFind(v);return hit.length===1?hit[0].n:''}
+function bindCombo(id){
+  const inp=$(id);if(!inp)return;
+  const box=document.createElement('div');box.className='bcres';inp.insertAdjacentElement('afterend',box);
+  const draw=()=>{const v=inp.value.trim();
+    if(!v){box.innerHTML='';return}
+    if(BY[v]){box.innerHTML=`<div class="bcok">✔ <b>${esc(v)}</b>　${esc(BY[v].name.replace(/（.*$/,''))}</div>`;return}
+    const hit=boothFind(v);
+    box.innerHTML=hit.length?hit.map(b=>`<button type="button" class="bp-it" data-n="${b.n}"><b>${b.n}</b> ${esc(b.name.replace(/（.*$/,'').slice(0,40))}</button>`).join(''):'<div class="note" style="margin:4px 0">一覧にありません。</div>'};
+  inp.addEventListener('input',draw);inp._draw=draw;
+  box.addEventListener('click',e=>{const b=e.target.closest('[data-n]');if(!b)return;inp.value=b.dataset.n;inp.dispatchEvent(new Event('input',{bubbles:true}));inp.dispatchEvent(new Event('change',{bubbles:true}))});
+  if(inp.form)inp.form.addEventListener('reset',()=>setTimeout(draw,0));
+  draw();
+}
+bindCombo('w-booth');bindCombo('m-booth');bindCombo('n-booth');
 
 
 
