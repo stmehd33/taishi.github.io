@@ -532,13 +532,13 @@ body.sub h1#ev-name .t2{display:none}
 .hw-warn.ng{color:#fff;background:#c62828;border-color:#c62828}
 .nearb{margin-top:8px;border-top:1px dashed var(--line);padding-top:6px}
 .plank{border-left-width:8px!important}
-.plank.bp1{border-left-color:#dc4a2c!important}.plank.bp2{border-left-color:#d9a21b!important}.plank.bp3{border-left-color:#7d8a85!important}
+.plank.bp1{border-left-color:#dc4a2c!important}.plank.bp2{border-left-color:#d9a21b!important}.plank.bp3{border-left-color:#2e8b57!important}
 .plank .pn{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:15px;line-height:1.3}
 .plank .sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .seenbtn{font:inherit;font-weight:700;font-size:13px;flex:none;min-height:44px;min-width:60px;padding:0 8px;border:2px solid var(--ink);border-radius:6px;background:var(--surface);color:var(--ink);box-shadow:0 2px 0 var(--shadow)}
 .plank.done .seenbtn{background:var(--chip)}
 .stsel{font:inherit;font-weight:700;font-size:12px;flex:none;min-height:44px;width:108px;padding:0 2px;font-size:12px;border:2px solid var(--ink);border-radius:6px;background:var(--surface);color:var(--ink)}
-.plank.st-done{background:#cfe9d4!important;opacity:1!important}.plank.st-done .nm{text-decoration:none!important;color:#1d4d2b}.plank.st-done .stsel{background:#e9f7ec}
+.plank.st-done{opacity:1!important}.plank.st-done .nm{text-decoration:none!important}
 .plank.st-later .stsel{background:#fff1c9}
 .plank .nm{min-width:0}
 
@@ -584,6 +584,13 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 .prio .lci,.badge .lci{width:1em;height:1em}
 button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:100%}
 #ctiles .tile[aria-pressed="true"]{outline:3px solid var(--forest);outline-offset:1px}
+/* 優先順位カード: 基本は白、欲しい物があるブースは水色、満足は灰色 */
+.plank{background:#fff!important;background-image:none!important}
+.plank.hasw{background:#dff0fb!important}
+.plank.st-done{background:#e4e6e5!important;border-left-color:#7d8a85!important}
+.plank .pn{font-size:16px;-webkit-line-clamp:3}
+.plank .stsel{order:8;flex:0 0 calc(100% - 34px);width:auto;max-width:none;margin:2px 0 0 34px;min-height:38px}
+.plank .wlp{order:9}
 </style>
 
 <div class="wrap">
@@ -618,7 +625,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v29<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v30<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -708,6 +715,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
     <div class="full"><label for="w-name">② 品名・メモ（ざっくりでOK）</label><input type="text" id="w-name" placeholder="例：焚き火台、簡単に立てれるテント" autocomplete="off"></div>
     <div class="full"><label for="w-yen">③ 予算（円・空欄でOK）</label><input type="text" data-comma id="w-yen" inputmode="numeric" pattern="[0-9,]*" autocomplete="off" placeholder="5000"></div>
     <div class="full"><label>写真・スクショを添付（任意）</label><div class="wth-row"><span class="pkpair"><label class="wadd">写真<input type="file" accept="image/*" capture="environment" data-cam="w-img" hidden></label><label class="wadd" for="w-img">アルバム</label></span></div><input type="file" id="w-img" accept="image/*" multiple hidden><div class="note" id="w-imsg" style="margin:2px 0 0"></div><div class="wth-row" id="w-prev"></div></div>
+    <div class="full"><label for="w-bp">優先度（優先順位の左端の色：高＝赤・中＝黄・低＝緑）</label><select id="w-bp"><option value="1">高</option><option value="2" selected>中</option><option value="3">低</option></select></div>
     <div class="full"><label for="w-prio">買うかどうか</label>
       <select id="w-prio"><option value="1">絶対買う</option><option value="2" selected>悩み中</option><option value="3">我慢</option></select></div>
     <div class="full"><button class="btn" type="submit" id="w-submit">リストに追加</button> <button class="btn sub2" type="button" id="w-cancel" hidden>編集をやめる</button></div>
@@ -1114,10 +1122,10 @@ function renderPlan(){
     $('go-b').onclick=()=>{show('booths');render()};return;
   }
   const done=ks.filter(doneOf).length;
-  let h=`<h2>優先順位</h2><div class="sum"><div>見たいブース<b>${ks.length}</b></div><div>見終わった<b>${done}</b></div></div><div class="note" style="margin:0 0 8px">左の「≡」をつかんで上下にドラッグすると、入れ替えられます。左の数字がマップのピン番号です。行の左端の色は、ブースに行く優先度（赤＝高、黄＝中、灰＝低）です。</div><div class="board" id="board">`;
+  let h=`<h2>優先順位</h2><div class="sum"><div>見たいブース<b>${ks.length}</b></div><div>見終わった<b>${done}</b></div></div><div class="note" style="margin:0 0 8px">左の「≡」をつかんで上下にドラッグすると、入れ替えられます。左の数字がマップのピン番号です。行の左端の色は、ブースに行く優先度（赤＝高、黄＝中、緑＝低、灰＝満足）です。カードが水色のブースは、欲しい物が入っています。</div><div class="board" id="board">`;
   ks.forEach((k,i)=>{const d=doneOf(k),ws=openWants(k);
     const sub=ws.length?ws.map(w=>esc(w.name)+(w.yen?' '+yen(w.yen):'')).join('、'):'商品未定';
-    h+=`<div class="plank bp${boothPrio(k)} ${d?'done':''} st-${stOf(k)}" data-k="${k}"><button class="grip" data-grip="${k}" aria-label="${esc(BY[k].name)}を並べ替え（上下キーでも動かせます）">≡</button><span class="ord">${i+1}</span>${badge(k)}<div class="nm" data-tog="${k}" role="button" tabindex="0" aria-expanded="${planOpen.has(k)}"><b class="pn">${esc(shortName(k))}</b>${Object.keys((S.subStars||{})[k]||{}).length?`<span class="sub">回りたい：${Object.keys(S.subStars[k]).map(esc).join('、')}</span>`:''}<span class="sub">${planOpen.has(k)?'▾':'▸'} ${sub}</span></div><select class="stsel" data-stsel="${k}" aria-label="${esc(BY[k].name)}の状態">${['none','done','later'].map(x=>`<option value="${x}" ${stOf(k)===x?'selected':''}>${ST_L[x]}</option>`).join('')}</select><button class="x" data-unstar="${k}" aria-label="外す">✕</button>${planOpen.has(k)?`<div class="wlp">${ws.length?ws.map(w=>`<div class="wlpi"><span class="prio p${w.prio}">${({1:'絶対',2:'悩み',3:'我慢'})[w.prio]||''}</span>${esc(w.name)}<span class="wlpy">${w.yen?yen(w.yen):'予算未入力'}${w.sub?' ／ 店：'+esc(w.sub):''}</span>${wImgs(w.id).length?`<div class="wth-row">${wImgs(w.id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wvp="${x.id}">`).join('')}</div>`:''}</div>`).join(''):'<div class="wlpi">このブースの欲しい物はまだありません。</div>'}</div>`:''}</div>`;
+    h+=`<div class="plank bp${boothPrio(k)} ${d?'done':''} st-${stOf(k)}${ws.length?' hasw':''}" data-k="${k}"><button class="grip" data-grip="${k}" aria-label="${esc(BY[k].name)}を並べ替え（上下キーでも動かせます）">≡</button><span class="ord">${i+1}</span>${badge(k)}<div class="nm" data-tog="${k}" role="button" tabindex="0" aria-expanded="${planOpen.has(k)}"><b class="pn">${esc(ckBrands(k).join('・'))}</b><span class="sub">${planOpen.has(k)?'▾':'▸'} ${sub}</span></div><select class="stsel" data-stsel="${k}" aria-label="${esc(BY[k].name)}の状態">${['none','done','later'].map(x=>`<option value="${x}" ${stOf(k)===x?'selected':''}>${ST_L[x]}</option>`).join('')}</select><button class="x" data-unstar="${k}" aria-label="外す">✕</button>${planOpen.has(k)?`<div class="wlp">${ws.length?ws.map(w=>`<div class="wlpi"><span class="prio p${w.prio}">${({1:'絶対',2:'悩み',3:'我慢'})[w.prio]||''}</span>${esc(w.name)}<span class="wlpy">${w.yen?yen(w.yen):'予算未入力'}${w.sub?' ／ 店：'+esc(w.sub):''}</span>${wImgs(w.id).length?`<div class="wth-row">${wImgs(w.id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wvp="${x.id}">`).join('')}</div>`:''}</div>`).join(''):'<div class="wlpi">このブースの欲しい物はまだありません。</div>'}</div>`:''}</div>`;
   });
   h+='</div>';
   h+=`<div class="tools" style="margin-top:16px"><button class="btn sub2" id="copyplan">一覧をコピー</button>${RT?'<button class="btn" id="planroute">優先順位の道順をマップで見る</button>':''}</div><div class="note" id="copymsg"></div>`;
@@ -1254,10 +1262,11 @@ commaInput($('budget'));commaInput($('hbudget'));
 $('budget').addEventListener('input',()=>{S.budget=numOf($('budget'));save();renderWants()});
 $('w-booth').addEventListener('input',()=>fillSub('w-sub','w-subbox',$('w-booth').value.trim()));
 let editW=null;
+function syncBoothPrio(k){const ws=S.wants.filter(w=>w.booth===k&&!w.got&&w.bp);if(ws.length&&S.stars[k])S.stars[k].prio=Math.min(...ws.map(w=>w.bp))}
 function startEdit(id){const w=S.wants.find(x=>x.id==id);if(!w)return;editW=w.id;
   $('w-booth').value=w.booth||w.brand||'';$('w-booth').dispatchEvent(new Event('input',{bubbles:true}));
   if(w.booth)fillSub('w-sub','w-subbox',w.booth,w.sub||'');
-  $('w-name').value=w.name;$('w-yen').value=w.yen?(+w.yen).toLocaleString('en-US'):'';$('w-prio').value=String(w.prio||2);
+  $('w-name').value=w.name;$('w-yen').value=w.yen?(+w.yen).toLocaleString('en-US'):'';$('w-prio').value=String(w.prio||2);$('w-bp').value=String(w.bp||boothPrio(w.booth)||2);
   $('w-img').value='';wPrev();$('w-imsg').textContent='';$('w-submit').textContent='変更を保存';$('w-cancel').hidden=false;
   $('wform').scrollIntoView({behavior:'smooth',block:'start'});toast('✎ 編集中：直して「変更を保存」を押してください')}
 function endEdit(){editW=null;$('w-submit').textContent='リストに追加';$('w-cancel').hidden=true}
@@ -1286,11 +1295,12 @@ $('wform').addEventListener('submit',async e=>{
   const name=$('w-name').value.trim();if(!name){$('w-name').focus();return}
   const rawB=$('w-booth').value.trim();let booth=resolveBooth(rawB);$('w-bmsg').textContent='';if(booth&&!$('w-sub').value){const ms=subMatch(rawB,booth);if(ms)fillSub('w-sub','w-subbox',booth,ms)}
   let newId=Date.now();const imgFiles=[...$('w-img').files];
-  const rec={name,brand:booth?($('w-sub').value||shortName(booth)):rawB,yen:ynum($('w-yen').value)||0,booth,sub:$('w-sub').value||'',prio:+$('w-prio').value,intent:['','must','maybe','skip'][+$('w-prio').value]};
+  const rec={name,brand:booth?($('w-sub').value||shortName(booth)):rawB,yen:ynum($('w-yen').value)||0,booth,sub:$('w-sub').value||'',prio:+$('w-prio').value,intent:['','must','maybe','skip'][+$('w-prio').value],bp:+$('w-bp').value||2};
   const edW=editW!=null?S.wants.find(x=>x.id==editW):null;if(edW){Object.assign(edW,rec);newId=edW.id}else S.wants.push({id:newId,...rec,got:false});
   const wasEdit=!!edW;endEdit();
   let newStar=false;if(booth){if(!S.stars[booth]){S.stars[booth]={done:false,prio:2};newStar=true}const sb=$('w-sub').value;if(sb){S.subStars=S.subStars||{};(S.subStars[booth]=S.subStars[booth]||{})[sb]=true}}
-  save();$('wform').reset();$('w-prio').value='2';$('w-imsg').textContent='';fillSub('w-sub','w-subbox','');let ni=0;if(imgFiles.length)ni=await wSaveImgs(newId,imgFiles);render();if(imgFiles.length&&!ni)toast('画像は保存できませんでした（リストには追加済み）');else toast(wasEdit?'✔ 変更を保存しました':newStar?'✔ リストに追加しました（ブース '+booth+' も「回りたいブース」に入れました）':'✔ リストに追加しました');
+  if(booth)syncBoothPrio(booth);
+  save();$('wform').reset();$('w-prio').value='2';$('w-bp').value='2';$('w-imsg').textContent='';fillSub('w-sub','w-subbox','');let ni=0;if(imgFiles.length)ni=await wSaveImgs(newId,imgFiles);render();if(imgFiles.length&&!ni)toast('画像は保存できませんでした（リストには追加済み）');else toast(wasEdit?'✔ 変更を保存しました':newStar?'✔ リストに追加しました（ブース '+booth+' も「回りたいブース」に入れました）':'✔ リストに追加しました');
 });
 
 /* booths */
