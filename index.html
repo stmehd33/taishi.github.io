@@ -485,6 +485,12 @@ body.daymode .tile,body.daymode .hbox .chip,body.daymode .hbody button{min-heigh
 .wnew input[type=text]{width:100%}
 .yenin input,.yenin input:focus,.yenin input:focus-visible{outline:none!important;box-shadow:none!important;border:0!important}
 .yenin input::placeholder{font-size:18px;font-weight:600;color:#9aa3a0}
+/* 数値が枠からはみ出さないよう、JSで自動縮小（fitAll）。10万円台・7桁まで */
+.tile b{white-space:nowrap;overflow:visible}
+.hgrp-b .yenin input{max-width:none!important;min-width:0}
+.nxw input{width:112px;flex:none}
+.tkn input{min-width:0}
+
 
 .bpick{margin-top:4px}
 .bp-btn{min-height:44px}
@@ -651,8 +657,8 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
     <button class="btn" id="venue-copy" type="button">📋 住所をコピー（ナビ用）</button>
     <div class="note" id="venue-msg" style="margin-top:6px"></div>
   </div>
-  <div class="venue" id="sento" style="margin-top:14px">
-    <div style="font-weight:700;color:var(--forest)">🛁 銭湯</div>
+  <details class="venue" id="sento" style="margin-top:14px">
+    <summary style="font-weight:700;color:var(--forest);cursor:pointer;min-height:44px;display:flex;align-items:center">🛁 SOLA SPA 風の湯（セントレア）</summary>
     <div style="font-size:14px;margin-top:6px">
       <div><b>場所</b>：中部国際空港（セントレア）第1ターミナル 4階 スカイタウン（「くつろぎ処」内の展望風呂）</div>
       <div><b>営業時間</b>：8:00〜22:00（最終受付 21:00）</div>
@@ -672,7 +678,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
       </table>
       <div class="note">単位は円。出典：中部国際空港（centrair.jp）の「SOLA SPA 風の湯」ページ（2026年11月8日夜に確認した画面）。幼児の区分は画面が途中で切れていたため、年齢とタオルなしの料金は未確認です。料金・営業は変わることがあるので、行く前に<a href="https://www.centrair.jp/shop-dine/shop/fu-no-yu.html" target="_blank" rel="noopener noreferrer">公式ページ ↗</a>も見てください。</div>
     </div>
-  </div>
+  </details>
 </section>
 
 <section id="plan" hidden></section>
@@ -2231,4 +2237,19 @@ $('bk-in').onchange=async()=>{
 };
 </script>
 
+<script>
+(function(){
+const SEL='.tile b,.tkn input,.yenin input,.nxw input,.nxy,[data-fit]';
+function fit(el){try{el.style.fontSize='';if(!el.clientWidth)return;let s=parseFloat(getComputedStyle(el).fontSize)||16,n=0;
+ while(el.scrollWidth>el.clientWidth+1&&s>9&&n++<60){s-=1;el.style.fontSize=s+'px'}}catch(e){}}
+function fitAll(){document.querySelectorAll(SEL).forEach(fit)}
+window.fitAll=fitAll;
+try{const r=render;render=function(){const v=r.apply(this,arguments);fitAll();return v}}catch(e){}
+document.addEventListener('input',e=>{if(e.target&&e.target.matches&&e.target.matches(SEL))fit(e.target)},true);
+addEventListener('resize',fitAll);addEventListener('orientationchange',fitAll);addEventListener('load',()=>{fitAll();setTimeout(fitAll,400)});
+document.addEventListener('click',()=>setTimeout(fitAll,60),true);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitAll);
+setTimeout(fitAll,0);
+})();
+</script>
 </body></html>
