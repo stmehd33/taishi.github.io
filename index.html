@@ -1893,8 +1893,8 @@ function renderEntry(skip){renderTickets();
   const fb=firstBoothName(),yellow=fb&&P.yellow.some(n=>fb.includes(n)),dd=EVENT.days.find(d=>d.key===e.day);
   $('e-big').innerHTML=!e.day?'<small>入場日を選んでください</small>':curNo?`<small>${dd?esc(dd.label):''} 整理番号</small>${esc(curNo)}番`:'<small>整理番号を入れてください</small>';
   const area=!fb?`<span class="entry-area area-y">指定ブースの列</span><span class="entry-area area-b">優先入場の列</span>`
-    :yellow?`<span class="entry-area area-y">${P.yellowName}</span>（最初のブース：${esc(BY[starList()[0]].name.replace(/（.*$/,''))}）`
-    :`<span class="entry-area area-b">${P.blueName}</span>（最初のブース：${esc(BY[starList()[0]].name.replace(/（.*$/,'').slice(0,24))}）`;
+    :yellow?`<span class="entry-area area-y">${P.yellowName}</span><span class="entry-first" style="display:block;margin-top:2px">（最初のブース：${esc(BY[starList()[0]].name.replace(/（.*$/,''))}）</span>`
+    :`<span class="entry-area area-b">${P.blueName}</span><span class="entry-first" style="display:block;margin-top:2px">（最初のブース：${esc(BY[starList()[0]].name.replace(/（.*$/,'').slice(0,24))}）</span>`;
   $('e-sub').innerHTML=`<b>集合 ${dd?dd.md+' ':''}${P.time}</b>　${area}`;
 }
 $('e-no').addEventListener('input',()=>{const e=S.entry=S.entry||{nos:{},day:''};e.nos=e.nos||{};if(e.day){e.nos[e.day]=$('e-no').value.trim();save();renderEntry()}});
