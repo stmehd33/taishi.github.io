@@ -852,10 +852,18 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 </section>
 
 <section id="events" hidden>
-  <h2>イベントリスト</h2>
+  <h2>イベント</h2>
+  <div class="dayseg" id="evsw" style="margin:0 0 10px"><button class="chip" type="button" data-evv="list" aria-pressed="true">イベントリスト</button><button class="chip" type="button" data-evv="perk" aria-pressed="false">ブース限定情報</button></div>
+  <div id="ev-list">
   <div class="note" style="margin:0 0 6px">見たいイベントは「☆ 気になる」を押すと印が付きます（もう一度押すと外れます）。公式サイト（2026/11/8時点）の情報です。変更の可能性があるので、当日は会場の案内も確認してください。</div>
   <div class="tools" id="evday"></div>
   <div id="evlist"></div>
+  </div>
+  <div id="ev-perk" hidden>
+    <div class="note" id="pk-note" style="margin:0 0 6px"></div>
+    <div class="tools" id="pkf"></div>
+    <div id="pklist"></div>
+  </div>
 </section>
 
 <section id="consider" hidden>
@@ -921,6 +929,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 <script>document.documentElement.lang="ja"</script>
 <script src="data-2026.js"></script>
 <script src="route-2026.js"></script>
+<script src="perks-2026.js"></script>
 <script>
 /* 年度の選択: URLの #y2026 → 保存した選択 → 最新年 の順 */
 const YEAR_KEYS=Object.keys(YEARS).map(Number).sort((a,b)=>a-b);
@@ -1812,6 +1821,21 @@ function renderEvents(){
     if(!ex)S.sched.push({id:uid(),evId:e.id,day:e.day||EVENT.days.find(d=>d.key!=='prev').key,time:e.start||'',text:e.title+(e.place?'（'+e.place+'）':''),done:false});
     save();renderEvents();renderSched();renderEvMarks();renderEvAlert()});
 }
+
+/* ---- ブース別の限定情報 ---- */
+let evview='list',pkFilter='all';
+const PK_T={gacha:'🎰 ガチャ・くじ',first:'🆕 先行・初出し・限定',sale:'💴 特価・割引',gift:'🎁 プレゼント・特典',exp:'🛵 体験'};
+function applyEV(){const p=evview==='perk';if($('ev-list'))$('ev-list').hidden=p;if($('ev-perk'))$('ev-perk').hidden=!p;document.querySelectorAll('#evsw [data-evv]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.evv===evview))}
+function renderPerks(){
+  if(!$('pklist')||!window.PERKS)return;
+  const M=window.PERKS_META||{},all=window.PERKS;
+  $('pk-note').innerHTML='更新：'+esc(M.updated||'')+'　'+esc(M.note||'');
+  $('pkf').innerHTML=[['all','すべて'],...Object.entries(PK_T)].map(([k,l])=>`<button class="chip" type="button" data-pk="${k}" aria-pressed="${pkFilter===k}">${l}</button>`).join('');
+  $('pkf').querySelectorAll('[data-pk]').forEach(b=>b.onclick=()=>{pkFilter=b.dataset.pk;renderPerks()});
+  const list=all.filter(x=>pkFilter==='all'||x.type===pkFilter);
+  $('pklist').innerHTML=list.length?list.map(x=>`<div class="ck" style="align-items:flex-start"><div class="nm"><span class="sub" style="font-weight:700">${PK_T[x.type]||''}</span><b>${esc(x.title)}</b><span class="sub">${esc(x.brand)}${x.booth?' ／ ブース '+esc(x.booth):' ／ ブース番号の記載なし'}</span><span class="sub">${esc(x.detail)}</span>${x.cond?`<span class="sub">条件：${esc(x.cond)}</span>`:''}<span class="sub">出典：<a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.src)} ↗</a></span>${x.booth?'':''}<span class="sub"><a class="ig" href="${igUrl(x.brand.replace(/（.*$/,''))}" target="_blank" rel="noopener noreferrer">📷 Instagramを探す</a></span></div>${x.booth&&BY[x.booth]?badge(x.booth):''}</div>`).join(''):`<div class="empty">この種類の情報は、2026年の公式情報では見つかっていません。</div>`;
+}
+document.querySelectorAll('#evsw [data-evv]').forEach(b=>b.onclick=()=>{evview=b.dataset.evv;applyEV();window.scrollTo({top:0})});
 /* ---- packing ---- */
 const SUG=[['🔌 電源・充電',['モバイルバッテリー','ポータブル電源','スマホ充電ケーブル']],
  ['💳 支払い・移動',['ETCカード','クレジットカード']],
@@ -2084,7 +2108,7 @@ function renderHaul(){
 document.querySelectorAll('#wsw [data-wv]').forEach(b=>b.onclick=()=>{wview=b.dataset.wv;applyWV();window.scrollTo({top:0})});
 $('haul-photo').onclick=()=>{memoFilter=null;memoAdd=false;show('memo');render();renderMemo()};
 $('haul-wants').onclick=()=>{wview='want';applyWV();window.scrollTo({top:0})};
-function render(){renderEvMarks();renderEvAlert();renderSeen();renderHaul();renderEntry();renderHome();renderSpend();if(!$('consider').hidden&&document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.coy)renderConsiderSummary();else renderConsider();renderNotes();renderPlan();renderWants();renderBooths();renderMap();renderSched();renderEvents();renderPack();renderCheck()}
+function render(){renderEvMarks();renderEvAlert();renderSeen();renderHaul();renderEntry();renderHome();renderSpend();if(!$('consider').hidden&&document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.coy)renderConsiderSummary();else renderConsider();renderNotes();renderPlan();renderWants();renderBooths();renderMap();renderSched();renderEvents();renderPerks();renderPack();renderCheck()}
 
 /* ================= クラウド同期（claude.ai の db 機能。使えない時は端末内のみ） =================
    自分専用の領域 data/users/<id>/ に保存するので、同じアカウントなら PC とスマホで同じ内容になる。
