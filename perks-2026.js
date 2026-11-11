@@ -1,5 +1,5 @@
 /* ブース別の限定情報（ガチャ・先行販売・割引・特典など）。出典つき。更新したらこのファイルだけ差し替える */
-window.PERKS_META={updated:'2026-11-11',note:'公式サイト・プレスリリースで確認できたものだけを載せています。Instagramの投稿は、ログインが必要で自動では読めないため、各ブランドの「📷 Instagramを探す」から直接確認してください。'};
+window.PERKS_META={updated:'2026-11-11',note:'公式サイト・プレスリリースで確認できたものだけを載せています。Instagramの投稿は、ログインが必要で自動では読めないため、各ブランドの「Instagramを探す」から直接確認してください。'};
 window.PERKS=[
  {type:'gacha',brand:'Makuake',booth:'617',title:'ヒット商品が当たる無料ガチャ',detail:'Makuake発のヒット商品が当たる無料のガチャ企画。実施中プロジェクトの商品展示・体験もあり。',cond:'',src:'PR TIMES（Makuake）',url:'https://prtimes.jp/main/html/rd/p/000000349.000036381.html'},
  {type:'first',brand:'HILLS FIELD',booth:'503',title:'新作テーブルを超先行販売「俺のTEKKIN」「私のTEKKIN」',detail:'一般発売に先駆けて会場で販売。俺のTEKKIN＝ソロ向けローテーブル、私のTEKKIN＝デュオ・ファミリー向けハイテーブル。',cond:'数量限定・なくなり次第終了',src:'HILLS FIELD 特設ページ',url:'https://www.hills-field.com/pages/field-style-2026'},

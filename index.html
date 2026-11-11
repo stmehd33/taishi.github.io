@@ -587,7 +587,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
   <h1 id="ev-name"></h1>
   <div class="years" id="years" style="margin:2px 0 4px;gap:6px" title="見たい年を選ぶと、その年のマップ・ブース・記録に切り替わります"></div>
   <div class="note" id="ynote" hidden style="margin:0 0 6px"></div>
-  <div class="tools" style="margin:0 0 8px"><button class="chip" id="go-guide" type="button" aria-expanded="false" aria-controls="guide-pop">❓ 使い方 ▾</button><button class="chip" id="go-day" type="button" aria-pressed="false">☀ 当日モード</button></div>
+  <div class="tools" style="margin:0 0 8px"><button class="chip" id="go-guide" type="button" aria-expanded="false" aria-controls="guide-pop">使い方 ▾</button><button class="chip" id="go-day" type="button" aria-pressed="false">当日モード</button></div>
   <div id="guide-pop" hidden></div>
   <div class="note" id="syncst" style="margin:6px 0 0"></div>
   <div class="meta">ホールC・D・E・F。見たいブースに★、欲しいものを書き込んで、当日はマップで番号を探す。</div>
@@ -611,12 +611,12 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v18<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v19<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
-  <div class="hgrp hg-entry"><div class="hgrp-t">🎫 整理番号・優先入場</div>
-  <div class="tkcard" id="tickets"><div class="tkh">🎫 優先入場の整理番号</div><div class="tkrow" id="tkrow"></div></div>
+  <div class="hgrp hg-entry"><div class="hgrp-t">整理番号・優先入場</div>
+  <div class="tkcard" id="tickets"><div class="tkh">優先入場の整理番号</div><div class="tkrow" id="tkrow"></div></div>
   <div class="entry" id="entry">
     <div class="entry-h">優先入場</div>
     <div class="entry-row">
@@ -625,18 +625,18 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
     </div>
     <div class="entry-big" id="e-big"></div>
     <div class="entry-sub" id="e-sub"></div>
-    <details id="entmap" style="margin-top:10px"><summary style="font-weight:700;cursor:pointer;min-height:44px;display:flex;align-items:center;color:var(--forest)">🗺 集合場所のマップを見る（タップで開閉）</summary>
+    <details id="entmap" style="margin-top:10px"><summary style="font-weight:700;cursor:pointer;min-height:44px;display:flex;align-items:center;color:var(--forest)">集合場所のマップを見る（タップで開閉）</summary>
     <img src="entrance-area.png" alt="集合場所の図。優先入場・指定ブース・ペット・当日券の整列エリアの位置" style="display:block;width:100%;height:auto;margin-top:6px;border:2px solid var(--ink);border-radius:4px;background:#fff">
     <div class="note" style="margin:4px 0 0">主催者メール（2026年11月）の図です。水色＝優先入場、黄色＝指定ブース、紫＝ペット、ピンク＝当日券の整列エリア。</div></details>
   </div>
   </div>
   <div class="entry" id="packwarn" hidden style="border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--surface))">
-    <div class="entry-h" style="color:var(--accent)">⚠ 出発前に必ず確認</div>
+    <div class="entry-h" style="color:var(--accent)">出発前に必ず確認</div>
     <div style="font-weight:700;line-height:1.5">出発する前に、必ず「持ち物」のチェックリストを確認してください。</div>
     <div class="entry-sub" id="pw-state"></div>
-    <div class="acts" style="display:flex;margin-top:8px"><button class="btn" id="pw-go" type="button">🎒 持ち物を確認する</button></div>
+    <div class="acts" style="display:flex;margin-top:8px"><button class="btn" id="pw-go" type="button">持ち物を確認する</button></div>
   </div>
-  <div class="hgrp hg-money"><div class="hgrp-t">💰 予算・お金</div><div class="hgrp-b">
+  <div class="hgrp hg-money"><div class="hgrp-t">予算・お金</div><div class="hgrp-b">
   <div class="budcard"><label for="hbudget">予算（2日間）</label><div class="yenin"><span aria-hidden="true">¥</span><input type="text" id="hbudget" inputmode="numeric" pattern="[0-9,]*" autocomplete="off" placeholder="例：50,000" aria-label="総予算（円）"></div></div>
   <div class="tiles" id="hmoney" style="grid-template-columns:1fr 1fr">
     <button class="tile" id="h-spent" type="button" style="font:inherit;color:inherit;cursor:pointer"><small>使った金額 ›</small><b id="h-spent-v">¥0</b><small id="h-spent-sub" hidden></small></button>
@@ -647,13 +647,13 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
   <div id="mustleft"></div>
   <div class="note" style="margin:6px 0 0">「使った金額」「残り」を押すと、ブースごとの内訳が見られます。</div>
   </div>
-  <div class="hgrp hg-next"><div class="hgrp-t">📍 次に行くブース・ブース・戦利品</div>
+  <div class="hgrp hg-next"><div class="hgrp-t">次に行くブース・ブース・戦利品</div>
   <div class="entry nextc" id="nextc"></div>
   <div class="tiles" id="htiles"></div>
   <div id="hlists"></div>
   </div>
-  <a class="btn" id="official" href="https://field-style.jp/" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;text-decoration:none;margin-top:14px">🌐 FIELDSTYLE 公式サイトを開く ↗</a>
-  <details class="venue" id="bkbox" style="margin-top:14px"><summary style="font-weight:700;color:var(--forest);cursor:pointer;min-height:44px;display:flex;align-items:center">💾 バックアップ（書き出し・読み込み）</summary>
+  <a class="btn" id="official" href="https://field-style.jp/" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;text-decoration:none;margin-top:14px">FIELDSTYLE 公式サイトを開く ↗</a>
+  <details class="venue" id="bkbox" style="margin-top:14px"><summary style="font-weight:700;color:var(--forest);cursor:pointer;min-height:44px;display:flex;align-items:center">バックアップ（書き出し・読み込み）</summary>
     <div class="note" style="margin-top:6px">ブース・欲しい物・予算・写真・メモを、1つのファイルに書き出します。スマホを替えたときや、データが消えたときに「読み込む」で戻せます。当日の前に1回書き出しておくと安心です。</div>
     <div class="acts" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn" id="bk-out" type="button">書き出す</button><label class="btn sub2" id="bk-inl" style="display:inline-flex;align-items:center;cursor:pointer">読み込む<input type="file" id="bk-in" accept=".json,application/json" hidden></label></div>
     <div class="note" id="bk-msg"></div><div id="bk-conf"></div></details>
@@ -661,11 +661,11 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
   <div class="venue" id="venue" style="margin-top:14px" hidden>
     <div class="venue-n" id="venue-n"></div>
     <div class="venue-a" id="venue-a"></div>
-    <button class="btn" id="venue-copy" type="button">📋 住所をコピー（ナビ用）</button>
+    <button class="btn" id="venue-copy" type="button">住所をコピー（ナビ用）</button>
     <div class="note" id="venue-msg" style="margin-top:6px"></div>
   </div>
   <details class="venue" id="sento" style="margin-top:14px">
-    <summary style="font-weight:700;color:var(--forest);cursor:pointer;min-height:44px;display:flex;align-items:center">🛁 SOLA SPA 風の湯（セントレア）</summary>
+    <summary style="font-weight:700;color:var(--forest);cursor:pointer;min-height:44px;display:flex;align-items:center">SOLA SPA 風の湯（セントレア）</summary>
     <div style="font-size:14px;margin-top:6px">
       <div><b>場所</b>：中部国際空港（セントレア）第1ターミナル 4階 スカイタウン（「くつろぎ処」内の展望風呂）</div>
       <div><b>営業時間</b>：8:00〜22:00（最終受付 21:00）</div>
@@ -738,7 +738,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 
 <section id="map" hidden>
   <h2>マップ・ブース</h2>
-  <button class="btn" id="bsearch-btn" type="button" aria-expanded="false" aria-controls="bsearch" style="width:100%;text-align:left;margin-bottom:8px">🔍 ブース一覧・検索（★を付ける） ▾</button>
+  <button class="btn" id="bsearch-btn" type="button" aria-expanded="false" aria-controls="bsearch" style="width:100%;text-align:left;margin-bottom:8px">ブース一覧・検索（★を付ける） ▾</button>
   <div id="bsearch" hidden>
     <input type="search" id="q" placeholder="ブース名・番号で検索（例：403、UNIFLAME）" aria-label="ブース検索">
     <div class="tools" id="hallchips"></div>
@@ -755,12 +755,12 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
   </div>
   <div class="optbox" id="optbar" hidden></div>
   <div class="routebar" id="routebar" hidden>
-    <div class="rb-row" style="margin-bottom:6px"><button class="btn" id="rb-toggle" type="button" aria-expanded="false" style="flex:1">🔍 検索・現在地・道順 ▾</button><button class="chip" id="rot-l" aria-label="マップを左に90度回す">⟲</button><button class="chip" id="rot-r" aria-label="マップを右に90度回す">⟳</button><button class="chip" id="map-fs" type="button">⛶ 全画面</button></div>
-    <div class="rb-row" id="clr-row" style="margin-bottom:6px" hidden><button class="chip" id="here-clear2" type="button" hidden>📍 現在地を消す ✕</button><button class="chip" id="route-clear2" type="button" hidden>🎯 目的地を消す ✕</button></div>
+    <div class="rb-row" style="margin-bottom:6px"><button class="btn" id="rb-toggle" type="button" aria-expanded="false" style="flex:1">検索・現在地・道順 ▾</button><button class="chip" id="rot-l" aria-label="マップを左に90度回す">⟲</button><button class="chip" id="rot-r" aria-label="マップを右に90度回す">⟳</button><button class="chip" id="map-fs" type="button">全画面</button></div>
+    <div class="rb-row" id="clr-row" style="margin-bottom:6px" hidden><button class="chip" id="here-clear2" type="button" hidden>現在地を消す ✕</button><button class="chip" id="route-clear2" type="button" hidden>目的地を消す ✕</button></div>
     <div id="rb-body" hidden>
-      <div class="rb-row"><input id="here-in" type="text" inputmode="text" autocomplete="off" enterkeyhint="search" placeholder="ブース番号かブース名で検索（例 301）" aria-label="ブース番号かブース名で検索"><button class="btn" id="map-search" type="button">🔍 検索</button></div>
+      <div class="rb-row"><input id="here-in" type="text" inputmode="text" autocomplete="off" enterkeyhint="search" placeholder="ブース番号かブース名で検索（例 301）" aria-label="ブース番号かブース名で検索"><button class="btn" id="map-search" type="button">検索</button></div>
       <div id="srch-res" style="margin-bottom:8px"></div>
-      <div class="rb-row"><button class="btn" id="here-set" type="button" style="width:100%">📍 このブースを現在地にする</button></div>
+      <div class="rb-row"><button class="btn" id="here-set" type="button" style="width:100%">このブースを現在地にする</button></div>
       <div class="rb-row"><select id="here-ent" aria-label="入口・出口から現在地を選ぶ"><option value="">入口・出口から現在地を選ぶ…</option></select></div>
       <div class="rb-row"><button class="chip" id="go-all">優先順位どおりに全部の道順</button><button class="chip" id="go-next">次の見たいブースへ</button><button class="chip" id="route-clear">目的地を消す</button><button class="chip" id="here-clear">現在地を消す</button></div>
       <div class="rb-row"><button class="chip" id="rot-0">向きを戻す</button></div>
@@ -795,7 +795,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
     <div class="step"><span class="ord">1</span><div><b>前日までに準備</b><p>「持ち物」で荷物を登録（候補をタップで追加）。見たいステージは「イベント」で「気になる」を付けておきます。</p></div></div>
     <div class="step"><span class="ord">2</span><div><b>行きたいブースを決める</b><p>「マップ」で見たいブースの☆をタップ（検索もできます）。買いたい物が決まっていれば「欲しい物」に品名・予算・ブース番号を入れます。</p></div></div>
     <div class="step"><span class="ord">3</span><div><b>優先順位を決める</b><p>「優先順位」で左の「≡」をつかんで上下に動かすと、回りたい順に並べ替えられます。その番号が「マップ」のピンの番号になります。</p></div></div>
-    <div class="step"><span class="ord">4</span><div><b>当日はマップで探す</b><p>「マップ」でC・D・E・Fのボタンを押すとそのホールが大きくなります。ブースをタップで名前、もう一度タップで詳細（欲しい物・オンラインショップ・Instagram）。上の枠に近くのブース番号を入れて「📍現在地」（着いたばかりのときは「入口・出口から現在地を選ぶ」）、詳細の「➡ ここへの道順」で通路に沿った道順が出ます。</p></div></div>
+    <div class="step"><span class="ord">4</span><div><b>当日はマップで探す</b><p>「マップ」でC・D・E・Fのボタンを押すとそのホールが大きくなります。ブースをタップで名前、もう一度タップで詳細（欲しい物・オンラインショップ・Instagram）。上の枠に近くのブース番号を入れて「現在地」（着いたばかりのときは「入口・出口から現在地を選ぶ」）、詳細の「ここへの道順」で通路に沿った道順が出ます。</p></div></div>
     <div class="step"><span class="ord">5</span><div><b>買ったら写真と金額を残す</b><p>ブース詳細の「買った物を撮る」で撮影し、金額を入れて保存。使った合計と残り予算が自動で更新されます（予算は「欲しい物」で設定）。</p></div></div>
     <div class="step"><span class="ord">6</span><div><b>「チェック」で全体を確認</b><p>見たブース・買った物・持ち物の達成状況が1画面に出ます。ここでのチェックは他のタブにも反映されます。</p></div></div>
   </div>
@@ -839,14 +839,14 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 ・ホーム画面に追加する場合は、Safariの「…」→「共有」→「ホーム画面に追加」で「Webアプリとして開く」をオフにしてください。
 ・Safariの「履歴とWebサイトデータを消去」をすると、記録が消えます。
 ・使い方は、アプリの「使い方」タブに書いてあります。</div>
-    <button class="btn" id="share-copy" type="button">📋 案内文をコピー</button>
+    <button class="btn" id="share-copy" type="button">案内文をコピー</button>
     <div class="note" id="share-copy-msg" style="margin-top:6px"></div>
   </div>
   <div class="note">共有を「やめる」と、リンクが使えなくなり、同じアプリを同じリンクでは再公開できません。保存データも消えるとされているので、共有をやめない（取り消さない）ようにしてください。</div>
   <h3 class="sh">知っておくと便利</h3>
   <ul class="tips">
     <li><b>ログインなしで使えます</b>：共有リンクを開くだけで、すべての機能が使えます。入力した内容は、そのスマホのブラウザの中だけに保存され、ほかの人には見えません。</li>
-    <li><b>データの保存（ログインしている場合）</b>：claude.aiにログインしていると、あなた専用の領域にも自動で保存（同期）されます。同じアカウントなら、PCとスマホで同じ内容になります。画面上部に「☁ 同期済み」と出ていれば同期できています。圏外でも使え、つながったときに同期されます。</li>
+    <li><b>データの保存（ログインしている場合）</b>：claude.aiにログインしていると、あなた専用の領域にも自動で保存（同期）されます。同じアカウントなら、PCとスマホで同じ内容になります。画面上部に「同期済み」と出ていれば同期できています。圏外でも使え、つながったときに同期されます。</li>
     <li><b>アプリが新しくなったとき</b>：内容が更新されても、入力した記録はそのまま残ります。開いている最中に更新されると画面が読み込み直されるので、入力中の文字だけは消えることがあります。</li>
     <li><b>年の切り替え</b>：「ホーム」で年を選べます。年ごとに記録は別々に残ります。</li>
     <li><b>PC表示</b>：パソコンなど広い画面で開くと、自動でPC表示になります。</li>
@@ -983,7 +983,7 @@ function placeMap(tab){
 }
 /* tabs */
 let bview=null;
-function setBSearch(o){const b=$('bsearch-btn'),p=$('bsearch');if(!b||!p)return;p.hidden=!o;b.setAttribute('aria-expanded',o);b.textContent='🔍 ブース一覧・検索（★を付ける） '+(o?'▴':'▾');if(o)setTimeout(()=>{try{$('q').focus({preventScroll:true})}catch(e){}},50)}
+function setBSearch(o){const b=$('bsearch-btn'),p=$('bsearch');if(!b||!p)return;p.hidden=!o;b.setAttribute('aria-expanded',o);b.textContent='ブース一覧・検索（★を付ける） '+(o?'▴':'▾');if(o)setTimeout(()=>{try{$('q').focus({preventScroll:true})}catch(e){}},50)}
 function setBView_old(v){bview=v;document.querySelectorAll('#booths [data-bvw]').forEach(e=>e.hidden=e.dataset.bvw!==v);document.querySelectorAll('#bviews [data-bv]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.bv===v))}
 let wview='want';
 function applyWV(){document.querySelectorAll('#wsw [data-wv]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.wv===wview));const m={want:'wv-want',haul:'wv-haul',consider:'consider'};for(const k in m){const e=$(m[k]);if(e)e.hidden=k!==wview}}
@@ -1006,8 +1006,8 @@ function show(tab){
 const GUIDE_HTML=`<div class="guide gp">
 <div class="step"><span class="ord">★</span><div><b>このアプリについて</b><p>FIELDSTYLE EXPO 2026 を回るための、スマホ用メモ帳です。ログインや登録は要りません。入力した内容は、いま使っているスマホの中に保存されます（他の人の画面には出ません）。</p></div></div>
 <div class="step"><span class="ord">1</span><div><b>まず最初に（5分）</b><p>①画面下の「マップ」で、行きたいブースの☆をタップ。②買いたい物が決まっていれば、下の「欲しい物」に品名を入れて「リストに追加」。③「その他」→「持ち物」で、忘れ物チェックの候補から必要な物を追加。</p></div></div>
-<div class="step"><span class="ord">2</span><div><b>優先順位を決める</b><p>下の「優先順位」を開き、左の「≡」を指でつかんで上下に動かすと、回りたい順に並べ替えられます。その番号がマップのピンの番号になります。「🧭 優先順位の道順をマップで見る」を押すと、全部をつないだ道順が出ます。</p></div></div>
-<div class="step"><span class="ord">3</span><div><b>当日：マップでブースを探す</b><p>「マップ」でC・D・E・Fのボタンを押すと、そのホールが大きくなります。ブースを1回タップで名前、もう1回タップで詳細（欲しい物・オンラインショップ・Instagram）が出ます。「🔍 検索・現在地・道順」を開くと、番号や名前で探せます。</p></div></div>
+<div class="step"><span class="ord">2</span><div><b>優先順位を決める</b><p>下の「優先順位」を開き、左の「≡」を指でつかんで上下に動かすと、回りたい順に並べ替えられます。その番号がマップのピンの番号になります。「優先順位の道順をマップで見る」を押すと、全部をつないだ道順が出ます。</p></div></div>
+<div class="step"><span class="ord">3</span><div><b>当日：マップでブースを探す</b><p>「マップ」でC・D・E・Fのボタンを押すと、そのホールが大きくなります。ブースを1回タップで名前、もう1回タップで詳細（欲しい物・オンラインショップ・Instagram）が出ます。「検索・現在地・道順」を開くと、番号や名前で探せます。</p></div></div>
 <div class="step"><span class="ord">4</span><div><b>当日：道順を出す</b><p>「検索・現在地・道順」に、いま近くにあるブースの番号を入れて「現在地」を押します。行き先のブースをタップして「ここへの道順」を押すと、赤い線で道順が出ます。「次の見たいブースへ」は、優先順位で次のブースまでの道順です。道に迷ったら、現在地を入れ直すだけで大丈夫です（行き先は消えません）。「⟲ ⟳」でマップを90度ずつ回せます。</p></div></div>
 <div class="step"><span class="ord">5</span><div><b>見たら「✔ 見た」、買ったら記録</b><p>ブースの詳細で「✔ 見た」を押すと、見終わった印が付きます。ホームの「次に行くブース」や「次の見たいブースへ」は、見終わったブースを飛ばして次を案内します。買った物は「買った物を撮る」から写真と金額を保存します。使った合計と残り予算は、自動で計算されます（総予算は「欲しい物」で入れます）。</p></div></div>
 <div class="step"><span class="ord">6</span><div><b>欲しい物は、あいまいでOK</b><p>「焚き火台」「簡単に立てられるテント」のように、品名だけで登録できます。予算・ブランド・ブース番号は空欄で構いません。買ったら、リストの「買った」から写真・金額・ブランドを入れられます（あとからでも入力できます）。</p></div></div>
@@ -1041,7 +1041,7 @@ function buildGuide(){
   p.querySelector('#gp-close').onclick=()=>toggleGuide(false);
   p.querySelector('#gp-share').onclick=()=>{toggleGuide(false);show('guide');render()};
 }
-function toggleGuide(on){const p=$('guide-pop'),b=$('go-guide');if(on===undefined)on=p.hidden;if(on)buildGuide();p.hidden=!on;b.setAttribute('aria-expanded',on);b.textContent='❓ 使い方 '+(on?'▴':'▾');if(on)b.scrollIntoView({block:'start',behavior:'smooth'})}
+function toggleGuide(on){const p=$('guide-pop'),b=$('go-guide');if(on===undefined)on=p.hidden;if(on)buildGuide();p.hidden=!on;b.setAttribute('aria-expanded',on);b.textContent='使い方 '+(on?'▴':'▾');if(on)b.scrollIntoView({block:'start',behavior:'smooth'})}
 $('go-guide').onclick=()=>toggleGuide();
 $('t-more').onclick=e=>{e.stopPropagation();const o=$('tabs').classList.toggle('open');$('t-more').setAttribute('aria-expanded',o)};
 document.addEventListener('click',e=>{if(!e.target.closest('#tabs')&&$('tabs').classList.contains('open')){$('tabs').classList.remove('open');$('t-more').setAttribute('aria-expanded','false')}});
@@ -1108,13 +1108,13 @@ function renderPlan(){
     $('go-b').onclick=()=>{show('booths');render()};return;
   }
   const done=ks.filter(doneOf).length;
-  let h=`<h2>優先順位</h2><div class="sum"><div>見たいブース<b>${ks.length}</b></div><div>見終わった<b>${done}</b></div></div><div class="note" style="margin:0 0 8px">左の「≡」をつかんで上下にドラッグすると、入れ替えられます。左の数字がマップのピン番号です。行の左端の色は、ブースに行く優先度（赤＝高、黄＝中、灰＝低）です。</div><button class="btn sub2" id="opt-open" type="button" style="width:100%;margin:0 0 8px">⚡ 効率よく回るルートを提案（マップで見る）</button><div class="board" id="board">`;
+  let h=`<h2>優先順位</h2><div class="sum"><div>見たいブース<b>${ks.length}</b></div><div>見終わった<b>${done}</b></div></div><div class="note" style="margin:0 0 8px">左の「≡」をつかんで上下にドラッグすると、入れ替えられます。左の数字がマップのピン番号です。行の左端の色は、ブースに行く優先度（赤＝高、黄＝中、灰＝低）です。</div><button class="btn sub2" id="opt-open" type="button" style="width:100%;margin:0 0 8px">効率よく回るルートを提案（マップで見る）</button><div class="board" id="board">`;
   ks.forEach((k,i)=>{const d=doneOf(k),ws=openWants(k);
     const sub=ws.length?ws.map(w=>esc(w.name)+(w.yen?' '+yen(w.yen):'')).join('、'):'商品未定';
     h+=`<div class="plank bp${boothPrio(k)} ${d?'done':''} st-${stOf(k)}" data-k="${k}"><button class="grip" data-grip="${k}" aria-label="${esc(BY[k].name)}を並べ替え（上下キーでも動かせます）">≡</button><span class="ord">${i+1}</span>${badge(k)}<div class="nm" data-tog="${k}" role="button" tabindex="0" aria-expanded="${planOpen.has(k)}"><b class="pn">${esc(shortName(k))}</b>${Object.keys((S.subStars||{})[k]||{}).length?`<span class="sub">回りたい：${Object.keys(S.subStars[k]).map(esc).join('、')}</span>`:''}<span class="sub">${planOpen.has(k)?'▾':'▸'} ${sub}</span></div><select class="stsel" data-stsel="${k}" aria-label="${esc(BY[k].name)}の状態">${['none','done','later'].map(x=>`<option value="${x}" ${stOf(k)===x?'selected':''}>${ST_L[x]}</option>`).join('')}</select><button class="x" data-unstar="${k}" aria-label="外す">✕</button>${planOpen.has(k)?`<div class="wlp">${ws.length?ws.map(w=>`<div class="wlpi"><span class="prio p${w.prio}">${({1:'絶対',2:'悩み',3:'我慢'})[w.prio]||''}</span>${esc(w.name)}<span class="wlpy">${w.yen?yen(w.yen):'予算未入力'}${w.sub?' ／ 店：'+esc(w.sub):''}</span>${wImgs(w.id).length?`<div class="wth-row">${wImgs(w.id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wvp="${x.id}">`).join('')}</div>`:''}</div>`).join(''):'<div class="wlpi">このブースの欲しい物はまだありません。</div>'}</div>`:''}</div>`;
   });
   h+='</div>';
-  h+=`<div class="tools" style="margin-top:16px"><button class="btn sub2" id="copyplan">一覧をコピー</button>${RT?'<button class="btn" id="planroute">🧭 優先順位の道順をマップで見る</button>':''}</div><div class="note" id="copymsg"></div>`;
+  h+=`<div class="tools" style="margin-top:16px"><button class="btn sub2" id="copyplan">一覧をコピー</button>${RT?'<button class="btn" id="planroute">優先順位の道順をマップで見る</button>':''}</div><div class="note" id="copymsg"></div>`;
   el.innerHTML=h;
   el.querySelectorAll('[data-done]').forEach(c=>c.onchange=()=>{if(c.checked)S.seen[c.dataset.done]=true;else delete S.seen[c.dataset.done];save();renderPlan()});
   setupDrag();bindOpt();
@@ -1168,7 +1168,7 @@ function renderOptBar(){
   if(!routeOverride){bar.hidden=true;bar.innerHTML='';return}
   const r=optCompute();if(!r.q){bar.hidden=true;return}
   bar.hidden=false;
-  bar.innerHTML=`<div style="font-weight:700;margin-bottom:4px">⚡ 効率重視の提案ルート（${r.q.length}か所）</div>
+  bar.innerHTML=`<div style="font-weight:700;margin-bottom:4px">効率重視の提案ルート（${r.q.length}か所）</div>
     <div style="font-weight:700;color:var(--accent);margin-bottom:4px">${r.same?'いまの並びがほぼ最適です。':(r.pct>0?'歩く距離の目安：約'+r.pct+'％短くなります':'距離はほぼ同じです（優先順位を重く見ています）')}</div>
     <label class="note" style="display:block;margin:0">距離重視 ⇄ 優先順位重視<input type="range" id="opt-lam" min="0" max="100" value="${optLam}" style="width:100%"></label>
     <div class="note" style="margin:2px 0 6px">マップの番号は、提案どおりの順番です。まだ並べ替えていません。</div>
@@ -1367,9 +1367,9 @@ function brandCards(k){
   return `<div style="margin-top:14px;font-weight:700;font-size:13px">このブースのブランド（${subs.length}）</div><div class="note" style="margin:0 0 6px">回りたいブランドに☆を付けると、「優先順位」にそのブランド名が出ます。</div>`
    +subs.map(b=>{const on=subOn(k,b),ws=openWants(k).filter(w=>w.sub===b),ig=igBrand(k,b),ns=bw.filter(n=>n.booth===k&&n.sub===b);
      return `<div class="bcard${on?' on':''}" data-bn="${esc(b)}"><div class="bc-h"><button type="button" class="bc-n lnk" data-bd="${esc(k)}" data-bn2="${esc(b)}" style="width:auto;flex:1">${esc(b)} <small>詳細 ›</small></button><button class="ic" data-sub="${esc(k)}" data-b="${esc(b)}" aria-pressed="${on}" aria-label="${esc(b)}を回りたいブランドに${on?'から外す':'入れる'}">${on?'★':'☆'}</button></div>`
-      +(ws.length?ws.map(w=>`<div class="item"><span>🛍 ${esc(w.name)}</span><b>${w.yen?yen(w.yen):'値段未入力'}</b></div>`).join(''):'')
-      +(ns.length?ns.map(n=>`<div class="note" style="margin:2px 0">📝 ${esc(n.text)}</div>`).join(''):'')
-      +`<div class="shops">${ig.map(h=>`<a class="ig" href="https://www.instagram.com/${h}/" target="_blank" rel="noopener noreferrer">📷 公式 @${esc(h)} ↗</a>`).join('')}<span class="bp"><a href="${shopUrl(b)}" target="_blank" rel="noopener noreferrer">🛒 ショップ ↗</a><a class="ig" href="${igUrl(b)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(b)}のInstagramを探す">📷 Instagramを探す</a></span></div></div>`}).join('');
+      +(ws.length?ws.map(w=>`<div class="item"><span>${esc(w.name)}</span><b>${w.yen?yen(w.yen):'値段未入力'}</b></div>`).join(''):'')
+      +(ns.length?ns.map(n=>`<div class="note" style="margin:2px 0">${esc(n.text)}</div>`).join(''):'')
+      +`<div class="shops">${ig.map(h=>`<a class="ig" href="https://www.instagram.com/${h}/" target="_blank" rel="noopener noreferrer">公式 @${esc(h)} ↗</a>`).join('')}<span class="bp"><a href="${shopUrl(b)}" target="_blank" rel="noopener noreferrer">ショップ ↗</a><a class="ig" href="${igUrl(b)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(b)}のInstagramを探す">Instagramを探す</a></span></div></div>`}).join('');
 }
 function subsOf(k){
   const b=BY[k];if(!b)return [];const n=b.name,i=n.indexOf('（'),j=n.lastIndexOf('）');if(i<0||j<i)return [];
@@ -1422,12 +1422,12 @@ function showBrandPin(k,br,center){
   $('pinfo').innerHTML=`<button class="chip" id="bd-back" type="button" style="margin-bottom:8px">‹ ${esc(shortName(k))} の全ブランドへ</button>
   <h3>${badge(k)}<span>${esc(br)}</span></h3><div class="note" style="margin:0 0 4px">${esc(shortName(k))} 内のブランド${i>=0?' ／ このブースは優先順位 '+(i+1)+'番目':''}</div>${wantBlock(k,br)}
   <div class="bst" style="margin:8px 0 2px"><span class="note" style="margin:0 4px 0 0;align-self:center">ブースの状態</span>${['none','later','done'].map(x=>`<button type="button" class="chip" data-bs="${k}" data-st="${x}" aria-pressed="${stOf(k)===x}">${ST_L[x]}</button>`).join('')}</div>
-  <div class="acts"><button class="btn ${on?'':'sub2'}" id="bd-star" aria-pressed="${on}">${on?'★ 回りたいブランドに選択中':'☆ 回りたいブランドに入れる'}</button><button class="btn sub2" id="bd-buy">買った物を撮る</button>${np?`<button class="btn sub2" id="bd-photo">写真メモを見る（${np}）</button>`:''}${RT?`<button class="btn sub2" id="bd-here">📍 ここを現在地にする</button><button class="btn sub2" id="bd-go">➡ ここへの道順</button>`:''}</div>
-  <div style="margin-top:12px;font-weight:700;font-size:13px">📝 このブランドのメモ</div>
+  <div class="acts"><button class="btn ${on?'':'sub2'}" id="bd-star" aria-pressed="${on}">${on?'★ 回りたいブランドに選択中':'☆ 回りたいブランドに入れる'}</button><button class="btn sub2" id="bd-buy">買った物を撮る</button>${np?`<button class="btn sub2" id="bd-photo">写真メモを見る（${np}）</button>`:''}${RT?`<button class="btn sub2" id="bd-here">ここを現在地にする</button><button class="btn sub2" id="bd-go">ここへの道順</button>`:''}</div>
+  <div style="margin-top:12px;font-weight:700;font-size:13px">このブランドのメモ</div>
   ${ns.map(n=>`<div class="nt" style="padding:6px 0"><div class="top"><span class="note" style="margin:0;flex:1">${new Date(n.ts||Date.now()).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span><button class="x" data-bdx="${n.id}" aria-label="このメモを削除" style="width:36px;height:36px">✕</button></div><div class="txt">${esc(n.text)}</div></div>`).join('')||'<div class="note" style="margin:2px 0">まだメモはありません。</div>'}
   <textarea id="bd-text" placeholder="例：サイズ違いあり、会場限定価格" aria-label="このブランドのメモ" style="min-height:64px;margin-top:6px"></textarea><button class="btn" id="bd-save" type="button" style="margin-top:6px">メモを保存</button>
   <div style="margin-top:12px;font-weight:700;font-size:13px">オンラインショップ・Instagram</div>
-  <div class="shops">${ig.map(h=>`<a class="ig" href="https://www.instagram.com/${h}/" target="_blank" rel="noopener noreferrer">📷 公式 @${esc(h)} ↗</a>`).join('')}<span class="bp"><a href="${shopUrl(br)}" target="_blank" rel="noopener noreferrer">🛒 ショップ ↗</a><a class="ig" href="${igUrl(br)}" target="_blank" rel="noopener noreferrer">📷 Instagramを探す</a></span></div>
+  <div class="shops">${ig.map(h=>`<a class="ig" href="https://www.instagram.com/${h}/" target="_blank" rel="noopener noreferrer">公式 @${esc(h)} ↗</a>`).join('')}<span class="bp"><a href="${shopUrl(br)}" target="_blank" rel="noopener noreferrer">ショップ ↗</a><a class="ig" href="${igUrl(br)}" target="_blank" rel="noopener noreferrer">Instagramを探す</a></span></div>
   <div class="note">ブランド名の検索結果が開きます。公式アカウントが出るとは限らないので、名前を見て確認してください。</div>`;
   const bt=$('bd-text');bt.value=(bnDraft.k===k&&bnDraft.b===br)?bnDraft.t:'';bt.oninput=()=>{bnDraft={k,b:br,t:bt.value}};
   $('bd-save').onclick=()=>{const t=bt.value.trim();if(!t){bt.focus();return}S.notes.unshift({id:uid(),text:t,booth:k,sub:br,ts:Date.now()});bnDraft={k:null,b:null,t:''};save();render();showBrandPin(k,br);toast('✔ メモを保存しました')};
@@ -1451,9 +1451,9 @@ function showPin(k,center,noScroll){
   const tot=ws.reduce((a,w)=>a+(+w.yen||0),0), np=memos.filter(m=>m.booth===k).length, bs=boothSpent(k);
   $('pinfo').innerHTML=`<h3>${i>=0?`<span class="ord">${i+1}</span>`:''}${badge(k)}<span>${esc(b.name)}</span></h3><div class="note" style="margin:0 0 4px">${i>=0?'優先順位 '+(i+1)+'番目'+(doneOf(k)?' ／ 見終わった':''):'ホール'+b.hall}${(EVENT.alias[k]||Object.values(EVENT.alias).includes(k))?' ／ 同じブースに別の番号もあります':''}</div>${bs?`<div class="item"><span>このブースで使った金額</span><b>${yen(bs)}</b></div>`:''}${wantBlock(k,null)}${ws.length>1&&tot?`<div class="item"><span>合計</span><b>${yen(tot)}</b></div>`:''}
   ${i>=0?`<div class="bst" style="margin:8px 0 2px"><span class="note" style="margin:0 4px 0 0;align-self:center;width:100%">ブースを見たか</span>${['none','later','done'].map(x=>`<button type="button" class="chip" data-bs="${k}" data-st="${x}" aria-pressed="${stOf(k)===x}">${ST_L[x]}</button>`).join('')}</div>`:''}
-  ${starred?bprioRow(k):''}<div class="acts"><button class="btn ${starred?'':'sub2'}" id="pi-star" aria-pressed="${starred}">${starred?'★ 見たいブースに選択中':'☆ 見たいブースに入れる'}</button><button class="btn sub2" id="pi-buy">買った物を撮る</button>${np?`<button class="btn sub2" id="pi-photo">写真メモを見る（${np}）</button>`:''}${RT?`<button class="btn sub2" id="pi-here">📍 ここを現在地にする</button><button class="btn sub2" id="pi-go">➡ ここへの道順</button>`:''}</div>
-  <div style="margin-top:12px;font-weight:700;font-size:13px">📝 このブースのメモ</div>${pinNotes(k)}
-  ${igDirect(k).length?`<div class="shops" style="margin-top:12px">${igDirect(k).map(h=>`<a class="ig" href="https://www.instagram.com/${h}/" target="_blank" rel="noopener noreferrer">📷 公式Instagram @${esc(h)} ↗</a>`).join('')}</div>`:''}${subsOf(k).length?brandCards(k):`<div style="margin-top:12px;font-weight:700;font-size:13px">オンラインショップ・Instagramを探す</div><div class="shops">${brandsOf(b.name).map(x=>`<span class="bp"><a href="${shopUrl(x)}" target="_blank" rel="noopener noreferrer">${esc(x)} ↗</a><a class="ig" href="${igUrl(x)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(x)}のInstagramを探す">📷 Instagram</a></span>`).join('')}</div><div class="note">ブランド名の検索結果が開きます。左がオンラインショップ、右（📷）がInstagram。公式アカウントが出るとは限らないので、名前を見て確認してください。</div>`}`;
+  ${starred?bprioRow(k):''}<div class="acts"><button class="btn ${starred?'':'sub2'}" id="pi-star" aria-pressed="${starred}">${starred?'★ 見たいブースに選択中':'☆ 見たいブースに入れる'}</button><button class="btn sub2" id="pi-buy">買った物を撮る</button>${np?`<button class="btn sub2" id="pi-photo">写真メモを見る（${np}）</button>`:''}${RT?`<button class="btn sub2" id="pi-here">ここを現在地にする</button><button class="btn sub2" id="pi-go">ここへの道順</button>`:''}</div>
+  <div style="margin-top:12px;font-weight:700;font-size:13px">このブースのメモ</div>${pinNotes(k)}
+  ${igDirect(k).length?`<div class="shops" style="margin-top:12px">${igDirect(k).map(h=>`<a class="ig" href="https://www.instagram.com/${h}/" target="_blank" rel="noopener noreferrer">公式Instagram @${esc(h)} ↗</a>`).join('')}</div>`:''}${subsOf(k).length?brandCards(k):`<div style="margin-top:12px;font-weight:700;font-size:13px">オンラインショップ・Instagramを探す</div><div class="shops">${brandsOf(b.name).map(x=>`<span class="bp"><a href="${shopUrl(x)}" target="_blank" rel="noopener noreferrer">${esc(x)} ↗</a><a class="ig" href="${igUrl(x)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(x)}のInstagramを探す">Instagram</a></span>`).join('')}</div><div class="note">ブランド名の検索結果が開きます。左がオンラインショップ、右（）がInstagram。公式アカウントが出るとは限らないので、名前を見て確認してください。</div>`}`;
   const pt=$('pn-text');if(pt){pt.value=pinDraft.k===k?pinDraft.t:'';pt.oninput=()=>{pinDraft={k,t:pt.value}};
     $('pn-save').onclick=()=>{const t=pt.value.trim();if(!t){pt.focus();return}
       S.notes.unshift({id:uid(),text:t,booth:k,sub:'',ts:Date.now()});pinDraft={k:null,t:''};save();render();showPin(k,false,true);toast('✔ メモを保存しました')};
@@ -1481,7 +1481,7 @@ function wantBlock(k,br){
     <div class="wth-row">${wImgs(w.id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wv="${x.id}">`).join('')}<span class="pkpair"><label class="wadd">写真<input type="file" accept="image/*" capture="environment" data-wfile="${w.id}" hidden></label><label class="wadd">アルバム<input type="file" accept="image/*" multiple data-wfile="${w.id}" hidden></label></span></div>
     <div class="wrow"><label class="wy">金額 ¥<input type="text" data-comma inputmode="numeric" pattern="[0-9,]*" autocomplete="off" data-wyen="${w.id}" value="${fmtY2(w.yen||'')}" placeholder="未入力"></label></div>
     <div class="wseg">${seg(intentOf(w),`data-wi="${w.id}"`)}</div></div>`).join('');
-  return `<div class="wblock"><div class="wh">🛍 ここで買いたい物</div>${cards||'<div class="note" style="margin:4px 0">まだありません。下から追加できます。</div>'}
+  return `<div class="wblock"><div class="wh">ここで買いたい物</div>${cards||'<div class="note" style="margin:4px 0">まだありません。下から追加できます。</div>'}
   <details class="wnew"><summary>＋ 買いたい物を追加（スクショ・写真・金額）</summary>
    <input type="text" id="wn-name" placeholder="品名（空欄でも画像だけで追加できます）" autocomplete="off">
    <span class="wth-row" style="margin:6px 0 0"><span class="pkpair"><label class="wadd">写真<input type="file" accept="image/*" capture="environment" data-cam="wn-file" hidden></label><label class="wadd" for="wn-file">アルバム</label></span></span><input type="file" id="wn-file" accept="image/*" multiple hidden><span class="note" id="wn-fn" style="margin:0 0 0 6px"></span>
@@ -1692,7 +1692,7 @@ function drawAll(noScroll){
 }
 function setGoal(k){allMode=false;openRb(false);goalK=k;try{localStorage.setItem('fs-goal',k)}catch(e){}rtDraw()}
 window.closeFs=window.closeFs||function(){};
-function openRb(o){const b=$('rb-body'),t=$('rb-toggle');if(!b)return;b.hidden=!o;t.setAttribute('aria-expanded',o);t.textContent='🔍 検索・現在地・道順 '+(o?'▴':'▾')}
+function openRb(o){const b=$('rb-body'),t=$('rb-toggle');if(!b)return;b.hidden=!o;t.setAttribute('aria-expanded',o);t.textContent='検索・現在地・道順 '+(o?'▴':'▾')}
 function needHere(){toast('先に現在地（近くのブース番号）を入れてください');const e=$('here-in');if(e){closeFs();openRb(true);$('routebar').scrollIntoView({block:'center',behavior:'smooth'});e.focus()}}
 if(RT){
   $('routebar').hidden=false;
@@ -1866,7 +1866,7 @@ function renderEvents(){
 
 /* ---- ブース別の限定情報 ---- */
 let evview='list',pkFilter='all';
-const PK_T={gacha:'🎰 ガチャ・くじ',first:'🆕 先行・初出し・限定',sale:'💴 特価・割引',gift:'🎁 プレゼント・特典',exp:'🛵 体験'};
+const PK_T={gacha:'ガチャ・くじ',first:'先行・初出し・限定',sale:'特価・割引',gift:'プレゼント・特典',exp:'体験'};
 function applyEV(){const p=evview==='perk';if($('ev-list'))$('ev-list').hidden=p;if($('ev-perk'))$('ev-perk').hidden=!p;document.querySelectorAll('#evsw [data-evv]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.evv===evview))}
 function renderPerks(){
   if(!$('pklist')||!window.PERKS)return;
@@ -1875,16 +1875,16 @@ function renderPerks(){
   $('pkf').innerHTML=[['all','すべて'],...Object.entries(PK_T)].map(([k,l])=>`<button class="chip" type="button" data-pk="${k}" aria-pressed="${pkFilter===k}">${l}</button>`).join('');
   $('pkf').querySelectorAll('[data-pk]').forEach(b=>b.onclick=()=>{pkFilter=b.dataset.pk;renderPerks()});
   const list=all.filter(x=>pkFilter==='all'||x.type===pkFilter);
-  $('pklist').innerHTML=list.length?list.map(x=>`<div class="ck" style="align-items:flex-start"><div class="nm"><span class="sub" style="font-weight:700">${PK_T[x.type]||''}</span><b>${esc(x.title)}</b><span class="sub">${esc(x.brand)}${x.booth?' ／ ブース '+esc(x.booth):' ／ ブース番号の記載なし'}</span><span class="sub">${esc(x.detail)}</span>${x.cond?`<span class="sub">条件：${esc(x.cond)}</span>`:''}<span class="sub">出典：<a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.src)} ↗</a></span>${x.booth?'':''}<span class="sub"><a class="ig" href="${igUrl(x.brand.replace(/（.*$/,''))}" target="_blank" rel="noopener noreferrer">📷 Instagramを探す</a></span></div>${x.booth&&BY[x.booth]?badge(x.booth):''}</div>`).join(''):`<div class="empty">この種類の情報は、2026年の公式情報では見つかっていません。</div>`;
+  $('pklist').innerHTML=list.length?list.map(x=>`<div class="ck" style="align-items:flex-start"><div class="nm"><span class="sub" style="font-weight:700">${PK_T[x.type]||''}</span><b>${esc(x.title)}</b><span class="sub">${esc(x.brand)}${x.booth?' ／ ブース '+esc(x.booth):' ／ ブース番号の記載なし'}</span><span class="sub">${esc(x.detail)}</span>${x.cond?`<span class="sub">条件：${esc(x.cond)}</span>`:''}<span class="sub">出典：<a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.src)} ↗</a></span>${x.booth?'':''}<span class="sub"><a class="ig" href="${igUrl(x.brand.replace(/（.*$/,''))}" target="_blank" rel="noopener noreferrer">Instagramを探す</a></span></div>${x.booth&&BY[x.booth]?badge(x.booth):''}</div>`).join(''):`<div class="empty">この種類の情報は、2026年の公式情報では見つかっていません。</div>`;
 }
 document.querySelectorAll('#evsw [data-evv]').forEach(b=>b.onclick=()=>{evview=b.dataset.evv;applyEV();window.scrollTo({top:0})});
 /* ---- packing ---- */
-const SUG=[['🔌 電源・充電',['モバイルバッテリー','ポータブル電源','スマホ充電ケーブル']],
- ['💳 支払い・移動',['ETCカード','クレジットカード']],
- ['💊 薬・健康',['ムヒ','目薬','カロナール','CPAP','CPAPの電源・水']],
- ['👕 着替え・衛生',['着替え','寝巻き','汗拭きシート','ゴミ袋','歯ブラシ','ウェットティッシュ','ティッシュ','タオル']],
- ['🛏 寝具・防寒・車中泊',['窓の目隠し（サンシェード）','LEDランタン','インフレーターマット','枕','布団','シュラフ','電気毛布','防寒着（ダウンなど）','耳栓・アイマスク','寝る場所の段差を埋めるタオル','セラミックヒーター']],
- ['🧰 その他',['エコバッグ','水・飲み物','サンダル','一酸化炭素チェッカー','雨具','マスク','生刷り用のギア（グラインドロッヂなどで刷ってもらう物）']]];
+const SUG=[['電源・充電',['モバイルバッテリー','ポータブル電源','スマホ充電ケーブル']],
+ ['支払い・移動',['ETCカード','クレジットカード']],
+ ['薬・健康',['ムヒ','目薬','カロナール','CPAP','CPAPの電源・水']],
+ ['着替え・衛生',['着替え','寝巻き','汗拭きシート','ゴミ袋','歯ブラシ','ウェットティッシュ','ティッシュ','タオル']],
+ ['寝具・防寒・車中泊',['窓の目隠し（サンシェード）','LEDランタン','インフレーターマット','枕','布団','シュラフ','電気毛布','防寒着（ダウンなど）','耳栓・アイマスク','寝る場所の段差を埋めるタオル','セラミックヒーター']],
+ ['その他',['エコバッグ','水・飲み物','サンダル','一酸化炭素チェッカー','雨具','マスク','生刷り用のギア（グラインドロッヂなどで刷ってもらう物）']]];
 const packOpen=new Set();let packAllOpen=false;
 const REQ=[{id:'def-ticket',name:'チケット（紙・整理番号入り）'},{id:'def-wallet',name:'財布（現金）'}];
 const REQ2=['窓の目隠し（サンシェード）','LEDランタン','歯ブラシ','ウェットティッシュ','ティッシュ','寝巻き','セラミックヒーター','タオル','寝る場所の段差を埋めるタオル'];
@@ -2035,14 +2035,14 @@ function evDue(){const now=Date.now();return evItems().map(o=>({o,t:evStartMs(o)
 function renderEvAlert(){
   const box=$('evalert');if(!box)return;const due=evDue().filter(r=>!evDismiss.has(r.o.x.id));
   box.innerHTML=due.map(r=>{const mins=Math.ceil((r.t-Date.now())/60000),p=EV_POS[r.o.e.place];
-    return `<div class="entry evnow"><div class="entry-h">⏰ ${mins>0?'あと '+mins+' 分でイベント':'イベント開始'}（${esc(r.o.x.time||r.o.e.start)}）</div><div style="font-weight:700;line-height:1.5">${esc(r.o.e.title)}</div><div class="entry-sub">${esc(r.o.e.place||'')}</div><div class="acts" style="display:flex;gap:8px;margin-top:8px">${p?`<button class="btn" type="button" data-evmap="${r.o.x.id}">🗺 マップで見る</button>`:''}<button class="btn sub2" type="button" data-evok="${r.o.x.id}">確認した</button></div></div>`}).join('');
+    return `<div class="entry evnow"><div class="entry-h">${mins>0?'あと '+mins+' 分でイベント':'イベント開始'}（${esc(r.o.x.time||r.o.e.start)}）</div><div style="font-weight:700;line-height:1.5">${esc(r.o.e.title)}</div><div class="entry-sub">${esc(r.o.e.place||'')}</div><div class="acts" style="display:flex;gap:8px;margin-top:8px">${p?`<button class="btn" type="button" data-evmap="${r.o.x.id}">マップで見る</button>`:''}<button class="btn sub2" type="button" data-evok="${r.o.x.id}">確認した</button></div></div>`}).join('');
   box.querySelectorAll('[data-evok]').forEach(b=>b.onclick=()=>{evDismiss.add(b.dataset.evok);evSave();renderEvAlert()});
   box.querySelectorAll('[data-evmap]').forEach(b=>b.onclick=()=>{const o=evItems().find(v=>v.x.id===b.dataset.evmap),p=o&&EV_POS[o.e.place];if(!p)return;show('map');render();zoomHall('E');setTimeout(()=>{scrollToImg(p[0],p[1],false);$('mapbox').scrollIntoView({block:'center',behavior:'smooth'})},80)});
 }
 function evTick(){
   renderEvAlert();
   evDue().forEach(r=>{const id=r.o.x.id;if(evNotified.has(id))return;evNotified.add(id);evSave();
-    const mins=Math.max(0,Math.ceil((r.t-Date.now())/60000)),msg='⏰ '+(mins>0?'あと'+mins+'分：':'開始：')+r.o.e.title.replace(/^SPECIAL STAGE：/,'');
+    const mins=Math.max(0,Math.ceil((r.t-Date.now())/60000)),msg=''+(mins>0?'あと'+mins+'分：':'開始：')+r.o.e.title.replace(/^SPECIAL STAGE：/,'');
     toast(msg);try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}
     try{if('Notification' in window&&Notification.permission==='granted')new Notification('イベント '+(r.o.x.time||r.o.e.start),{body:r.o.e.title+(r.o.e.place?'（'+r.o.e.place+'）':'')})}catch(e){}});
 }
@@ -2085,14 +2085,14 @@ function renderNext(){
       +(stOf(k)==='later'?'<div class="entry-sub" style="color:var(--accent);font-weight:700">（「あとでもう一度」のブースだけ残っています）</div>':'')
       +(ws.length?`<div class="nxws">${ws.map(w=>`<div class="nxw ${intentOf(w)==='skip'?'skip':''}"><span class="nxn"><i class="it it-${intentOf(w)}">${INT[intentOf(w)][0]}</i> ${esc(w.name)}</span><input type="text" data-comma inputmode="numeric" pattern="[0-9,]*" autocomplete="off" data-nxy="${w.id}" value="${fmtY2(w.yen||'')}" placeholder="金額" aria-label="${esc(w.name)}の金額"><button class="btn" type="button" data-nxbuy="${w.id}">買った</button></div>`).join('')}</div>`:'')
       +(B?`<div class="entry-sub">残り予算：<b>${left<0?'−':''}${yen(Math.abs(left))}</b></div>`:'')
-      +`<div class="acts"><button class="btn" id="nx-go" type="button">🧭 道順を出す</button><button class="btn sub2" id="nx-seen" type="button">✔ 見た</button>${stOf(k)==='later'?'':'<button class="btn sub2" id="nx-later" type="button">⏭ あとで</button>'}<button class="btn sub2" id="nx-map" type="button">🗺 マップで見る</button></div>`;
-  }else if(all.length){h+='<div class="entry-sub">見たいブースは、すべて見終わりました 🎉</div>'}
+      +`<div class="acts"><button class="btn" id="nx-go" type="button">道順を出す</button><button class="btn sub2" id="nx-seen" type="button">✔ 見た</button>${stOf(k)==='later'?'':'<button class="btn sub2" id="nx-later" type="button">あとで</button>'}<button class="btn sub2" id="nx-map" type="button">マップで見る</button></div>`;
+  }else if(all.length){h+='<div class="entry-sub">見たいブースは、すべて見終わりました </div>'}
   else{h+='<div class="acts"><button class="btn" id="nx-pick" type="button">ブースを選ぶ</button></div>'}
   try{if(k&&rest.length>1){
     if(typeof hereK!=='undefined'&&hereK&&POS[hereK]){let n=null,bd=1e18;rest.forEach(x=>{if(!POS[x]||x===hereK)return;const d=pathLen(hereK,x);if(d<bd){bd=d;n=x}});
-      if(n&&n!==k)h+=`<div class="entry-sub nearb">📍 現在地（${esc(hereK)}）から一番近い：${badge(n)} <b>${esc(shortName(n))}</b></div><div class="acts"><button class="btn sub2" id="nx-near" type="button">そこへの道順</button></div>`;
-      else if(n===k)h+=`<div class="entry-sub nearb">📍 現在地から一番近いのも、このブースです</div>`}
-    else if(typeof dayOn==='function'&&dayOn())h+=`<div class="entry-sub nearb">📍 現在地を入れると、一番近いブースを出せます</div><div class="acts"><button class="btn sub2" id="nx-here" type="button">現在地を入れる</button></div>`}}catch(e){}
+      if(n&&n!==k)h+=`<div class="entry-sub nearb">現在地（${esc(hereK)}）から一番近い：${badge(n)} <b>${esc(shortName(n))}</b></div><div class="acts"><button class="btn sub2" id="nx-near" type="button">そこへの道順</button></div>`;
+      else if(n===k)h+=`<div class="entry-sub nearb">現在地から一番近いのも、このブースです</div>`}
+    else if(typeof dayOn==='function'&&dayOn())h+=`<div class="entry-sub nearb">現在地を入れると、一番近いブースを出せます</div><div class="acts"><button class="btn sub2" id="nx-here" type="button">現在地を入れる</button></div>`}}catch(e){}
   el.innerHTML=h;
   try{if($('nx-near')){const nk=(()=>{let n=null,bd=1e18;rest.forEach(x=>{if(!POS[x]||x===hereK)return;const d=pathLen(hereK,x);if(d<bd){bd=d;n=x}});return n})();$('nx-near').onclick=()=>{show('map');render();setGoal(nk)}}
     if($('nx-here'))$('nx-here').onclick=()=>{show('map');render();needHere()}}catch(e){}
@@ -2125,13 +2125,13 @@ function renderHome(){
   $('htiles').querySelectorAll('[data-ht]').forEach(b=>b.onclick=()=>{if(b.dataset.ht==='haul'){show('haul');render();window.scrollTo({top:0});return}homeOpen=homeOpen===b.dataset.ht?null:b.dataset.ht;renderHome()});
   if(document.activeElement!==$('hbudget'))$('hbudget').value=fmtYen(B);
   {const op=S.wants.filter(w=>!w.got),sm=i=>op.filter(w=>intentOf(w)===i).reduce((a,w)=>a+(+w.yen||0),0),must=sm('must'),maybe=sm('maybe'),skip=sm('skip');
-   let msg='';if(B){const lf2=B-sp;if(must>lf2)msg=`<div class="hw-warn ng">⚠ 「絶対買う」だけで予算を ${yen(must-lf2)} 超えます</div>`;else if(must+maybe>lf2)msg=`<div class="hw-warn">「悩み中」も全部買うと ${yen(must+maybe-lf2)} 超えます</div>`}
+   let msg='';if(B){const lf2=B-sp;if(must>lf2)msg=`<div class="hw-warn ng">「絶対買う」だけで予算を ${yen(must-lf2)} 超えます</div>`;else if(must+maybe>lf2)msg=`<div class="hw-warn">「悩み中」も全部買うと ${yen(must+maybe-lf2)} 超えます</div>`}
    $('hwant').innerHTML=op.length?`<div class="hw-row"><span class="hw hw-m"><small>絶対買う</small><b>${yen(must)}</b></span><span class="hw hw-y"><small>悩み中</small><b>${yen(maybe)}</b></span><span class="hw hw-s"><small>我慢</small><b>${yen(skip)}</b></span></div>${msg}`:''}
   {const jst=new Date(Date.now()+9*36e5),hr=jst.getUTCHours(),ml=S.wants.filter(w=>!w.got&&intentOf(w)==='must');
-   $('mustleft').innerHTML=ml.length?`<details class="mustleft" ${(isExpoDay()&&hr>=15)?'open':''}><summary>⚠ 「絶対買う」でまだ買っていない：${ml.length}件</summary>${ml.map(w=>`<button type="button" class="hrow" data-ml="${w.booth||''}">${w.booth&&BY[w.booth]?badge(w.booth):'<span class="note" style="margin:0">ブース未定</span>'}<span class="nm">${esc(w.name)}${w.booth&&BY[w.booth]?'<small> ／ '+esc(shortName(w.booth))+'</small>':''}</span><span class="hy">${w.yen?yen(w.yen):''}</span></button>`).join('')}</details>`:'';
+   $('mustleft').innerHTML=ml.length?`<details class="mustleft" ${(isExpoDay()&&hr>=15)?'open':''}><summary>「絶対買う」でまだ買っていない：${ml.length}件</summary>${ml.map(w=>`<button type="button" class="hrow" data-ml="${w.booth||''}">${w.booth&&BY[w.booth]?badge(w.booth):'<span class="note" style="margin:0">ブース未定</span>'}<span class="nm">${esc(w.name)}${w.booth&&BY[w.booth]?'<small> ／ '+esc(shortName(w.booth))+'</small>':''}</span><span class="hy">${w.yen?yen(w.yen):''}</span></button>`).join('')}</details>`:'';
    $('mustleft').querySelectorAll('[data-ml]').forEach(b=>b.onclick=()=>{if(b.dataset.ml&&POS[b.dataset.ml])focusBooth(b.dataset.ml)});
    const dd=EVENT.days.find(v=>v.key===todayKey()),k0=starList();
-   $('dayhdr').innerHTML=`<b>☀ ${dd?esc(dd.md)+'　'+esc(dd.label):'当日'}</b><span>見たブース ${k0.filter(doneOf).length}/${k0.length}　戦利品 ${gotOn(dd?dd.key:'d1')}点　使った ${yen(spentOn(dd?dd.key:'d1'))}</span><span class="dayseg">${EVENT.days.filter(v=>v.key!=='prev').map(v=>`<button type="button" class="dayoff dsw" data-dsw="${v.key}" aria-pressed="${v.key===todayKey()}">${esc(v.label)}</button>`).join('')}</span><button type="button" class="dayoff" id="day-off">当日モードを切る</button>`;$('dayhdr').querySelectorAll('[data-dsw]').forEach(b=>b.onclick=()=>{const dj=new Date(Date.now()+9*36e5).toISOString().slice(0,10);UI.dayPick={d:dj,k:b.dataset.dsw};uiSave();const en=S.entry=S.entry||{nos:{},day:''};en.day=b.dataset.dsw;save();render()});$('day-off').onclick=()=>{UI.day='off';uiSave();applyUI();renderHome();toast('当日モードを切りました')}}
+   $('dayhdr').innerHTML=`<b>${dd?esc(dd.md)+'　'+esc(dd.label):'当日'}</b><span>見たブース ${k0.filter(doneOf).length}/${k0.length}　戦利品 ${gotOn(dd?dd.key:'d1')}点　使った ${yen(spentOn(dd?dd.key:'d1'))}</span><span class="dayseg">${EVENT.days.filter(v=>v.key!=='prev').map(v=>`<button type="button" class="dayoff dsw" data-dsw="${v.key}" aria-pressed="${v.key===todayKey()}">${esc(v.label)}</button>`).join('')}</span><button type="button" class="dayoff" id="day-off">当日モードを切る</button>`;$('dayhdr').querySelectorAll('[data-dsw]').forEach(b=>b.onclick=()=>{const dj=new Date(Date.now()+9*36e5).toISOString().slice(0,10);UI.dayPick={d:dj,k:b.dataset.dsw};uiSave();const en=S.entry=S.entry||{nos:{},day:''};en.day=b.dataset.dsw;save();render()});$('day-off').onclick=()=>{UI.day='off';uiSave();applyUI();renderHome();toast('当日モードを切りました')}}
   {const dk=todayKey(),dm=(()=>{try{return dayOn()}catch(e){return false}})(),dl=(EVENT.days.find(v=>v.key===dk)||{}).label||'この日';
    $('h-spent-v').textContent=yen(dm?spentOn(dk):sp);
    $('h-spent').querySelector('small').textContent=dm?dl+'の使った金額 ›':'使った金額 ›';
@@ -2156,7 +2156,7 @@ function render(){renderEvMarks();renderEvAlert();renderSeen();renderHaul();rend
    自分専用の領域 data/users/<id>/ に保存するので、同じアカウントなら PC とスマホで同じ内容になる。
    ほかの人には見えない（共有した人も、それぞれ自分専用の領域）。 */
 let cloud=null,stateRef=null,syncOK=false;
-const SYNC_TXT={local:'端末内のみに保存中（他の端末とは同期しません）',connecting:'☁ 同期を確認中…',ok:'☁ 同期済み（同じアカウントのPC・スマホで共通）',push:'☁ 同期中…',error:'☁ 同期できません。この端末には保存済みです',noperm:'☁ この共有では保存できません（共有設定が「投稿者」以上で、ログインが必要です）。この端末には保存済み'};
+const SYNC_TXT={local:'端末内のみに保存中（他の端末とは同期しません）',connecting:'同期を確認中…',ok:'同期済み（同じアカウントのPC・スマホで共通）',push:'同期中…',error:'同期できません。この端末には保存済みです',noperm:'この共有では保存できません（共有設定が「投稿者」以上で、ログインが必要です）。この端末には保存済み'};
 function setSync(st){const e=$('syncst');if(e)e.textContent=SYNC_TXT[st]||'';syncOK=(st==='ok'||st==='push')}
 const clone=o=>JSON.parse(JSON.stringify(o));
 const hasData=s=>s&&(Object.keys(s.stars||{}).length||(s.wants||[]).length||(s.sched||[]).length||(s.pack||[]).length||(s.budget||0)||Object.keys(s.seen||{}).length);
@@ -2240,7 +2240,7 @@ chips();show('home');render();
       n.addEventListener('animationend',()=>n.classList.remove('fxpop'),{once:true});
       const on=(n.matches('.ic[aria-pressed="true"],input.chk:checked'))||(n.id==='pi-star'&&/^★/.test(n.textContent));
       if(on&&!matchMedia('(prefers-reduced-motion:reduce)').matches){
-        const r=n.getBoundingClientRect(),b=document.createElement('span');b.className='fxburst';b.textContent=n.matches('input.chk')?'✔':'⭐';
+        const r=n.getBoundingClientRect(),b=document.createElement('span');b.className='fxburst';b.textContent=n.matches('input.chk')?'✔':'';
         b.style.left=(r.left+r.width/2)+'px';b.style.top=(r.top+r.height/2-8)+'px';document.body.appendChild(b);setTimeout(()=>b.remove(),800)}
     },40);
   },true);
@@ -2251,27 +2251,27 @@ const UIK='fieldstyle-ui';let UI={};try{UI=JSON.parse(localStorage.getItem(UIK)|
 function uiSave(){try{localStorage.setItem(UIK,JSON.stringify(UI))}catch(e){}}
 function isExpoDay(){try{const d=new Date(Date.now()+9*36e5).toISOString().slice(0,10);return EVENT.days.some(x=>x.key!=='prev'&&x.date===d)}catch(e){return false}}
 function dayOn(){return UI.day==='on'||(UI.day!=='off'&&isExpoDay())}
-function applyUI(){document.body.classList.toggle('daymode',dayOn());document.body.classList.toggle('sub',$('home').hidden||dayOn());document.body.classList.toggle('morning',isExpoDay()&&new Date(Date.now()+9*36e5).getUTCHours()<10);$('go-day').setAttribute('aria-pressed',dayOn());$('go-day').textContent=dayOn()?'☀ 当日モード：オン':'☀ 当日モード'}
+function applyUI(){document.body.classList.toggle('daymode',dayOn());document.body.classList.toggle('sub',$('home').hidden||dayOn());document.body.classList.toggle('morning',isExpoDay()&&new Date(Date.now()+9*36e5).getUTCHours()<10);$('go-day').setAttribute('aria-pressed',dayOn());$('go-day').textContent=dayOn()?'当日モード：オン':'当日モード'}
 $('go-day').onclick=()=>{UI.day=dayOn()?'off':'on';uiSave();applyUI();toast(dayOn()?'当日モード：予算入力や説明を隠しました':'当日モードを切りました')};
 applyUI();setInterval(()=>{applyUI();if(document.body.classList.contains('daymode')&&typeof render==='function')try{renderHome()}catch(e){}},60000);
 (function(){const o=$('offst');if(!o)return;const vs=$('verst');
- if(!('serviceWorker' in navigator)){o.textContent='📴 オフライン保存：この環境では使えません（電波が弱いときは、先に一度開いておいてください）';return}
- navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{o.textContent='📴 オフライン保存：準備OK（一度開いたあと、電波がなくても開けます）';if(vs)vs.textContent=' ／ 📴 オフライン準備OK'}).catch(()=>{o.textContent='📴 オフライン保存：この環境では使えません（電波が弱いときは、先に一度開いておいてください）'})})();
+ if(!('serviceWorker' in navigator)){o.textContent='オフライン保存：この環境では使えません（電波が弱いときは、先に一度開いておいてください）';return}
+ navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{o.textContent='オフライン保存：準備OK（一度開いたあと、電波がなくても開けます）';if(vs)vs.textContent=' ／ オフライン準備OK'}).catch(()=>{o.textContent='オフライン保存：この環境では使えません（電波が弱いときは、先に一度開いておいてください）'})})();
 
 /* ブース番号の入力欄：番号を直接入れる／「名前で探す」（普段は閉じている）で選ぶ */
 function attachBoothPicker(id){
   const inp=$(id);if(!inp)return;
   const wrap=document.createElement('div');wrap.className='bpick';
-  wrap.innerHTML=`<button type="button" class="chip bp-btn" aria-expanded="false">🔍 名前で探して選ぶ ▾</button><div class="bp-panel" hidden><input type="search" class="bp-q" placeholder="ブース名・ブランド名（例：UNIFLAME）" autocomplete="off" aria-label="ブースを名前で検索"><div class="bp-res"></div></div>`;
+  wrap.innerHTML=`<button type="button" class="chip bp-btn" aria-expanded="false">名前で探して選ぶ ▾</button><div class="bp-panel" hidden><input type="search" class="bp-q" placeholder="ブース名・ブランド名（例：UNIFLAME）" autocomplete="off" aria-label="ブースを名前で検索"><div class="bp-res"></div></div>`;
   inp.insertAdjacentElement('afterend',wrap);
   const btn=wrap.querySelector('.bp-btn'),pan=wrap.querySelector('.bp-panel'),q=wrap.querySelector('.bp-q'),res=wrap.querySelector('.bp-res');
   const draw=()=>{const t=q.value.trim().toLowerCase();
     if(!t){res.innerHTML='<div class="note" style="margin:4px 0">名前か番号を入れると候補が出ます。</div>';return}
     const hit=BOOTHS.filter(b=>b.n.startsWith(t)||b.name.toLowerCase().includes(t)).slice(0,30);
     res.innerHTML=hit.length?hit.map(b=>`<button type="button" class="bp-it" data-n="${b.n}"><b>${b.n}</b> ${esc(b.name.replace(/（.*$/,'').slice(0,40))}</button>`).join(''):'<div class="note" style="margin:4px 0">見つかりません。</div>'};
-  btn.onclick=()=>{const o=pan.hidden;pan.hidden=!o;btn.setAttribute('aria-expanded',o);btn.textContent='🔍 名前で探して選ぶ '+(o?'▴':'▾');if(o){q.value='';draw();setTimeout(()=>{try{q.focus({preventScroll:true})}catch(e){}},50)}};
+  btn.onclick=()=>{const o=pan.hidden;pan.hidden=!o;btn.setAttribute('aria-expanded',o);btn.textContent='名前で探して選ぶ '+(o?'▴':'▾');if(o){q.value='';draw();setTimeout(()=>{try{q.focus({preventScroll:true})}catch(e){}},50)}};
   q.addEventListener('input',draw);
-  res.addEventListener('click',e=>{const b=e.target.closest('[data-n]');if(!b)return;inp.value=b.dataset.n;inp.dispatchEvent(new Event('input',{bubbles:true}));inp.dispatchEvent(new Event('change',{bubbles:true}));pan.hidden=true;btn.setAttribute('aria-expanded',false);btn.textContent='🔍 名前で探して選ぶ ▾';toast('✔ '+b.dataset.n+' を選びました')});
+  res.addEventListener('click',e=>{const b=e.target.closest('[data-n]');if(!b)return;inp.value=b.dataset.n;inp.dispatchEvent(new Event('input',{bubbles:true}));inp.dispatchEvent(new Event('change',{bubbles:true}));pan.hidden=true;btn.setAttribute('aria-expanded',false);btn.textContent='名前で探して選ぶ ▾';toast('✔ '+b.dataset.n+' を選びました')});
 }
 function boothFind(t){t=String(t||'').trim().toLowerCase();if(!t)return[];return BOOTHS.filter(b=>b.n.startsWith(t)||b.name.toLowerCase().includes(t)).slice(0,8)}
 function subMatch(t,k){t=String(t||'').trim().toLowerCase();if(!t||!BY[k])return'';const l=subsOf(k);return l.find(s=>s.toLowerCase()===t)||(l.filter(s=>s.toLowerCase().includes(t)).length===1?l.filter(s=>s.toLowerCase().includes(t))[0]:'')}
@@ -2310,7 +2310,7 @@ async function bkOut(){
     $('bk-msg').textContent='書き出しました（写真'+all.filter(x=>x.img).length+'枚を含む）。ファイルは「ファイル」アプリなどに保存してください。';bkLast();
   }catch(e){$('bk-msg').textContent=(e&&e.code==='declined')?'保存をやめました。':'書き出せませんでした。もう一度試してください。'}
 }
-function bkLast(){try{const t=+localStorage.getItem('fs-lastbackup');if(t&&$('bkbox')){const d=new Date(t);$('bkbox').querySelector('summary').textContent='💾 バックアップ（最後：'+(d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+'）'}}catch(e){}}
+function bkLast(){try{const t=+localStorage.getItem('fs-lastbackup');if(t&&$('bkbox')){const d=new Date(t);$('bkbox').querySelector('summary').textContent='バックアップ（最後：'+(d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+'）'}}catch(e){}}
 $('bk-out').onclick=bkOut;bkLast();
 $('bk-in').onchange=async()=>{
   const f=$('bk-in').files[0];if(!f)return;$('bk-conf').innerHTML='';
