@@ -625,7 +625,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v32<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v33<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -1920,7 +1920,7 @@ const SUG=[['電源・充電',['モバイルバッテリー','ポータブル電
  ['着替え・衛生',['着替え','寝巻き','汗拭きシート','ゴミ袋','歯ブラシ','ウェットティッシュ','ティッシュ','タオル']],
  ['寝具・防寒・車中泊',['窓の目隠し（サンシェード）','LEDランタン','インフレーターマット','枕','布団','シュラフ','電気毛布','防寒着（ダウンなど）','耳栓・アイマスク','寝る場所の段差を埋めるタオル','セラミックヒーター']],
  ['その他',['エコバッグ','水・飲み物','サンダル','一酸化炭素チェッカー','雨具','マスク','生刷り用のギア（グラインドロッヂなどで刷ってもらう物）']]];
-const TODO_SUG=['LEDランタン充電','ポータブル電源充電','モバイルバッテリー充電','車中泊の準備（段差を埋めてマットを敷く）','荷物の準備'];
+const TODO_SUG=['LEDランタン充電','ポータブル電源充電','モバイルバッテリー充電','車中泊の準備（段差を埋めてマットを敷く）','荷物の準備','ガソリンを入れる','チケットを印刷する'];
 function addTodo(n){n=n.trim();if(!n)return;S.todo=S.todo||[];if(S.todo.some(p=>p.name===n))return;S.todo.push({id:uid(),name:n,done:false});save();renderTodo()}
 document.getElementById('tform').addEventListener('submit',e=>{e.preventDefault();addTodo(document.getElementById('t-name').value);document.getElementById('t-name').value=''});
 function renderTodo(){
