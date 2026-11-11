@@ -1221,7 +1221,7 @@ function renderWants(){
   $('wlist').querySelectorAll('[data-act]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.act);w.actual=ynum(c.value);save();renderWants()});
   $('wlist').querySelectorAll('[data-got]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.got);w.got=c.checked;if(c.checked)w.day=todayKey();if(c.checked&&w.actual==null)w.actual=+w.yen||0;save();render()});
   $('wlist').querySelectorAll('[data-wbr]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.wbr);w.brand=c.value.trim();save();renderWants()});
-  $('wlist').querySelectorAll('[data-wbo]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.wbo),v=c.value.trim();if(v&&!BY[v]){toast('そのブース番号は一覧にありません');c.value=w.booth||'';return}w.booth=v;if(!v)w.sub='';save();render()});
+  $('wlist').querySelectorAll('[data-wbo]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.wbo),v=c.value.trim();if(v&&!BY[v]){toast('そのブース番号は一覧にありません');c.value=w.booth||'';return}w.booth=v;if(!v)w.sub='';if(v&&!S.stars[v])S.stars[v]={done:false,prio:2};save();render()});
   $('wlist').querySelectorAll('[data-wbuy]').forEach(c=>c.onclick=()=>{const w=S.wants.find(x=>x.id==c.dataset.wbuy);memoFilter=null;memoAdd=true;show('memo');render();renderMemo();$('m-booth').value=w.booth||'';updMB();$('m-want').value=String(w.id);pickWant();$('mform').scrollIntoView({behavior:'smooth'})});
   $('wlist').querySelectorAll('[data-wdel]').forEach(c=>c.onclick=()=>{S.wants=S.wants.filter(x=>x.id!=c.dataset.wdel);save();render()});
 }
@@ -1233,7 +1233,8 @@ $('wform').addEventListener('submit',e=>{
   const name=$('w-name').value.trim();if(!name){$('w-name').focus();return}
   const rawB=$('w-booth').value.trim();let booth=resolveBooth(rawB);$('w-bmsg').textContent='';
   S.wants.push({id:Date.now(),name,brand:booth?($('w-sub').value||shortName(booth)):rawB,yen:ynum($('w-yen').value)||0,booth,sub:$('w-sub').value||'',prio:+$('w-prio').value,intent:['','must','maybe','skip'][+$('w-prio').value],got:false});
-  save();$('wform').reset();$('w-prio').value='2';fillSub('w-sub','w-subbox','');render();toast('✔ リストに追加しました');
+  let newStar=false;if(booth){if(!S.stars[booth]){S.stars[booth]={done:false,prio:2};newStar=true}const sb=$('w-sub').value;if(sb){S.subStars=S.subStars||{};(S.subStars[booth]=S.subStars[booth]||{})[sb]=true}}
+  save();$('wform').reset();$('w-prio').value='2';fillSub('w-sub','w-subbox','');render();toast(newStar?'✔ リストに追加しました（ブース '+booth+' も「回りたいブース」に入れました）':'✔ リストに追加しました');
 });
 
 /* booths */
