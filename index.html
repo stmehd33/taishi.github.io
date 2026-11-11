@@ -616,7 +616,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v22<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v23<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -933,7 +933,6 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
   <h3 class="sh">見たいブース</h3><div id="cbooth"></div>
   <h3 class="sh">買う物・買った物</h3><div id="cbuy"></div>
   <h3 class="sh">ブース別に使った金額</h3><div id="cspend"></div>
-  <h3 class="sh">持ち物</h3><div id="cpack"></div>
 </section>
 </div>
 
@@ -1925,12 +1924,11 @@ function renderCheck(){
   const wd=S.wants.filter(w=>w.got).length,wt=S.wants.length+boughtExtra.length,wb=wd+boughtExtra.length;
   const pd=S.pack.filter(p=>p.done).length;
   const tile=(label,a,b)=>`<div class="tile ${b&&a===b?'full':''}"><small>${label}</small><b>${a}/${b}</b><div class="bar"><i style="width:${b?a/b*100:0}%"></i></div></div>`;
-  $('ctiles').innerHTML=tile('見たブース',seen,ks.length)+tile('買った物',wb,wt)+tile('持ち物',pd,S.pack.length);
+  $('ctiles').innerHTML=tile('見たブース',seen,ks.length)+tile('買った物',wb,wt);
   $('cbooth').innerHTML=ks.length?ks.map((k,i)=>{const d=doneOf(k);return `<div class="ck ${d?'done':''}"><input class="chk" type="checkbox" data-cb="${k}" ${d?'checked':''} aria-label="${esc(BY[k].name)}を見た"><span class="ord">${i+1}</span>${badge(k)}<div class="nm">${esc(brandOf(k))}</div><span class="mk">${d?'✔':''}</span></div>`}).join(''):'<div class="empty">見たいブースを選ぶとここに並びます。</div>';
   const wrow=w=>`<div class="ck ${w.got?'done':''}"><input class="chk" type="checkbox" data-cw="${w.id}" ${w.got?'checked':''} aria-label="${esc(w.name)}を買った"><div class="nm">${esc(w.name)}<span class="sub">${w.got?'実際 '+yen(w.actual!=null?w.actual:w.yen):(w.yen?'予定 '+yen(w.yen):'予算未入力')}${w.booth&&BY[w.booth]?' ／ '+w.booth+' '+esc(w.sub||brandOf(w.booth)):''}</span></div><span class="mk">${w.got?'✔':''}</span></div>`;
   const xrow=m=>`<div class="ck done"><span style="width:26px;flex:none"></span><div class="nm">${esc(m.text||'写真メモ')}<span class="sub">予定外 ${yen(m.yen)} ／ ${m.booth} ${esc(m.sub||brandOf(m.booth))}</span></div><span class="mk">✔</span></div>`;
   $('cbuy').innerHTML=(S.wants.length||boughtExtra.length)?S.wants.slice().sort((a,b)=>(a.got-b.got)||(a.prio-b.prio)).map(wrow).join('')+boughtExtra.map(xrow).join(''):'<div class="empty">欲しい物を入れるとここに並びます。</div>';
-  $('cpack').innerHTML=S.pack.length?S.pack.map(p=>`<div class="ck ${p.done?'done':''}"><input class="chk" type="checkbox" data-cp="${p.id}" ${p.done?'checked':''} aria-label="${esc(p.name)}を持った"><div class="nm">${esc(p.name)}</div><span class="mk">${p.done?'✔':''}</span></div>`).join(''):'<div class="empty">持ち物タブで追加できます。</div>';
   const by={};
   memos.forEach(m=>{if(m.yen==null)return;(by[m.booth]=by[m.booth]||{sum:0,items:[]});by[m.booth].sum+=+m.yen;by[m.booth].items.push((m.sub?m.sub+'：':'')+(m.text||'写真メモ')+' '+yen(m.yen))});
   S.wants.filter(w=>w.got&&!w.memoId&&w.booth&&BY[w.booth]).forEach(w=>{const a=+(w.actual!=null?w.actual:w.yen)||0;(by[w.booth]=by[w.booth]||{sum:0,items:[]});by[w.booth].sum+=a;by[w.booth].items.push((w.sub?w.sub+'：':'')+w.name+' '+yen(a))});
@@ -1939,7 +1937,6 @@ function renderCheck(){
   $('cspend').querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{memoFilter=b.dataset.sp;memoAdd=false;show('memo');render();renderMemo()});
   $('cbooth').querySelectorAll('[data-cb]').forEach(c=>c.onchange=()=>{if(c.checked)S.seen[c.dataset.cb]=true;else delete S.seen[c.dataset.cb];save();render()});
   $('cbuy').querySelectorAll('[data-cw]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.cw);w.got=c.checked;if(c.checked)w.day=todayKey();if(c.checked&&w.actual==null)w.actual=+w.yen||0;save();render()});
-  $('cpack').querySelectorAll('[data-cp]').forEach(c=>c.onchange=()=>{S.pack.find(x=>x.id==c.dataset.cp).done=c.checked;save();render()});
 }
 /* ---- layout toggle ---- */
 function setLayout(m){document.documentElement.dataset.layout=m;try{localStorage.setItem('fs-layout',m)}catch(e){}
