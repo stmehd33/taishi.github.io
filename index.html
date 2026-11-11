@@ -616,7 +616,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v21<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v22<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -1113,7 +1113,7 @@ function renderPlan(){
     $('go-b').onclick=()=>{show('booths');render()};return;
   }
   const done=ks.filter(doneOf).length;
-  let h=`<h2>優先順位</h2><div class="sum"><div>見たいブース<b>${ks.length}</b></div><div>見終わった<b>${done}</b></div></div><div class="note" style="margin:0 0 8px">左の「≡」をつかんで上下にドラッグすると、入れ替えられます。左の数字がマップのピン番号です。行の左端の色は、ブースに行く優先度（赤＝高、黄＝中、灰＝低）です。</div><button class="btn sub2" id="opt-open" type="button" style="width:100%;margin:0 0 8px">効率よく回るルートを提案（マップで見る）</button><div class="board" id="board">`;
+  let h=`<h2>優先順位</h2><div class="sum"><div>見たいブース<b>${ks.length}</b></div><div>見終わった<b>${done}</b></div></div><div class="note" style="margin:0 0 8px">左の「≡」をつかんで上下にドラッグすると、入れ替えられます。左の数字がマップのピン番号です。行の左端の色は、ブースに行く優先度（赤＝高、黄＝中、灰＝低）です。</div><div class="board" id="board">`;
   ks.forEach((k,i)=>{const d=doneOf(k),ws=openWants(k);
     const sub=ws.length?ws.map(w=>esc(w.name)+(w.yen?' '+yen(w.yen):'')).join('、'):'商品未定';
     h+=`<div class="plank bp${boothPrio(k)} ${d?'done':''} st-${stOf(k)}" data-k="${k}"><button class="grip" data-grip="${k}" aria-label="${esc(BY[k].name)}を並べ替え（上下キーでも動かせます）">≡</button><span class="ord">${i+1}</span>${badge(k)}<div class="nm" data-tog="${k}" role="button" tabindex="0" aria-expanded="${planOpen.has(k)}"><b class="pn">${esc(shortName(k))}</b>${Object.keys((S.subStars||{})[k]||{}).length?`<span class="sub">回りたい：${Object.keys(S.subStars[k]).map(esc).join('、')}</span>`:''}<span class="sub">${planOpen.has(k)?'▾':'▸'} ${sub}</span></div><select class="stsel" data-stsel="${k}" aria-label="${esc(BY[k].name)}の状態">${['none','done','later'].map(x=>`<option value="${x}" ${stOf(k)===x?'selected':''}>${ST_L[x]}</option>`).join('')}</select><button class="x" data-unstar="${k}" aria-label="外す">✕</button>${planOpen.has(k)?`<div class="wlp">${ws.length?ws.map(w=>`<div class="wlpi"><span class="prio p${w.prio}">${({1:'絶対',2:'悩み',3:'我慢'})[w.prio]||''}</span>${esc(w.name)}<span class="wlpy">${w.yen?yen(w.yen):'予算未入力'}${w.sub?' ／ 店：'+esc(w.sub):''}</span>${wImgs(w.id).length?`<div class="wth-row">${wImgs(w.id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wvp="${x.id}">`).join('')}</div>`:''}</div>`).join(''):'<div class="wlpi">このブースの欲しい物はまだありません。</div>'}</div>`:''}</div>`;
@@ -1359,6 +1359,7 @@ function setRot(n){
 $('zin').onclick=()=>{zoom=Math.min(8,zoom+1);applyZoom()};
 $('zout').onclick=()=>{zoom=Math.max(1,zoom-1);applyZoom()};
 const IW=EVENT.mapW,IH=EVENT.mapH;
+const brandOf=k=>{if(!BY[k])return String(k);if(!subsOf(k).length)return shortName(k);const ss=Object.keys((S.subStars||{})[k]||{});if(ss.length)return ss[0]+(ss.length>1?' ほか'+(ss.length-1):'');const ws=S.wants.find(w=>w.booth===k&&w.sub);return ws?ws.sub:shortName(k)};
 const shortName=k=>{const n=BY[k]?BY[k].name:'';return subsOf(k).length?n.slice(0,n.indexOf('（')).trim()||n:n};
 const subOn=(k,b)=>!!((S.subStars||{})[k]&&S.subStars[k][b]);
 function toggleSub(k,b){
@@ -1925,16 +1926,16 @@ function renderCheck(){
   const pd=S.pack.filter(p=>p.done).length;
   const tile=(label,a,b)=>`<div class="tile ${b&&a===b?'full':''}"><small>${label}</small><b>${a}/${b}</b><div class="bar"><i style="width:${b?a/b*100:0}%"></i></div></div>`;
   $('ctiles').innerHTML=tile('見たブース',seen,ks.length)+tile('買った物',wb,wt)+tile('持ち物',pd,S.pack.length);
-  $('cbooth').innerHTML=ks.length?ks.map((k,i)=>{const d=doneOf(k);return `<div class="ck ${d?'done':''}"><input class="chk" type="checkbox" data-cb="${k}" ${d?'checked':''} aria-label="${esc(BY[k].name)}を見た"><span class="ord">${i+1}</span>${badge(k)}<div class="nm">${esc(BY[k].name)}</div><span class="mk">${d?'✔':''}</span></div>`}).join(''):'<div class="empty">見たいブースを選ぶとここに並びます。</div>';
-  const wrow=w=>`<div class="ck ${w.got?'done':''}"><input class="chk" type="checkbox" data-cw="${w.id}" ${w.got?'checked':''} aria-label="${esc(w.name)}を買った"><div class="nm">${esc(w.name)}<span class="sub">${w.got?'実際 '+yen(w.actual!=null?w.actual:w.yen):(w.yen?'予定 '+yen(w.yen):'予算未入力')}${w.booth&&BY[w.booth]?' ／ '+w.booth+' '+esc(BY[w.booth].name):''}</span></div><span class="mk">${w.got?'✔':''}</span></div>`;
-  const xrow=m=>`<div class="ck done"><span style="width:26px;flex:none"></span><div class="nm">${esc(m.text||'写真メモ')}<span class="sub">予定外 ${yen(m.yen)} ／ ${m.booth} ${esc(BY[m.booth].name)}</span></div><span class="mk">✔</span></div>`;
+  $('cbooth').innerHTML=ks.length?ks.map((k,i)=>{const d=doneOf(k);return `<div class="ck ${d?'done':''}"><input class="chk" type="checkbox" data-cb="${k}" ${d?'checked':''} aria-label="${esc(BY[k].name)}を見た"><span class="ord">${i+1}</span>${badge(k)}<div class="nm">${esc(brandOf(k))}</div><span class="mk">${d?'✔':''}</span></div>`}).join(''):'<div class="empty">見たいブースを選ぶとここに並びます。</div>';
+  const wrow=w=>`<div class="ck ${w.got?'done':''}"><input class="chk" type="checkbox" data-cw="${w.id}" ${w.got?'checked':''} aria-label="${esc(w.name)}を買った"><div class="nm">${esc(w.name)}<span class="sub">${w.got?'実際 '+yen(w.actual!=null?w.actual:w.yen):(w.yen?'予定 '+yen(w.yen):'予算未入力')}${w.booth&&BY[w.booth]?' ／ '+w.booth+' '+esc(w.sub||brandOf(w.booth)):''}</span></div><span class="mk">${w.got?'✔':''}</span></div>`;
+  const xrow=m=>`<div class="ck done"><span style="width:26px;flex:none"></span><div class="nm">${esc(m.text||'写真メモ')}<span class="sub">予定外 ${yen(m.yen)} ／ ${m.booth} ${esc(m.sub||brandOf(m.booth))}</span></div><span class="mk">✔</span></div>`;
   $('cbuy').innerHTML=(S.wants.length||boughtExtra.length)?S.wants.slice().sort((a,b)=>(a.got-b.got)||(a.prio-b.prio)).map(wrow).join('')+boughtExtra.map(xrow).join(''):'<div class="empty">欲しい物を入れるとここに並びます。</div>';
   $('cpack').innerHTML=S.pack.length?S.pack.map(p=>`<div class="ck ${p.done?'done':''}"><input class="chk" type="checkbox" data-cp="${p.id}" ${p.done?'checked':''} aria-label="${esc(p.name)}を持った"><div class="nm">${esc(p.name)}</div><span class="mk">${p.done?'✔':''}</span></div>`).join(''):'<div class="empty">持ち物タブで追加できます。</div>';
   const by={};
   memos.forEach(m=>{if(m.yen==null)return;(by[m.booth]=by[m.booth]||{sum:0,items:[]});by[m.booth].sum+=+m.yen;by[m.booth].items.push((m.sub?m.sub+'：':'')+(m.text||'写真メモ')+' '+yen(m.yen))});
   S.wants.filter(w=>w.got&&!w.memoId&&w.booth&&BY[w.booth]).forEach(w=>{const a=+(w.actual!=null?w.actual:w.yen)||0;(by[w.booth]=by[w.booth]||{sum:0,items:[]});by[w.booth].sum+=a;by[w.booth].items.push((w.sub?w.sub+'：':'')+w.name+' '+yen(a))});
   const rows=Object.entries(by).sort((a,b)=>b[1].sum-a[1].sum),noBooth=S.wants.filter(w=>w.got&&!w.memoId&&!w.booth).reduce((s,w)=>s+(+(w.actual!=null?w.actual:w.yen)||0),0);
-  $('cspend').innerHTML=rows.length||noBooth?rows.map(([k,v])=>`<button class="ck" data-sp="${k}" style="width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer">${badge(k)}<div class="nm">${esc(BY[k].name.replace(/（.*$/,''))}<span class="sub">${v.items.map(esc).join('、')}</span></div><b style="font-family:var(--display);font-size:19px;white-space:nowrap">${yen(v.sum)}</b></button>`).join('')+(noBooth?`<div class="ck"><div class="nm">ブース未指定<span class="sub">欲しい物のチェックで「買った」にしたもの</span></div><b style="font-family:var(--display);font-size:19px">${yen(noBooth)}</b></div>`:'')+`<div class="ck done"><div class="nm"><b>合計</b></div><b style="font-family:var(--display);font-size:21px">${yen(spentTotal())}</b></div>`:'<div class="empty">買った物の写真と金額を保存すると、ブースごとの合計が出ます。</div>';
+  $('cspend').innerHTML=rows.length||noBooth?rows.map(([k,v])=>`<button class="ck" data-sp="${k}" style="width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer">${badge(k)}<div class="nm">${esc(brandOf(k))}<span class="sub">${v.items.map(esc).join('、')}</span></div><b style="font-family:var(--display);font-size:19px;white-space:nowrap">${yen(v.sum)}</b></button>`).join('')+(noBooth?`<div class="ck"><div class="nm">ブース未指定<span class="sub">欲しい物のチェックで「買った」にしたもの</span></div><b style="font-family:var(--display);font-size:19px">${yen(noBooth)}</b></div>`:'')+`<div class="ck done"><div class="nm"><b>合計</b></div><b style="font-family:var(--display);font-size:21px">${yen(spentTotal())}</b></div>`:'<div class="empty">買った物の写真と金額を保存すると、ブースごとの合計が出ます。</div>';
   $('cspend').querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{memoFilter=b.dataset.sp;memoAdd=false;show('memo');render();renderMemo()});
   $('cbooth').querySelectorAll('[data-cb]').forEach(c=>c.onchange=()=>{if(c.checked)S.seen[c.dataset.cb]=true;else delete S.seen[c.dataset.cb];save();render()});
   $('cbuy').querySelectorAll('[data-cw]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.cw);w.got=c.checked;if(c.checked)w.day=todayKey();if(c.checked&&w.actual==null)w.actual=+w.yen||0;save();render()});
@@ -2018,7 +2019,7 @@ function renderSpend(){
   const B=+S.budget||0,sp=spentTotal(),left=B-sp,{rows,noBooth}=spendByBooth();
   $('sp-tiles').innerHTML=`<div class="tile"><small>予算</small><b>${B?yen(B):'未設定'}</b></div><div class="tile"><small>使った</small><b>${yen(sp)}</b></div><div class="tile"><small>残り</small><b class="${B&&left<0?'neg':''}">${B?(left<0?'−':'')+yen(Math.abs(left)):'—'}</b></div>`;
   $('sp-bar').classList.toggle('over',B&&left<0);$('sp-fill').style.width=B?Math.min(100,sp/B*100)+'%':'0';
-  $('sp-list').innerHTML=rows.length||noBooth?rows.map(([k,v])=>`<button class="ck" data-sp="${k}" style="width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer">${badge(k)}<div class="nm">${esc(BY[k].name.replace(/（.*$/,''))}<span class="sub">${v.items.map(esc).join('、')}</span></div><b style="font-family:var(--display);font-size:19px;white-space:nowrap">${yen(v.sum)}</b></button>`).join('')+(noBooth?`<div class="ck"><div class="nm">ブース未指定<span class="sub">欲しい物のチェックで「買った」にしたもの</span></div><b style="font-family:var(--display);font-size:19px">${yen(noBooth)}</b></div>`:''):'<div class="empty">買った物の写真と金額を保存すると、ブースごとの内訳が出ます。</div>';
+  $('sp-list').innerHTML=rows.length||noBooth?rows.map(([k,v])=>`<button class="ck" data-sp="${k}" style="width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer">${badge(k)}<div class="nm">${esc(brandOf(k))}<span class="sub">${v.items.map(esc).join('、')}</span></div><b style="font-family:var(--display);font-size:19px;white-space:nowrap">${yen(v.sum)}</b></button>`).join('')+(noBooth?`<div class="ck"><div class="nm">ブース未指定<span class="sub">欲しい物のチェックで「買った」にしたもの</span></div><b style="font-family:var(--display);font-size:19px">${yen(noBooth)}</b></div>`:''):'<div class="empty">買った物の写真と金額を保存すると、ブースごとの内訳が出ます。</div>';
   $('sp-list').querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{memoFilter=b.dataset.sp;memoAdd=false;show('memo');render();renderMemo()});
 }
 /* ---- イベント: マップ上の★と時間、30分前のお知らせ ---- */
