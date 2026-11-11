@@ -610,7 +610,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v14<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v15<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -1251,6 +1251,15 @@ function startEdit(id){const w=S.wants.find(x=>x.id==id);if(!w)return;editW=w.id
   $('w-img').value='';$('w-imsg').textContent='';$('w-submit').textContent='変更を保存';$('w-cancel').hidden=false;
   $('wform').scrollIntoView({behavior:'smooth',block:'start'});toast('✎ 編集中：直して「変更を保存」を押してください')}
 function endEdit(){editW=null;$('w-submit').textContent='リストに追加';$('w-cancel').hidden=true}
+function boothSwitch(nb){
+  if(editW==null||!nb)return;const ew=S.wants.find(x=>x.id==editW);if(!ew||nb===ew.booth)return;
+  const list=S.wants.filter(x=>x.booth===nb&&x.id!==ew.id&&!x.got);
+  endEdit();
+  if(list.length===1){startEdit(list[0].id);return}
+  $('w-name').value='';$('w-yen').value='';$('w-prio').value='2';$('w-img').value='';$('w-imsg').textContent='';
+  toast(list.length?`ブース ${nb} は欲しい物が${list.length}件あります。下のリストから選ぶか、新規で追加してください`:'編集をやめて、このブースの新規追加に切り替えました')}
+$('w-booth').addEventListener('input',()=>{const v=$('w-booth').value.trim();if(BY[v])boothSwitch(resolveBooth(v))});
+$('w-booth').addEventListener('change',()=>boothSwitch(resolveBooth($('w-booth').value.trim())));
 $('w-cancel').onclick=()=>{endEdit();$('wform').reset();$('w-prio').value='2';$('w-imsg').textContent='';fillSub('w-sub','w-subbox','')};
 $('w-img').addEventListener('change',()=>{const n=$('w-img').files.length;$('w-imsg').textContent=n?n+'枚 選択中':''});
 $('wform').addEventListener('submit',async e=>{
