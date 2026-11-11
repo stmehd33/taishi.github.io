@@ -684,7 +684,9 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 <section id="plan" hidden></section>
 
 <section id="wants" hidden>
-  <h2>欲しいもの</h2>
+  <h2>欲しい物・戦利品</h2>
+  <div class="dayseg" id="wsw" style="margin:0 0 10px"><button class="chip" type="button" data-wv="want" aria-pressed="true">欲しい物</button><button class="chip" type="button" data-wv="haul" aria-pressed="false">戦利品</button></div>
+  <div id="wv-want">
   <form class="form" id="wform">
     <div class="full"><label for="w-name">品名・メモ（ざっくりでOK。ブースだけ決まっている時は「ブース」で★）</label><input type="text" id="w-name" placeholder="例：焚き火台、簡単に立てれるテント" autocomplete="off"></div>
     <div class="full"><label for="w-brand">ブランド・店名（未定なら空欄。買ってから入れられます）</label><input type="text" id="w-brand" placeholder="例：未定" autocomplete="off"></div>
@@ -703,6 +705,12 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
   </div>
   <div class="sum" id="wsum"></div>
   <div id="wlist"></div>
+  </div>
+  <div id="wv-haul" hidden>
+    <div class="note" id="haul-sum" style="margin:0 0 8px"></div>
+    <div id="haul-list"></div>
+    <div class="tools" style="margin-top:12px"><button class="chip" id="haul-photo" type="button">買った物の写真を見る ›</button><button class="chip" id="haul-wants" type="button">欲しい物リストへ ›</button></div>
+  </div>
 </section>
 
 <section id="booths" hidden>
@@ -862,13 +870,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 
 
 
-<section id="haul" hidden>
-  <button class="chip" id="haul-back" type="button">‹ ホームにもどる</button>
-  <h2 style="margin-top:10px">戦利品</h2>
-  <div class="note" id="haul-sum" style="margin:0 0 8px"></div>
-  <div id="haul-list"></div>
-  <div class="tools" style="margin-top:12px"><button class="chip" id="haul-photo" type="button">買った物の写真を見る ›</button><button class="chip" id="haul-wants" type="button">欲しい物リストへ ›</button></div>
-</section>
+<section id="haul" hidden></section>
 
 <section id="spend" hidden>
   <button class="chip" id="sp-back" type="button">‹ ホームにもどる</button>
@@ -967,7 +969,11 @@ function placeMap(tab){
 let bview=null;
 function setBSearch(o){const b=$('bsearch-btn'),p=$('bsearch');if(!b||!p)return;p.hidden=!o;b.setAttribute('aria-expanded',o);b.textContent='🔍 ブース検索 '+(o?'▴':'▾');if(o)setTimeout(()=>{try{$('q').focus({preventScroll:true})}catch(e){}},50)}
 function setBView_old(v){bview=v;document.querySelectorAll('#booths [data-bvw]').forEach(e=>e.hidden=e.dataset.bvw!==v);document.querySelectorAll('#bviews [data-bv]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.bv===v))}
+let wview='want';
+function applyWV(){const w=wview==='haul';if($('wv-want'))$('wv-want').hidden=w;if($('wv-haul'))$('wv-haul').hidden=!w;document.querySelectorAll('#wsw [data-wv]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.wv===wview))}
 function show(tab){
+  if(tab==='haul'){wview='haul';tab='wants'}
+  if(tab==='wants')applyWV();
   if(tab!=='map'&&typeof routeOverride!=='undefined'&&routeOverride){routeOverride=null;if($('optbar'))$('optbar').hidden=true}
   {let dn=false;try{dn=dayOn()}catch(e){}document.body.classList.toggle('sub',tab!=='home'||dn)}
   if(tab==='seenp')tab='booths';
@@ -1022,7 +1028,7 @@ function toggleGuide(on){const p=$('guide-pop'),b=$('go-guide');if(on===undefine
 $('go-guide').onclick=()=>toggleGuide();
 $('t-more').onclick=e=>{e.stopPropagation();const o=$('tabs').classList.toggle('open');$('t-more').setAttribute('aria-expanded',o)};
 document.addEventListener('click',e=>{if(!e.target.closest('#tabs')&&$('tabs').classList.contains('open')){$('tabs').classList.remove('open');$('t-more').setAttribute('aria-expanded','false')}});
-document.querySelectorAll('.tabs button[data-tab]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.tab==='memo'){memoFilter=null;memoAdd=true}show(b.dataset.tab);render();if(b.dataset.tab==='memo')renderMemo()}));
+document.querySelectorAll('.tabs button[data-tab]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.tab==='memo'){memoFilter=null;memoAdd=true}if(b.dataset.tab==='wants')wview='want';show(b.dataset.tab);render();if(b.dataset.tab==='memo')renderMemo()}));
 
 /* plan */
 const PL={1:'高',2:'中',3:'低'};
@@ -1797,8 +1803,8 @@ function renderEvents(){
   $('evday').querySelectorAll('[data-ef]').forEach(b=>b.onclick=()=>{evFilter=b.dataset.ef;renderEvents()});
   const list=evs.filter(e=>evFilter==='all'||(evFilter==='none'?!e.day:e.day===evFilter)).sort((a,b)=>{const ix=x=>x.day?EVENT.days.findIndex(d=>d.key===x.day):99;return ix(a)-ix(b)||(a.start||'99').localeCompare(b.start||'99')});
   $('evlist').innerHTML=list.length?list.map(e=>{const add=S.sched.find(s=>s.evId===e.id);
-    return `<div class="ck ${add?'done':''}" style="align-items:flex-start"><span class="stime" style="padding-top:2px">${e.start||'--:--'}</span><div class="nm"><b>${esc(e.title)}</b><span class="sub">${dayLabel(e.day)} ／ ${esc(e.place||'')}</span>${e.note?`<span class="sub">${esc(e.note)}</span>`:''}</div>
-      <button class="btn ${add?'sub2':''}" data-ev="${e.id}" style="padding:8px 10px;font-size:13px;min-height:44px;flex:none">${add?'★ 気になる':'☆ 気になる'}</button></div>`}).join(''):'<div class="empty">この日のイベントは登録されていません。</div>';
+    return `<div class="ck" style="align-items:flex-start;${add?'border-left:6px solid var(--forest);':''}"><span class="stime" style="padding-top:2px">${e.start||'--:--'}</span><div class="nm"><b>${esc(e.title)}</b><span class="sub">${dayLabel(e.day)} ／ ${esc(e.place||'')}</span>${e.note?`<span class="sub">${esc(e.note)}</span>`:''}</div>
+      <button class="btn ${add?'':'sub2'}" aria-pressed="${!!add}" data-ev="${e.id}" style="padding:8px 10px;font-size:13px;min-height:44px;flex:none">${add?'★ 気になる':'☆ 気になる'}</button></div>`}).join(''):'<div class="empty">この日のイベントは登録されていません。</div>';
   $('evlist').querySelectorAll('[data-ev]').forEach(b=>b.onclick=()=>{
     const e=evs.find(x=>x.id===b.dataset.ev),ex=S.sched.find(s=>s.evId===e.id);
     if(ex)S.sched=S.sched.filter(s=>s.evId!==e.id);   /* もう一度押すと取り消し */
@@ -2039,7 +2045,7 @@ function renderHome(){
   const latest=YEAR_KEYS[YEAR_KEYS.length-1];
   $('ynote').innerHTML=`<b>${EVENT.year}年 ${esc(EVENT.name)}</b>（${esc(EVENT.dates)} ／ ${esc(EVENT.place)}）を表示中${CUR_YEAR<latest?'。<b>過去の記録</b>です':''}。`+(YEAR_KEYS.length===1?'<br>来年度版を作ると、ここに年が増えて、過去の年の記録もそのまま残ります。':'');
   const ks=starList(),seen=ks.filter(doneOf).length,B=+S.budget||0,sp=spentTotal();
-  const tile=(l,a,b,go)=>`<button type="button" class="tile ${b&&a===b?'full':''} ${homeOpen===go?'on':''}" data-ht="${go}" aria-expanded="${homeOpen===go}" style="font:inherit;color:inherit;cursor:pointer"><small>${l} ${homeOpen===go?'▴':'▾'}</small><b>${a}/${b}</b><div class="bar"><i style="width:${b?a/b*100:0}%"></i></div></button>`;
+  const tile=(l,a,b,go)=>`<button type="button" class="tile ${b&&a===b?'full':''} ${homeOpen===go?'on':''}" data-ht="${go}" aria-expanded="${homeOpen===go}" style="font:inherit;color:inherit;cursor:pointer"><small>${l} ${go==='haul'?'›':(homeOpen===go?'▴':'▾')}</small><b>${a}/${b}</b><div class="bar"><i style="width:${b?a/b*100:0}%"></i></div></button>`;
   $('htiles').innerHTML=tile('ブース',seen,ks.length,'booth')+tile('戦利品',S.wants.filter(w=>w.got).length,S.wants.length,'haul');
   {const sk=starList(),gt=S.wants.filter(w=>w.got),g=st=>sk.filter(k=>stOf(k)===st);
    const sec=(t,n,body,empty,go)=>`<div class="hbox"><div class="hh"><b>${t}</b><span>${n}</span>${go?`<button type="button" class="chip" data-hgo="${go}">全部 ›</button>`:''}</div><div class="hbody">${body||`<div class="note" style="margin:6px 0">${empty}</div>`}</div></div>`;
@@ -2050,7 +2056,7 @@ function renderHome(){
    $('hlists').innerHTML=homeOpen==='booth'?bx:homeOpen==='haul'?hx:'';
    bindBRows($('hlists'));
    $('hlists').querySelectorAll('[data-hgo]').forEach(b=>b.onclick=()=>{show(b.dataset.hgo);render()})}
-  $('htiles').querySelectorAll('[data-ht]').forEach(b=>b.onclick=()=>{homeOpen=homeOpen===b.dataset.ht?null:b.dataset.ht;renderHome()});
+  $('htiles').querySelectorAll('[data-ht]').forEach(b=>b.onclick=()=>{if(b.dataset.ht==='haul'){show('haul');render();window.scrollTo({top:0});return}homeOpen=homeOpen===b.dataset.ht?null:b.dataset.ht;renderHome()});
   if(document.activeElement!==$('hbudget'))$('hbudget').value=fmtYen(B);
   {const op=S.wants.filter(w=>!w.got),sm=i=>op.filter(w=>intentOf(w)===i).reduce((a,w)=>a+(+w.yen||0),0),must=sm('must'),maybe=sm('maybe'),skip=sm('skip');
    let msg='';if(B){const lf2=B-sp;if(must>lf2)msg=`<div class="hw-warn ng">⚠ 「絶対買う」だけで予算を ${yen(must-lf2)} 超えます</div>`;else if(must+maybe>lf2)msg=`<div class="hw-warn">「悩み中」も全部買うと ${yen(must+maybe-lf2)} 超えます</div>`}
@@ -2072,12 +2078,12 @@ function renderHaul(){
   const got=S.wants.filter(w=>w.got),open=S.wants.filter(w=>!w.got);
   const sum=got.reduce((a,w)=>a+(+(w.actual!=null?w.actual:w.yen)||0),0);
   $('haul-sum').textContent=S.wants.length?`買った ${got.length} / 欲しい物 ${S.wants.length}　・　戦利品の合計 ${yen(sum)}`:'まだ欲しい物がありません。「欲しい物」で登録し、買ったら「買った」を付けると、ここに並びます。';
-  const row=w=>`<div class="ck ${w.got?'done':''}"><div class="nm">${esc(w.name)}<span class="sub">${[w.brand,w.booth&&BY[w.booth]?w.booth+' '+BY[w.booth].name.replace(/（.*$/,''):'',w.got?(w.actual!=null?yen(w.actual):'金額未入力'):(w.yen?'予算 '+yen(w.yen):'')].filter(Boolean).map(esc).join(' ／ ')}</span></div></div>`;
+  const row=w=>`<div class="ck"><div class="nm">${esc(w.name)}<span class="sub">${[w.brand,w.booth&&BY[w.booth]?w.booth+' '+BY[w.booth].name.replace(/（.*$/,''):'',w.got?((EVENT.days.find(v=>v.key===recDay(w))||{}).label||'')+' '+(w.actual!=null?yen(w.actual):'金額未入力'):(w.yen?'予算 '+yen(w.yen):'')].filter(Boolean).map(esc).join(' ／ ')}</span></div></div>`;
   $('haul-list').innerHTML=(got.length?'<h3 class="sh">買った物</h3>'+got.map(row).join(''):'')+(open.length?'<h3 class="sh">まだ買っていない</h3>'+open.map(row).join(''):'');
 }
-$('haul-back').onclick=()=>{show('home');render()};
+document.querySelectorAll('#wsw [data-wv]').forEach(b=>b.onclick=()=>{wview=b.dataset.wv;applyWV();window.scrollTo({top:0})});
 $('haul-photo').onclick=()=>{memoFilter=null;memoAdd=false;show('memo');render();renderMemo()};
-$('haul-wants').onclick=()=>{show('wants');render()};
+$('haul-wants').onclick=()=>{wview='want';applyWV();window.scrollTo({top:0})};
 function render(){renderEvMarks();renderEvAlert();renderSeen();renderHaul();renderEntry();renderHome();renderSpend();if(!$('consider').hidden&&document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.coy)renderConsiderSummary();else renderConsider();renderNotes();renderPlan();renderWants();renderBooths();renderMap();renderSched();renderEvents();renderPack();renderCheck()}
 
 /* ================= クラウド同期（claude.ai の db 機能。使えない時は端末内のみ） =================
