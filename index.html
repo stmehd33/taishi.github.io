@@ -616,7 +616,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v24<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v25<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -1931,10 +1931,10 @@ function renderCheck(){
   const xrow=m=>`<div class="ck done"><span style="width:26px;flex:none"></span><div class="nm">${esc(m.text||'写真メモ')}<span class="sub">予定外 ${yen(m.yen)} ／ ${m.booth} ${esc(m.sub||brandOf(m.booth))}</span></div><span class="mk">✔</span></div>`;
   $('cbuy').innerHTML=(S.wants.length||boughtExtra.length)?S.wants.slice().sort((a,b)=>(a.got-b.got)||(a.prio-b.prio)).map(wrow).join('')+boughtExtra.map(xrow).join(''):'<div class="empty">欲しい物を入れるとここに並びます。</div>';
   const by={};
-  memos.forEach(m=>{if(m.yen==null)return;(by[m.booth]=by[m.booth]||{sum:0,items:[]});by[m.booth].sum+=+m.yen;by[m.booth].items.push((m.sub?m.sub+'：':'')+(m.text||'写真メモ')+' '+yen(m.yen))});
-  S.wants.filter(w=>w.got&&!w.memoId&&w.booth&&BY[w.booth]).forEach(w=>{const a=+(w.actual!=null?w.actual:w.yen)||0;(by[w.booth]=by[w.booth]||{sum:0,items:[]});by[w.booth].sum+=a;by[w.booth].items.push((w.sub?w.sub+'：':'')+w.name+' '+yen(a))});
+  memos.forEach(m=>{if(m.yen==null)return;const kk=m.booth+'|'+(m.sub||'');(by[kk]=by[kk]||{k:m.booth,sub:m.sub||'',sum:0,items:[]});by[kk].sum+=+m.yen;by[kk].items.push((m.text||'写真メモ')+' '+yen(m.yen))});
+  S.wants.filter(w=>w.got&&!w.memoId&&w.booth&&BY[w.booth]).forEach(w=>{const a=+(w.actual!=null?w.actual:w.yen)||0;const kk=w.booth+'|'+(w.sub||'');(by[kk]=by[kk]||{k:w.booth,sub:w.sub||'',sum:0,items:[]});by[kk].sum+=a;by[kk].items.push(w.name+' '+yen(a))});
   const rows=Object.entries(by).sort((a,b)=>b[1].sum-a[1].sum),noBooth=S.wants.filter(w=>w.got&&!w.memoId&&!w.booth).reduce((s,w)=>s+(+(w.actual!=null?w.actual:w.yen)||0),0);
-  $('cspend').innerHTML=rows.length||noBooth?rows.map(([k,v])=>`<button class="ck" data-sp="${k}" style="width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer">${badge(k)}<div class="nm">${esc(ckBrands(k).join('／'))}<span class="sub">${v.items.map(esc).join('、')}</span></div><b style="font-family:var(--display);font-size:19px;white-space:nowrap">${yen(v.sum)}</b></button>`).join('')+(noBooth?`<div class="ck"><div class="nm">ブース未指定<span class="sub">欲しい物のチェックで「買った」にしたもの</span></div><b style="font-family:var(--display);font-size:19px">${yen(noBooth)}</b></div>`:'')+`<div class="ck done"><div class="nm"><b>合計</b></div><b style="font-family:var(--display);font-size:21px">${yen(spentTotal())}</b></div>`:'<div class="empty">買った物の写真と金額を保存すると、ブースごとの合計が出ます。</div>';
+  $('cspend').innerHTML=rows.length||noBooth?rows.map(([_,v])=>`<button class="ck" data-sp="${v.k}" style="width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer">${badge(v.k)}<div class="nm">${esc(v.sub||shortName(v.k))}<span class="sub">${v.items.map(esc).join('、')}</span></div><b style="font-family:var(--display);font-size:19px;white-space:nowrap">${yen(v.sum)}</b></button>`).join('')+(noBooth?`<div class="ck"><div class="nm">ブース未指定<span class="sub">欲しい物のチェックで「買った」にしたもの</span></div><b style="font-family:var(--display);font-size:19px">${yen(noBooth)}</b></div>`:'')+`<div class="ck done"><div class="nm"><b>合計</b></div><b style="font-family:var(--display);font-size:21px">${yen(spentTotal())}</b></div>`:'<div class="empty">買った物の写真と金額を保存すると、ブースごとの合計が出ます。</div>';
   $('cspend').querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{memoFilter=b.dataset.sp;memoAdd=false;show('memo');render();renderMemo()});
   $('cbooth').querySelectorAll('[data-cb]').forEach(c=>c.onchange=()=>{if(c.checked)S.seen[c.dataset.cb]=true;else delete S.seen[c.dataset.cb];save();render()});
   $('cbuy').querySelectorAll('[data-cw]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.cw);w.got=c.checked;if(c.checked)w.day=todayKey();if(c.checked&&w.actual==null)w.actual=+w.yen||0;save();render()});
@@ -1983,8 +1983,8 @@ $('h-spent').onclick=$('h-left').onclick=()=>{show('spend');render()};
 $('sp-back').onclick=()=>{show('home');render()};
 function spendByBooth(){
   const by={};
-  memos.forEach(m=>{if(m.yen==null)return;(by[m.booth]=by[m.booth]||{sum:0,items:[]});by[m.booth].sum+=+m.yen;by[m.booth].items.push((m.sub?m.sub+'：':'')+(m.text||'写真メモ')+' '+yen(m.yen))});
-  S.wants.filter(w=>w.got&&!w.memoId&&w.booth&&BY[w.booth]).forEach(w=>{const a=+(w.actual!=null?w.actual:w.yen)||0;(by[w.booth]=by[w.booth]||{sum:0,items:[]});by[w.booth].sum+=a;by[w.booth].items.push((w.sub?w.sub+'：':'')+w.name+' '+yen(a))});
+  memos.forEach(m=>{if(m.yen==null)return;const kk=m.booth+'|'+(m.sub||'');(by[kk]=by[kk]||{k:m.booth,sub:m.sub||'',sum:0,items:[]});by[kk].sum+=+m.yen;by[kk].items.push((m.text||'写真メモ')+' '+yen(m.yen))});
+  S.wants.filter(w=>w.got&&!w.memoId&&w.booth&&BY[w.booth]).forEach(w=>{const a=+(w.actual!=null?w.actual:w.yen)||0;const kk=w.booth+'|'+(w.sub||'');(by[kk]=by[kk]||{k:w.booth,sub:w.sub||'',sum:0,items:[]});by[kk].sum+=a;by[kk].items.push(w.name+' '+yen(a))});
   const noBooth=S.wants.filter(w=>w.got&&!w.memoId&&!w.booth).reduce((s,w)=>s+(+(w.actual!=null?w.actual:w.yen)||0),0);
   return {rows:Object.entries(by).sort((a,b)=>b[1].sum-a[1].sum),noBooth};
 }
@@ -2017,7 +2017,7 @@ function renderSpend(){
   const B=+S.budget||0,sp=spentTotal(),left=B-sp,{rows,noBooth}=spendByBooth();
   $('sp-tiles').innerHTML=`<div class="tile"><small>予算</small><b>${B?yen(B):'未設定'}</b></div><div class="tile"><small>使った</small><b>${yen(sp)}</b></div><div class="tile"><small>残り</small><b class="${B&&left<0?'neg':''}">${B?(left<0?'−':'')+yen(Math.abs(left)):'—'}</b></div>`;
   $('sp-bar').classList.toggle('over',B&&left<0);$('sp-fill').style.width=B?Math.min(100,sp/B*100)+'%':'0';
-  $('sp-list').innerHTML=rows.length||noBooth?rows.map(([k,v])=>`<button class="ck" data-sp="${k}" style="width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer">${badge(k)}<div class="nm">${esc(ckBrands(k).join('／'))}<span class="sub">${v.items.map(esc).join('、')}</span></div><b style="font-family:var(--display);font-size:19px;white-space:nowrap">${yen(v.sum)}</b></button>`).join('')+(noBooth?`<div class="ck"><div class="nm">ブース未指定<span class="sub">欲しい物のチェックで「買った」にしたもの</span></div><b style="font-family:var(--display);font-size:19px">${yen(noBooth)}</b></div>`:''):'<div class="empty">買った物の写真と金額を保存すると、ブースごとの内訳が出ます。</div>';
+  $('sp-list').innerHTML=rows.length||noBooth?rows.map(([_,v])=>`<button class="ck" data-sp="${v.k}" style="width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer">${badge(v.k)}<div class="nm">${esc(v.sub||shortName(v.k))}<span class="sub">${v.items.map(esc).join('、')}</span></div><b style="font-family:var(--display);font-size:19px;white-space:nowrap">${yen(v.sum)}</b></button>`).join('')+(noBooth?`<div class="ck"><div class="nm">ブース未指定<span class="sub">欲しい物のチェックで「買った」にしたもの</span></div><b style="font-family:var(--display);font-size:19px">${yen(noBooth)}</b></div>`:''):'<div class="empty">買った物の写真と金額を保存すると、ブースごとの内訳が出ます。</div>';
   $('sp-list').querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{memoFilter=b.dataset.sp;memoAdd=false;show('memo');render();renderMemo()});
 }
 /* ---- イベント: マップ上の★と時間、30分前のお知らせ ---- */
