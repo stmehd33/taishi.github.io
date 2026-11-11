@@ -2223,7 +2223,7 @@ $('go-day').onclick=()=>{UI.day=dayOn()?'off':'on';uiSave();applyUI();toast(dayO
 applyUI();setInterval(()=>{applyUI();if(document.body.classList.contains('daymode')&&typeof render==='function')try{renderHome()}catch(e){}},60000);
 (function(){const o=$('offst');if(!o)return;
  if(!('serviceWorker' in navigator)){o.textContent='📴 オフライン保存：この環境では使えません（電波が弱いときは、先に一度開いておいてください）';return}
- navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{o.textContent='📴 オフライン保存：準備OK（一度開いたあと、電波がなくても開けます）'}).catch(()=>{o.textContent='📴 オフライン保存：この環境では使えません（電波が弱いときは、先に一度開いておいてください）'})})();
+ navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{o.textContent='📴 オフライン保存：準備OK／版 v9（一度開いたあと、電波がなくても開けます）'}).catch(()=>{o.textContent='📴 オフライン保存：この環境では使えません（電波が弱いときは、先に一度開いておいてください）'})})();
 
 /* ブース番号の入力欄：番号を直接入れる／「名前で探す」（普段は閉じている）で選ぶ */
 function attachBoothPicker(id){
