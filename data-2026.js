@@ -283,7 +283,7 @@ const RAW = `101|M16 camping equipment（MMF／WOOD and WOOD／NORAs／NMM／ner
 609|マリンライセンスロイヤル
 610|ユニマットプレシャス
 611|海は街より刺激的 Boatingの世界
-612|特殊道具推進組合
+612|特殊道具推進組合（CAMP GEEKS／Dapper Punch／OMA FACTORY／Aplysia CAMP／BELIER WORKS／Shim.Craft）
 613|Curiace
 614|KOVEA
 615|TENTFACTORY

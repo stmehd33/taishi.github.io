@@ -689,11 +689,12 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
   <div class="dayseg" id="wsw" style="margin:0 0 10px"><button class="chip" type="button" data-wv="want" aria-pressed="true">欲しい物</button><button class="chip" type="button" data-wv="haul" aria-pressed="false">戦利品</button></div>
   <div id="wv-want">
   <form class="form" id="wform">
-    <div class="full"><label for="w-name">品名・メモ（ざっくりでOK。ブースだけ決まっている時は「ブース」で★）</label><input type="text" id="w-name" placeholder="例：焚き火台、簡単に立てれるテント" autocomplete="off"></div>
-    <div><label for="w-yen">予算（円・空欄でOK）</label><input type="text" data-comma id="w-yen" inputmode="numeric" pattern="[0-9,]*" autocomplete="off" placeholder="5000"></div>
-    <div class="full"><label for="w-booth">ブース（番号か名前。未定なら空欄）</label><input type="text" id="w-booth" placeholder="例：403 か UNIFLAME">
+    <div class="full"><label for="w-booth">① ブース（番号か名前。未定なら空欄）</label><input type="text" id="w-booth" placeholder="例：403 か UNIFLAME か 612" autocomplete="off">
     <div class="note" id="w-bmsg" style="margin:2px 0 0"></div></div>
-    <div class="full" id="w-subbox" hidden><label for="w-sub">ブース内のどの店？（このブースは複数の店が入っています）</label><select id="w-sub"></select></div>
+    <div class="full" id="w-subbox" hidden><label for="w-sub">ブース内のどの店？（複数の店・ブランドが入っています）</label><select id="w-sub"></select></div>
+    <div class="full"><label for="w-name">② 品名・メモ（ざっくりでOK）</label><input type="text" id="w-name" placeholder="例：焚き火台、簡単に立てれるテント" autocomplete="off"></div>
+    <div class="full"><label for="w-yen">③ 予算（円・空欄でOK）</label><input type="text" data-comma id="w-yen" inputmode="numeric" pattern="[0-9,]*" autocomplete="off" placeholder="5000"></div>
+    <div class="full"><label class="wadd" for="w-img">📷 写真・スクショを添付（任意）</label><input type="file" id="w-img" accept="image/*" multiple hidden><div class="note" id="w-imsg" style="margin:2px 0 0"></div></div>
     <div class="full"><label for="w-prio">買うかどうか</label>
       <select id="w-prio"><option value="1">絶対買う</option><option value="2" selected>悩み中</option><option value="3">我慢</option></select></div>
     <div class="full"><button class="btn" type="submit">リストに追加</button></div>
@@ -1216,25 +1217,29 @@ function renderWants(){
   if(!ord.length){$('wlist').innerHTML='<div class="empty">欲しいものを追加すると、予算の合計が出ます。</div>';return}
   const pl={1:'絶対',2:'悩み',3:'我慢'};
   $('wlist').innerHTML=ord.map(w=>`<div class="row ${w.got?'done':''}"><input class="chk" type="checkbox" data-got="${w.id}" ${w.got?'checked':''} aria-label="${esc(w.name)}を買った">
-    <div class="nm"><span class="prio p${w.prio}">${pl[w.prio]}</span>${esc(w.name)}<span class="sub">${w.got?'予定 '+(w.yen?yen(w.yen):'なし'):(w.yen?yen(w.yen):'予算未入力')}${w.brand?' ／ '+esc(w.brand):''}${w.booth&&BY[w.booth]?' ／ '+esc(BY[w.booth].name.replace(/（.*$/,'')):(w.got||w.brand?'':' ／ ブース未定')}${subTag(w.sub)}</span>${w.got?`<span class="act"><label for="b${w.id}">ブランド・店名</label><input type="text" id="b${w.id}" data-wbr="${w.id}" value="${esc(w.brand||'')}" placeholder="買ってから入力OK"><label for="o${w.id}">ブース番号</label><input type="text" id="o${w.id}" data-wbo="${w.id}" inputmode="numeric" value="${esc(w.booth||'')}" placeholder="例：403"><label for="a${w.id}">実際の価格（円）</label><input type="text" data-comma id="a${w.id}" data-act="${w.id}" inputmode="numeric" pattern="[0-9,]*" autocomplete="off" value="${fmtY2(w.actual!=null?w.actual:(w.yen||''))}"></span>`:`<span class="act"><button class="btn sub2" type="button" data-wbuy="${w.id}">買った（写真・金額・ブランドを入れる）</button></span>`}</div>
+    <div class="nm"><span class="prio p${w.prio}">${pl[w.prio]}</span>${esc(w.name)}<span class="sub">${w.got?'予定 '+(w.yen?yen(w.yen):'なし'):(w.yen?yen(w.yen):'予算未入力')}${w.brand?' ／ '+esc(w.brand):''}${w.booth&&BY[w.booth]?' ／ '+esc(BY[w.booth].name.replace(/（.*$/,'')):(w.got||w.brand?'':' ／ ブース未定')}${subTag(w.sub)}</span>${w.got?`<span class="act"><label for="b${w.id}">ブランド・店名</label><input type="text" id="b${w.id}" data-wbr="${w.id}" value="${esc(w.brand||'')}" placeholder="買ってから入力OK"><label for="o${w.id}">ブース番号</label><input type="text" id="o${w.id}" data-wbo="${w.id}" inputmode="numeric" value="${esc(w.booth||'')}" placeholder="例：403"><label for="a${w.id}">実際の価格（円）</label><input type="text" data-comma id="a${w.id}" data-act="${w.id}" inputmode="numeric" pattern="[0-9,]*" autocomplete="off" value="${fmtY2(w.actual!=null?w.actual:(w.yen||''))}"></span>`:`<span class="act"><button class="btn sub2" type="button" data-wbuy="${w.id}">買った（写真・金額・ブランドを入れる）</button></span>`}${wRow(w.id)}</div>
     ${w.booth&&BY[w.booth]?badge(w.booth):''}<button class="x" data-wdel="${w.id}" aria-label="削除">✕</button></div>`).join('');
+  $('wlist').querySelectorAll('[data-wfile]').forEach(i=>i.onchange=async()=>{const n=await wSaveImgs(i.dataset.wfile,[...i.files]);toast(n?`✔ 画像を${n}枚追加しました`:'画像を保存できませんでした');renderWants()});
+  $('wlist').querySelectorAll('[data-wvi]').forEach(m=>m.onclick=()=>wViewer(m.dataset.wvi,renderWants));
   $('wlist').querySelectorAll('[data-act]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.act);w.actual=ynum(c.value);save();renderWants()});
   $('wlist').querySelectorAll('[data-got]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.got);w.got=c.checked;if(c.checked)w.day=todayKey();if(c.checked&&w.actual==null)w.actual=+w.yen||0;save();render()});
   $('wlist').querySelectorAll('[data-wbr]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.wbr);w.brand=c.value.trim();save();renderWants()});
   $('wlist').querySelectorAll('[data-wbo]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.wbo),v=c.value.trim();if(v&&!BY[v]){toast('そのブース番号は一覧にありません');c.value=w.booth||'';return}w.booth=v;if(!v)w.sub='';if(v&&!S.stars[v])S.stars[v]={done:false,prio:2};save();render()});
   $('wlist').querySelectorAll('[data-wbuy]').forEach(c=>c.onclick=()=>{const w=S.wants.find(x=>x.id==c.dataset.wbuy);memoFilter=null;memoAdd=true;show('memo');render();renderMemo();$('m-booth').value=w.booth||'';updMB();$('m-want').value=String(w.id);pickWant();$('mform').scrollIntoView({behavior:'smooth'})});
-  $('wlist').querySelectorAll('[data-wdel]').forEach(c=>c.onclick=()=>{S.wants=S.wants.filter(x=>x.id!=c.dataset.wdel);save();render()});
+  $('wlist').querySelectorAll('[data-wdel]').forEach(c=>c.onclick=()=>{S.wants=S.wants.filter(x=>x.id!=c.dataset.wdel);wDelImgs(c.dataset.wdel);save();render()});
 }
 commaInput($('budget'));commaInput($('hbudget'));
 $('budget').addEventListener('input',()=>{S.budget=numOf($('budget'));save();renderWants()});
 $('w-booth').addEventListener('input',()=>fillSub('w-sub','w-subbox',$('w-booth').value.trim()));
-$('wform').addEventListener('submit',e=>{
+$('w-img').addEventListener('change',()=>{const n=$('w-img').files.length;$('w-imsg').textContent=n?n+'枚 選択中':''});
+$('wform').addEventListener('submit',async e=>{
   e.preventDefault();
   const name=$('w-name').value.trim();if(!name){$('w-name').focus();return}
   const rawB=$('w-booth').value.trim();let booth=resolveBooth(rawB);$('w-bmsg').textContent='';
-  S.wants.push({id:Date.now(),name,brand:booth?($('w-sub').value||shortName(booth)):rawB,yen:ynum($('w-yen').value)||0,booth,sub:$('w-sub').value||'',prio:+$('w-prio').value,intent:['','must','maybe','skip'][+$('w-prio').value],got:false});
+  const newId=Date.now(),imgFiles=[...$('w-img').files];
+  S.wants.push({id:newId,name,brand:booth?($('w-sub').value||shortName(booth)):rawB,yen:ynum($('w-yen').value)||0,booth,sub:$('w-sub').value||'',prio:+$('w-prio').value,intent:['','must','maybe','skip'][+$('w-prio').value],got:false});
   let newStar=false;if(booth){if(!S.stars[booth]){S.stars[booth]={done:false,prio:2};newStar=true}const sb=$('w-sub').value;if(sb){S.subStars=S.subStars||{};(S.subStars[booth]=S.subStars[booth]||{})[sb]=true}}
-  save();$('wform').reset();$('w-prio').value='2';fillSub('w-sub','w-subbox','');render();toast(newStar?'✔ リストに追加しました（ブース '+booth+' も「回りたいブース」に入れました）':'✔ リストに追加しました');
+  save();$('wform').reset();$('w-prio').value='2';$('w-imsg').textContent='';fillSub('w-sub','w-subbox','');let ni=0;if(imgFiles.length)ni=await wSaveImgs(newId,imgFiles);render();if(imgFiles.length&&!ni)toast('画像は保存できませんでした（リストには追加済み）');else toast(newStar?'✔ リストに追加しました（ブース '+booth+' も「回りたいブース」に入れました）':'✔ リストに追加しました');
 });
 
 /* booths */
@@ -1450,6 +1455,8 @@ function wantBlock(k,br){
 }
 function bprioRow(k){const p=boothPrio(k);return `<div class="bst" style="margin:8px 0 2px"><span class="note" style="margin:0 4px 0 0;align-self:center">ブースに行く優先度</span>${[[1,'高'],[2,'中'],[3,'低']].map(([v,l])=>`<button type="button" class="chip" data-bp="${v}" aria-pressed="${p===v}">${l}</button>`).join('')}</div>`}
 function bindBPrio(k,re){document.querySelectorAll('#pinfo [data-bp]').forEach(b=>b.onclick=()=>{if(S.stars[k])S.stars[k].prio=+b.dataset.bp;save();render();re()})}
+function wRow(id){return `<div class="wth-row">${wImgs(id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wvi="${x.id}">`).join('')}<label class="wadd">📷 画像を追加<input type="file" accept="image/*" multiple data-wfile="${id}" hidden></label></div>`}
+function wDelImgs(id){const del=wImgs(id);wimgs=wimgs.filter(x=>String(x.wantId)!==String(id));del.forEach(x=>{try{idbTx('readwrite',s=>s.delete(x.id))}catch(e){}})}
 async function wSaveImgs(wid,files){let n=0;for(const f of files){try{const img=await shrink(f);const rec={id:'wi'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),kind:'wimg',wantId:wid,img,ts:Date.now()};wimgs.push(rec);await idbTx('readwrite',s=>s.put(rec));n++}catch(e){}}return n}
 function wViewer(id,re){const x=wimgs.find(v=>v.id===id);if(!x)return;const o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:12px';
   o.innerHTML=`<img src="${x.img}" alt="" style="max-width:100%;max-height:75vh;object-fit:contain"><div style="display:flex;gap:10px"><button class="btn" type="button" id="wv-c">閉じる</button><button class="btn sub2" type="button" id="wv-d">この画像を削除</button></div>`;
@@ -1460,7 +1467,7 @@ function bindWantBlock(k,br,re){
   root.querySelectorAll('[data-wv]').forEach(i=>i.onclick=()=>wViewer(i.dataset.wv,re));
   root.querySelectorAll('[data-wyen]').forEach(i=>i.onchange=()=>{const w=S.wants.find(x=>x.id==i.dataset.wyen);if(!w)return;w.yen=ynum(i.value)||0;save();render()});
   root.querySelectorAll('[data-wi]').forEach(b=>b.onclick=()=>{const w=S.wants.find(x=>x.id==b.dataset.wi);if(!w)return;setIntent(w,b.dataset.i);save();render();re()});
-  root.querySelectorAll('[data-wdel2]').forEach(b=>b.onclick=()=>{const sn=snapState();S.wants=S.wants.filter(x=>x.id!=b.dataset.wdel2);save();render();re();toastUndo('削除しました',sn)});
+  root.querySelectorAll('[data-wdel2]').forEach(b=>b.onclick=()=>{const sn=snapState();S.wants=S.wants.filter(x=>x.id!=b.dataset.wdel2);wDelImgs(b.dataset.wdel2);save();render();re();toastUndo('削除しました',sn)});
   root.querySelectorAll('[data-wfile]').forEach(i=>i.onchange=async()=>{const n=await wSaveImgs(i.dataset.wfile,[...i.files]);toast(n?`✔ 画像を${n}枚追加しました`:'画像を保存できませんでした');re()});
   const nf=$('wn-file');if(!nf)return;let it='maybe';
   nf.onchange=()=>{$('wn-fn').textContent=nf.files.length?nf.files.length+'枚選択中':''};
