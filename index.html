@@ -601,7 +601,6 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
   </div>
   <div class="tbar">
     <button role="tab" id="t-home" aria-selected="true" data-tab="home">ホーム</button>
-    <button role="tab" id="t-booths" aria-selected="false" data-tab="booths">ブース</button>
     <button role="tab" id="t-map" aria-selected="false" data-tab="map">マップ</button>
     <button role="tab" id="t-plan" aria-selected="false" data-tab="plan">優先順位<span class="n" id="n-plan">0</span></button>
     <button role="tab" id="t-wants" aria-selected="false" data-tab="wants">欲しい物<span class="n" id="n-wants">0</span></button>
@@ -610,7 +609,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v15<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v16<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -722,7 +721,13 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
 
 <section id="booths" hidden>
   <h2>ブース</h2>
-  <button class="btn" id="bsearch-btn" type="button" aria-expanded="false" aria-controls="bsearch" style="width:100%;text-align:left;margin-bottom:8px">🔍 ブース検索 ▾</button>
+  <div class="tools" id="bmaptools"><button class="chip" id="bz-out" type="button">－ 縮小</button><button class="chip" id="bz-in" type="button">＋ 拡大</button><button class="chip" id="bz-fit" type="button">全体</button></div>
+  <div id="bmapslot"></div>
+</section>
+
+<section id="map" hidden>
+  <h2>マップ・ブース</h2>
+  <button class="btn" id="bsearch-btn" type="button" aria-expanded="false" aria-controls="bsearch" style="width:100%;text-align:left;margin-bottom:8px">🔍 ブース一覧・検索（★を付ける） ▾</button>
   <div id="bsearch" hidden>
     <input type="search" id="q" placeholder="ブース名・番号で検索（例：403、UNIFLAME）" aria-label="ブース検索">
     <div class="tools" id="hallchips"></div>
@@ -730,12 +735,6 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
     <div id="blist"></div>
     <div class="note">一覧は公式サイトの出展リスト（変更の可能性あり）から転記。336は掲載がありませんでした。</div>
   </div>
-  <div class="tools" id="bmaptools"><button class="chip" id="bz-out" type="button">－ 縮小</button><button class="chip" id="bz-in" type="button">＋ 拡大</button><button class="chip" id="bz-fit" type="button">全体</button></div>
-  <div id="bmapslot"></div>
-</section>
-
-<section id="map" hidden>
-  <h2>屋内エリアMAP</h2>
   <div class="tools">
     <button class="chip" id="zout" aria-label="縮小">－ 縮小</button>
     <button class="chip" id="zin" aria-label="拡大">＋ 拡大</button>
@@ -783,7 +782,7 @@ body.daymode:not(.morning) #packwarn,body.daymode #bkbox{display:none!important}
   <h2>使い方</h2>
   <div class="guide">
     <div class="step"><span class="ord">1</span><div><b>前日までに準備</b><p>「持ち物」で荷物を登録（候補をタップで追加）。見たいステージは「イベント」で「気になる」を付けておきます。</p></div></div>
-    <div class="step"><span class="ord">2</span><div><b>行きたいブースを決める</b><p>「ブース」で見たいブースの☆をタップ（検索もできます）。買いたい物が決まっていれば「欲しい物」に品名・予算・ブース番号を入れます。</p></div></div>
+    <div class="step"><span class="ord">2</span><div><b>行きたいブースを決める</b><p>「マップ」で見たいブースの☆をタップ（検索もできます）。買いたい物が決まっていれば「欲しい物」に品名・予算・ブース番号を入れます。</p></div></div>
     <div class="step"><span class="ord">3</span><div><b>優先順位を決める</b><p>「優先順位」で左の「≡」をつかんで上下に動かすと、回りたい順に並べ替えられます。その番号が「マップ」のピンの番号になります。</p></div></div>
     <div class="step"><span class="ord">4</span><div><b>当日はマップで探す</b><p>「マップ」でC・D・E・Fのボタンを押すとそのホールが大きくなります。ブースをタップで名前、もう一度タップで詳細（欲しい物・オンラインショップ・Instagram）。上の枠に近くのブース番号を入れて「📍現在地」（着いたばかりのときは「入口・出口から現在地を選ぶ」）、詳細の「➡ ここへの道順」で通路に沿った道順が出ます。</p></div></div>
     <div class="step"><span class="ord">5</span><div><b>買ったら写真と金額を残す</b><p>ブース詳細の「買った物を撮る」で撮影し、金額を入れて保存。使った合計と残り予算が自動で更新されます（予算は「欲しい物」で設定）。</p></div></div>
@@ -981,7 +980,7 @@ function placeMap(tab){
 }
 /* tabs */
 let bview=null;
-function setBSearch(o){const b=$('bsearch-btn'),p=$('bsearch');if(!b||!p)return;p.hidden=!o;b.setAttribute('aria-expanded',o);b.textContent='🔍 ブース検索 '+(o?'▴':'▾');if(o)setTimeout(()=>{try{$('q').focus({preventScroll:true})}catch(e){}},50)}
+function setBSearch(o){const b=$('bsearch-btn'),p=$('bsearch');if(!b||!p)return;p.hidden=!o;b.setAttribute('aria-expanded',o);b.textContent='🔍 ブース一覧・検索（★を付ける） '+(o?'▴':'▾');if(o)setTimeout(()=>{try{$('q').focus({preventScroll:true})}catch(e){}},50)}
 function setBView_old(v){bview=v;document.querySelectorAll('#booths [data-bvw]').forEach(e=>e.hidden=e.dataset.bvw!==v);document.querySelectorAll('#bviews [data-bv]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.bv===v))}
 let wview='want';
 function applyWV(){const w=wview==='haul';if($('wv-want'))$('wv-want').hidden=w;if($('wv-haul'))$('wv-haul').hidden=!w;document.querySelectorAll('#wsw [data-wv]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.wv===wview))}
@@ -990,19 +989,19 @@ function show(tab){
   if(tab==='wants')applyWV();
   if(tab!=='map'&&typeof routeOverride!=='undefined'&&routeOverride){routeOverride=null;if($('optbar'))$('optbar').hidden=true}
   {let dn=false;try{dn=dayOn()}catch(e){}document.body.classList.toggle('sub',tab!=='home'||dn)}
-  if(tab==='seenp')tab='booths';
+  let _bs=false;if(tab==='seenp'||tab==='booths'){tab='map';_bs=true}
   for(const t of ['home','plan','wants','booths','map','memo','sched','events','notes','pack','check','guide','spend','consider','haul']){
     $(t).hidden=t!==tab; const tb=$('t-'+t);if(tb)tb.setAttribute('aria-selected',t===tab);
   }
   const SEC=['memo','notes','pack','events','check','consider'];
   $('t-more').setAttribute('aria-selected',SEC.includes(tab));$('tabs').classList.remove('open');$('t-more').setAttribute('aria-expanded','false');
-  placeMap(tab);
+  placeMap(tab);if(_bs)setBSearch(true);
   window.scrollTo({top:0});
   const sec=$(tab);if(sec){sec.classList.remove('fxin');void sec.offsetWidth;sec.classList.add('fxin')}
 }
 const GUIDE_HTML=`<div class="guide gp">
 <div class="step"><span class="ord">★</span><div><b>このアプリについて</b><p>FIELDSTYLE EXPO 2026 を回るための、スマホ用メモ帳です。ログインや登録は要りません。入力した内容は、いま使っているスマホの中に保存されます（他の人の画面には出ません）。</p></div></div>
-<div class="step"><span class="ord">1</span><div><b>まず最初に（5分）</b><p>①画面下の「ブース」で、行きたいブースの☆をタップ。②買いたい物が決まっていれば、下の「欲しい物」に品名を入れて「リストに追加」。③「その他」→「持ち物」で、忘れ物チェックの候補から必要な物を追加。</p></div></div>
+<div class="step"><span class="ord">1</span><div><b>まず最初に（5分）</b><p>①画面下の「マップ」で、行きたいブースの☆をタップ。②買いたい物が決まっていれば、下の「欲しい物」に品名を入れて「リストに追加」。③「その他」→「持ち物」で、忘れ物チェックの候補から必要な物を追加。</p></div></div>
 <div class="step"><span class="ord">2</span><div><b>優先順位を決める</b><p>下の「優先順位」を開き、左の「≡」を指でつかんで上下に動かすと、回りたい順に並べ替えられます。その番号がマップのピンの番号になります。「🧭 優先順位の道順をマップで見る」を押すと、全部をつないだ道順が出ます。</p></div></div>
 <div class="step"><span class="ord">3</span><div><b>当日：マップでブースを探す</b><p>「マップ」でC・D・E・Fのボタンを押すと、そのホールが大きくなります。ブースを1回タップで名前、もう1回タップで詳細（欲しい物・オンラインショップ・Instagram）が出ます。「🔍 検索・現在地・道順」を開くと、番号や名前で探せます。</p></div></div>
 <div class="step"><span class="ord">4</span><div><b>当日：道順を出す</b><p>「検索・現在地・道順」に、いま近くにあるブースの番号を入れて「現在地」を押します。行き先のブースをタップして「ここへの道順」を押すと、赤い線で道順が出ます。「次の見たいブースへ」は、優先順位で次のブースまでの道順です。道に迷ったら、現在地を入れ直すだけで大丈夫です（行き先は消えません）。「⟲ ⟳」でマップを90度ずつ回せます。</p></div></div>
@@ -1100,7 +1099,7 @@ function renderPlan(){
   const ks=starList(), el=$('plan');
   $('n-plan').textContent=ks.length;
   if(!ks.length){
-    el.innerHTML=`<h2>優先順位</h2><div class="empty">まだ選んでいません。<br>「ブース」で見たいブースに★を付けるか、「欲しい物」にブース番号を入れると、優先順にここへ並びます。<br><br><button class="btn" id="go-b">ブースを選ぶ</button></div>`;
+    el.innerHTML=`<h2>優先順位</h2><div class="empty">まだ選んでいません。<br>「マップ」で見たいブースに★を付けるか、「欲しい物」にブース番号を入れると、優先順にここへ並びます。<br><br><button class="btn" id="go-b">ブースを選ぶ</button></div>`;
     $('go-b').onclick=()=>{show('booths');render()};return;
   }
   const done=ks.filter(doneOf).length;
@@ -1279,7 +1278,7 @@ let hall='ALL';
 function chips(){
   const items=[['ALL','すべて'],['C','C'],['D','D'],['E','E'],['F','F'],['★','★ 選択中']];
   $('hallchips').innerHTML=items.map(([k,l])=>`<button class="chip" data-h="${k}" aria-pressed="${hall===k}">${l}</button>`).join('');
-  $('hallchips').querySelectorAll('button').forEach(b=>b.onclick=()=>{hall=b.dataset.h;chips();renderBooths();if('CDEF'.includes(hall)&&hall.length===1&&$('mapgrp').parentNode===$('bmapslot'))zoomHall(hall);else if(hall==='ALL'&&$('mapgrp').parentNode===$('bmapslot')){zoom=1;applyZoom();$('mapbox').scrollTo(0,0)}});
+  $('hallchips').querySelectorAll('button').forEach(b=>b.onclick=()=>{hall=b.dataset.h;chips();renderBooths();if('CDEF'.includes(hall)&&hall.length===1&&true)zoomHall(hall);else if(hall==='ALL'&&true){zoom=1;applyZoom();$('mapbox').scrollTo(0,0)}});
 }
 const boothOpen=new Set();
 function renderBooths(){
@@ -1818,7 +1817,7 @@ function renderMap(){
     e.style.left=(POS[k][0]/IW*100)+'%';e.style.top=(POS[k][1]/IH*100)+'%';
     e.setAttribute('aria-label',`${i+1}番 ${k} ${BY[k].name}`);e.onclick=()=>tapBooth(k);$('mapin').appendChild(e)});
   if(selPin&&ks.includes(selPin))showPin(selPin,false);
-  else{selPin=null;$('pinfo').innerHTML=ks.length?'':'<span class="note">「ブース」で★を付けるか、「欲しい物」にブース番号を入れると、ここに番号ピンが出ます。</span>'}
+  else{selPin=null;$('pinfo').innerHTML=ks.length?'':'<span class="note">「マップ」で★を付けるか、「欲しい物」にブース番号を入れると、ここに番号ピンが出ます。</span>'}
   $('mapnums').innerHTML=ks.map((k,i)=>{const ws=openWants(k);
     return `<button class="numrow" data-k="${k}"><span class="ord">${i+1}</span>${badge(k)}<span class="t">${esc(BY[k].name)}<small>${ws.length?ws.map(w=>esc(w.name)+(w.yen?' '+yen(w.yen):'')).join('、'):'商品未定'}</small></span></button>`}).join('');
   $('mapnums').querySelectorAll('.numrow').forEach(b=>b.onclick=()=>{showPin(b.dataset.k,true);$('mapbox').scrollIntoView({block:'nearest',behavior:'smooth'})});
@@ -2111,7 +2110,7 @@ function renderHome(){
   $('htiles').innerHTML=tile('ブース',seen,ks.length,'booth')+tile('戦利品',S.wants.filter(w=>w.got).length,S.wants.length,'haul');
   {const sk=starList(),gt=S.wants.filter(w=>w.got),g=st=>sk.filter(k=>stOf(k)===st);
    const sec=(t,n,body,empty,go)=>`<div class="hbox"><div class="hh"><b>${t}</b><span>${n}</span>${go?`<button type="button" class="chip" data-hgo="${go}">全部 ›</button>`:''}</div><div class="hbody">${body||`<div class="note" style="margin:6px 0">${empty}</div>`}</div></div>`;
-   const bx=sec('見てないブース',g('none').length+'か所',g('none').map(k=>bRow(k,'pop')).join(''),'見たいブースがありません。「ブース」で☆を付けてください。','')
+   const bx=sec('見てないブース',g('none').length+'か所',g('none').map(k=>bRow(k,'pop')).join(''),'見たいブースがありません。「マップ」で☆を付けてください。','')
     +sec('あとでもう一度見るブース',g('later').length+'か所',g('later').map(k=>bRow(k,'pop')).join(''),'ありません。','')
     +sec('もう見なくていいブース',g('done').length+'か所',g('done').map(k=>bRow(k,'pop')).join(''),'まだありません。',''),
     hx=sec('戦利品',gt.length+'点',gt.map(w=>`<div class="hrow"><span class="nm">${esc(w.name)}${w.brand?'<small> ／ '+esc(w.brand)+'</small>':''}</span><span class="hy">${w.actual!=null?yen(w.actual):''}</span></div>`).join(''),'まだ買った物はありません。','haul');
