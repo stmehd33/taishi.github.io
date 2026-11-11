@@ -1,4 +1,4 @@
-const C='fs-expo-2026-v7';
+const C='fs-expo-2026-v8';
 const FILES=['./','index.html','data-2026.js','route-2026.js','perks-2026.js','map.jpg','entrance-area.png','apple-touch-icon.png','manifest.webmanifest'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(FILES)))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});

@@ -212,7 +212,8 @@ html[data-layout="pc"] .tiles{max-width:640px}
 /* ---- camp theme overrides ---- */
 .board{background:var(--surface);border:3px solid var(--ink);border-radius:6px;padding:10px 8px;display:flex;flex-direction:column;gap:10px;box-shadow:0 3px 0 var(--shadow);position:relative;touch-action:pan-y}
 .plank{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 6px;background:var(--wood);background-image:repeating-linear-gradient(92deg,rgba(60,35,10,.10) 0 2px,transparent 2px 9px),repeating-linear-gradient(88deg,rgba(255,235,190,.10) 0 1px,transparent 1px 13px);border:2px solid var(--ink);border-radius:4px;box-shadow:0 3px 0 var(--shadow);color:#2b2a20;position:relative;min-height:60px}
-.plank .nm{flex:1;min-width:0;overflow-wrap:anywhere;line-height:1.35}
+.plank{flex-wrap:wrap}.plank .nm{flex:1;min-width:0;overflow-wrap:anywhere;line-height:1.35;cursor:pointer}
+.plank .wlp{flex:0 0 calc(100% - 34px);box-sizing:border-box;min-width:0;margin:2px 0 2px 34px;padding:8px 10px;background:rgba(255,255,255,.55);border-radius:8px;font-size:14px}.plank .wlpi{padding:3px 0;line-height:1.4}.plank .wlpy{display:block;color:#4a3a22;font-size:12px}
 .plank .sub{display:block;color:#4a3a22;font-size:12px}
 .plank.done{opacity:.6}.plank.done .nm{text-decoration:line-through}
 .plank.lift{z-index:5;box-shadow:0 10px 18px rgba(0,0,0,.45);transition:none;scale:1.02}
@@ -1088,6 +1089,7 @@ function bindBRows(el){
   el.querySelectorAll('[data-bs]').forEach(x=>x.onclick=()=>setSt(x.dataset.bs,x.dataset.st));
   el.querySelectorAll('[data-bb]').forEach(x=>x.onclick=()=>goBooth(x.dataset.bb,x.dataset.b));
 }
+const planOpen=new Set();
 function renderPlan(){
   const ks=starList(), el=$('plan');
   $('n-plan').textContent=ks.length;
@@ -1099,13 +1101,14 @@ function renderPlan(){
   let h=`<h2>優先順位</h2><div class="sum"><div>見たいブース<b>${ks.length}</b></div><div>見終わった<b>${done}</b></div></div><div class="note" style="margin:0 0 8px">左の「≡」をつかんで上下にドラッグすると、入れ替えられます。左の数字がマップのピン番号です。行の左端の色は、ブースに行く優先度（赤＝高、黄＝中、灰＝低）です。</div><button class="btn sub2" id="opt-open" type="button" style="width:100%;margin:0 0 8px">⚡ 効率よく回るルートを提案（マップで見る）</button><div class="board" id="board">`;
   ks.forEach((k,i)=>{const d=doneOf(k),ws=openWants(k);
     const sub=ws.length?ws.map(w=>esc(w.name)+(w.yen?' '+yen(w.yen):'')).join('、'):'商品未定';
-    h+=`<div class="plank bp${boothPrio(k)} ${d?'done':''}" data-k="${k}"><button class="grip" data-grip="${k}" aria-label="${esc(BY[k].name)}を並べ替え（上下キーでも動かせます）">≡</button><span class="ord">${i+1}</span>${badge(k)}<div class="nm"><b class="pn">${esc(shortName(k))}</b>${Object.keys((S.subStars||{})[k]||{}).length?`<span class="sub">回りたい：${Object.keys(S.subStars[k]).map(esc).join('、')}</span>`:''}<span class="sub">${sub}</span></div><button class="seenbtn" type="button" data-seen="${k}" aria-label="${esc(BY[k].name)}を${d?'見てないに戻す':'見たにする'}">${d?'↩ 戻す':'✔ 見た'}</button><button class="x" data-unstar="${k}" aria-label="外す">✕</button></div>`;
+    h+=`<div class="plank bp${boothPrio(k)} ${d?'done':''}" data-k="${k}"><button class="grip" data-grip="${k}" aria-label="${esc(BY[k].name)}を並べ替え（上下キーでも動かせます）">≡</button><span class="ord">${i+1}</span>${badge(k)}<div class="nm" data-tog="${k}" role="button" tabindex="0" aria-expanded="${planOpen.has(k)}"><b class="pn">${esc(shortName(k))}</b>${Object.keys((S.subStars||{})[k]||{}).length?`<span class="sub">回りたい：${Object.keys(S.subStars[k]).map(esc).join('、')}</span>`:''}<span class="sub">${planOpen.has(k)?'▾':'▸'} ${sub}</span></div><button class="seenbtn" type="button" data-seen="${k}" aria-label="${esc(BY[k].name)}を${d?'見てないに戻す':'見たにする'}">${d?'↩ 戻す':'✔ 見た'}</button><button class="x" data-unstar="${k}" aria-label="外す">✕</button>${planOpen.has(k)?`<div class="wlp">${ws.length?ws.map(w=>`<div class="wlpi"><span class="prio p${w.prio}">${({1:'絶対',2:'悩み',3:'我慢'})[w.prio]||''}</span>${esc(w.name)}<span class="wlpy">${w.yen?yen(w.yen):'予算未入力'}${w.sub?' ／ 店：'+esc(w.sub):''}</span></div>`).join(''):'<div class="wlpi">このブースの欲しい物はまだありません。</div>'}</div>`:''}</div>`;
   });
   h+='</div>';
   h+=`<div class="tools" style="margin-top:16px"><button class="btn sub2" id="copyplan">一覧をコピー</button>${RT?'<button class="btn" id="planroute">🧭 優先順位の道順をマップで見る</button>':''}</div><div class="note" id="copymsg"></div>`;
   el.innerHTML=h;
   el.querySelectorAll('[data-done]').forEach(c=>c.onchange=()=>{if(c.checked)S.seen[c.dataset.done]=true;else delete S.seen[c.dataset.done];save();renderPlan()});
   setupDrag();bindOpt();
+  el.querySelectorAll('[data-tog]').forEach(n=>{const f=()=>{const k=n.dataset.tog;planOpen.has(k)?planOpen.delete(k):planOpen.add(k);renderPlan()};n.onclick=f;n.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();f()}}});
   el.querySelectorAll('[data-seen]').forEach(b=>b.onclick=()=>setSt(b.dataset.seen,doneOf(b.dataset.seen)?'none':'done'));
   el.querySelectorAll('[data-unstar]').forEach(c=>c.onclick=()=>{const _sn=snapState();const k=c.dataset.unstar;delete S.stars[k],delete (S.subStars||{})[k];
     /* ★なしで欲しい物だけが残るブースは、その欲しい物からブース番号を外す */
