@@ -1,5 +1,5 @@
 /* ブース別の限定情報（ガチャ・先行販売・割引・特典など）。出典つき。更新したらこのファイルだけ差し替える */
-window.PERKS_META={updated:'2026-11-11',note:'公式サイト・プレスリリースで確認できたものだけを載せています。Instagramの投稿は、ログインが必要で自動では読めないため、各ブランドの「Instagramを探す」から直接確認してください。'};
+window.PERKS_META={updated:'2026-11-12',note:'公式サイト・プレスリリースで確認できたものだけを載せています。Instagramの投稿は自動では読めないため、投稿画面を確認できたものだけ載せています。'};
 window.PERKS=[
  {type:'gacha',brand:'Makuake',booth:'617',title:'ヒット商品が当たる無料ガチャ',detail:'Makuake発のヒット商品が当たる無料のガチャ企画。実施中プロジェクトの商品展示・体験もあり。',cond:'',src:'PR TIMES（Makuake）',url:'https://prtimes.jp/main/html/rd/p/000000349.000036381.html'},
  {type:'first',brand:'HILLS FIELD',booth:'503',title:'新作テーブルを超先行販売「俺のTEKKIN」「私のTEKKIN」',detail:'一般発売に先駆けて会場で販売。俺のTEKKIN＝ソロ向けローテーブル、私のTEKKIN＝デュオ・ファミリー向けハイテーブル。',cond:'数量限定・なくなり次第終了',src:'HILLS FIELD 特設ページ',url:'https://www.hills-field.com/pages/field-style-2026'},
@@ -15,5 +15,6 @@ window.PERKS=[
  {type:'gift',brand:'LUFT',booth:'822',title:'Instagramフォロー＋ストーリーズ投稿でオリジナルワークグローブ',detail:'LUFT公式Instagramをフォローしてストーリーズを投稿するとワークグローブ（M・L）をプレゼント。参加方法はブースで案内。',cond:'数量限定・なくなり次第終了',src:'PR TIMES（LUFT）',url:'https://prtimes.jp/main/html/rd/p/000000017.000058985.html'},
  {type:'first',brand:'LUFT',booth:'822',title:'新商品：コードレスブロワー「LUFT-AJF」',detail:'約214gの軽量ボディ。3段階の風量調整と4種類のノズル。',cond:'',src:'PR TIMES（LUFT）',url:'https://prtimes.jp/main/html/rd/p/000000017.000058985.html'},
  {type:'exp',brand:'Sun Emperor',booth:'905',title:'特定小型原付の無料試乗（屋外エリア）',detail:'SS1・Easy・SUNRIN・LBIRD を体験予定。対象は16歳以上。',cond:'別途イベント入場券が必要。内容は当日の状況で変わる',src:'PR TIMES（Sun Emperor）',url:'https://prtimes.jp/main/html/rd/p/000000084.000124820.html'},
- {type:'first',brand:'FIELDSTYLE 公式',booth:'',title:'10周年記念グッズ（会場で販売）',detail:'ほりにし手羽先味 950円／REVOMAXボトル 20oz 6,500円・12oz 5,500円／田口塩鶏 1,800円／Pake 1,000円。クラフトビール「Trail Onward」800円（屋外クラフトビールエリア）。',cond:'数量に限りあり。ブース・先行販売の記載なし',src:'PR TIMES（FIELDSTYLE EXPO 2026）',url:'https://prtimes.jp/main/html/rd/p/000001608.000014977.html'}
+ {type:'first',brand:'FIELDSTYLE 公式',booth:'',title:'10周年記念グッズ（会場で販売）',detail:'ほりにし手羽先味 950円／REVOMAXボトル 20oz 6,500円・12oz 5,500円／田口塩鶏 1,800円／Pake 1,000円。クラフトビール「Trail Onward」800円（屋外クラフトビールエリア）。',cond:'数量に限りあり。ブース・先行販売の記載なし',src:'PR TIMES（FIELDSTYLE EXPO 2026）',url:'https://prtimes.jp/main/html/rd/p/000001608.000014977.html'},
+ {type:'gacha',brand:'BUENOFE',booth:'324',title:'両日15:00 抽選会（各日7名に当たる）',detail:'11/14・15の両日15:00からブースで抽選。各日の賞品：FX-01 FOLD 4.5 TABLE V2.×1台、FX-02 FOLD 2.5 TABLE×1台、EX-01 CO SHIELD（一酸化炭素チェッカー）×5個。参加方法：①Instagramで@buenofe.jpと@mine_natureandfreedomの両方をフォローし、ブースでフォロー画面を提示→抽選券1枚。②当日ブースで購入すると、購入した商品1種類につき抽選券を1枚追加（同じ商品を複数買っても追加は1枚）。',cond:'抽選券の配布は各日15:00まで／当選時は本人がブースにいること（不在は無効）／当選は1人につき各日1回／抽選券は発行当日のみ有効',src:'BUENOFE公式Instagram（@buenofe.jp）の投稿',url:'https://www.instagram.com/buenofe.jp/'},
 ];
