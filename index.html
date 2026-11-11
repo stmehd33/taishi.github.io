@@ -625,7 +625,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v31<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v32<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -934,6 +934,14 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
     <div class="full" style="grid-column:1/-1"><details id="psug-all"><summary style="font-weight:700;cursor:pointer;min-height:44px;display:flex;align-items:center;color:var(--forest)">＋ 候補から追加する（ジャンル別）</summary><div class="tools" id="psug" style="margin:6px 0 0;display:block"></div></details></div>
   </form>
   <div id="plist"></div>
+  <h2 style="margin-top:22px">前日までにやること</h2>
+  <div class="sum" id="tsum"></div>
+  <form class="form" id="tform" style="grid-template-columns:1fr auto">
+    <div><label for="t-name">やること</label><input type="text" id="t-name" placeholder="例：車のガソリンを入れる" autocomplete="off"></div>
+    <div style="align-self:end"><button class="btn" type="submit">追加</button></div>
+    <div class="full" style="grid-column:1/-1"><details id="tsug-all"><summary style="font-weight:700;cursor:pointer;min-height:44px;display:flex;align-items:center;color:var(--forest)">＋ 候補から追加する</summary><div class="tools" id="tsug" style="margin:6px 0 0;display:block"></div></details></div>
+  </form>
+  <div id="tlist"></div>
 </section>
 
 <section id="check" hidden>
@@ -971,7 +979,7 @@ const BY = Object.fromEntries(BOOTHS.map(b=>[b.n,b]));
 for(const a in EVENT.alias)BY[a]=BY[EVENT.alias[a]];
 
 const KEY=EVENT.storageKey;
-const DEF=()=>({stars:{},later:{},subStars:{},packInit:false,packInit2:false,packInit3:false,packInit4:false,packInit5:false,packInit6:false,wants:[],seen:{},budget:0,order:[],sched:[],pack:[],notes:[],consider:{},entry:{nos:{},day:''},deletedMemos:[],_t:0});
+const DEF=()=>({stars:{},later:{},subStars:{},packInit:false,packInit2:false,packInit3:false,packInit4:false,packInit5:false,packInit6:false,wants:[],seen:{},budget:0,order:[],sched:[],pack:[],todo:[],notes:[],consider:{},entry:{nos:{},day:''},deletedMemos:[],_t:0});
 
 const fmtY2=n=>(n===''||n==null)?'':(+n).toLocaleString('en-US');
 const ynum=v=>{const d=String(v).replace(/[^\d]/g,'');return d===''?null:+d};
@@ -1906,12 +1914,25 @@ function renderPerks(){
 }
 document.querySelectorAll('#evsw [data-evv]').forEach(b=>b.onclick=()=>{evview=b.dataset.evv;applyEV();window.scrollTo({top:0})});
 /* ---- packing ---- */
-const SUG=[['電源・充電',['モバイルバッテリー','ポータブル電源','スマホ充電ケーブル']],
+const SUG=[['電源・充電',['モバイルバッテリー','ポータブル電源','スマホ充電ケーブル','Lightningスマホ充電器','タイプC充電ケーブル（モバイルバッテリーの充電用）']],
  ['支払い・移動',['ETCカード','クレジットカード']],
  ['薬・健康',['ムヒ','目薬','カロナール','CPAP','CPAPの電源・水']],
  ['着替え・衛生',['着替え','寝巻き','汗拭きシート','ゴミ袋','歯ブラシ','ウェットティッシュ','ティッシュ','タオル']],
  ['寝具・防寒・車中泊',['窓の目隠し（サンシェード）','LEDランタン','インフレーターマット','枕','布団','シュラフ','電気毛布','防寒着（ダウンなど）','耳栓・アイマスク','寝る場所の段差を埋めるタオル','セラミックヒーター']],
  ['その他',['エコバッグ','水・飲み物','サンダル','一酸化炭素チェッカー','雨具','マスク','生刷り用のギア（グラインドロッヂなどで刷ってもらう物）']]];
+const TODO_SUG=['LEDランタン充電','ポータブル電源充電','モバイルバッテリー充電','車中泊の準備（段差を埋めてマットを敷く）','荷物の準備'];
+function addTodo(n){n=n.trim();if(!n)return;S.todo=S.todo||[];if(S.todo.some(p=>p.name===n))return;S.todo.push({id:uid(),name:n,done:false});save();renderTodo()}
+document.getElementById('tform').addEventListener('submit',e=>{e.preventDefault();addTodo(document.getElementById('t-name').value);document.getElementById('t-name').value=''});
+function renderTodo(){
+  S.todo=S.todo||[];const dn=S.todo.filter(p=>p.done).length;
+  $('tsum').innerHTML=`<div>できた<b>${dn} / ${S.todo.length}</b></div>`;
+  const have=n=>S.todo.some(p=>p.name===n),r=TODO_SUG.filter(x=>!have(x));
+  $('tsug').innerHTML=r.length?`<div class="tools" style="margin:6px 0 10px">${r.map(x=>`<button type="button" class="chip" data-ts="${esc(x)}">＋${esc(x)}</button>`).join('')}</div>`:'<span class="note">候補はすべて追加済みです。</span>';
+  $('tsug').querySelectorAll('[data-ts]').forEach(b=>b.onclick=()=>addTodo(b.dataset.ts));
+  $('tlist').innerHTML=S.todo.length?S.todo.map(p=>`<div class="ck ${p.done?'done':''}"><input class="chk" type="checkbox" data-tk="${p.id}" ${p.done?'checked':''} aria-label="${esc(p.name)}を済ませた"><div class="nm">${esc(p.name)}</div><button class="x" data-tx="${p.id}" aria-label="削除">✕</button></div>`).join(''):'<div class="empty">やることを追加してください。上の候補をタップするとすぐ入ります。</div>';
+  $('tlist').querySelectorAll('[data-tk]').forEach(c=>c.onchange=()=>{S.todo.find(x=>x.id==c.dataset.tk).done=c.checked;save();renderTodo()});
+  $('tlist').querySelectorAll('[data-tx]').forEach(c=>c.onclick=()=>{S.todo=S.todo.filter(x=>x.id!=c.dataset.tx);save();renderTodo()});
+}
 const packOpen=new Set();let packAllOpen=false;
 const REQ=[{id:'def-ticket',name:'チケット（紙・整理番号入り）'},{id:'def-wallet',name:'財布（現金）'}];
 const REQ2=['窓の目隠し（サンシェード）','LEDランタン','歯ブラシ','ウェットティッシュ','ティッシュ','寝巻き','セラミックヒーター','タオル','寝る場所の段差を埋めるタオル'];
@@ -1926,7 +1947,7 @@ function ensurePackDefaults(){
 function addPack(n){n=n.trim();if(!n||S.pack.some(p=>p.name===n))return;S.pack.push({id:uid(),name:n,done:false});save();renderPack()}
 $('pform').addEventListener('submit',e=>{e.preventDefault();addPack($('p-name').value);$('p-name').value=''});
 function renderPack(){
-  ensurePackDefaults();
+  ensurePackDefaults();renderTodo();
   const dn=S.pack.filter(p=>p.done).length;
   $('n-pack').textContent=S.pack.length?`${dn}/${S.pack.length}`:'';
   $('psum').innerHTML=`<div>そろった<b>${dn} / ${S.pack.length}</b></div>`;
@@ -2190,7 +2211,7 @@ const clone=o=>JSON.parse(JSON.stringify(o));
 const hasData=s=>s&&(Object.keys(s.stars||{}).length||(s.wants||[]).length||(s.sched||[]).length||(s.pack||[]).length||(s.budget||0)||Object.keys(s.seen||{}).length);
 function mergeStates(a,b){ /* 初回だけ: 両方にデータがあるときは足し合わせる */
   const u=(x,y)=>{const m=new Map();[...(x||[]),...(y||[])].forEach(i=>{if(!m.has(String(i.id)))m.set(String(i.id),i)});return [...m.values()]};
-  return Object.assign(DEF(),{stars:{...a.stars,...b.stars},later:{...a.later,...b.later},seen:{...a.seen,...b.seen},packInit:!!(a.packInit||b.packInit),packInit2:!!(a.packInit2||b.packInit2),packInit3:!!(a.packInit3||b.packInit3),packInit4:!!(a.packInit4||b.packInit4),packInit5:!!(a.packInit5||b.packInit5),packInit6:!!(a.packInit6||b.packInit6),subStars:(()=>{const o={};[a.subStars,b.subStars].forEach(x=>{for(const k in (x||{}))o[k]=Object.assign(o[k]||{},x[k])});return o})(),wants:u(a.wants,b.wants),sched:u(a.sched,b.sched),pack:u(a.pack,b.pack),notes:u(a.notes,b.notes),consider:Object.assign({},a.consider||{},b.consider||{}),entry:(()=>{const f=e=>{e=e||{};const n=Object.assign({},e.nos||{});if(e.no&&!Object.keys(n).length)n[e.day||'d1']=e.no;return {nos:n,day:e.day||''}};const x=f(a.entry),y=f(b.entry);return {nos:Object.assign({},x.nos,y.nos),day:y.day||x.day}})(),
+  return Object.assign(DEF(),{stars:{...a.stars,...b.stars},later:{...a.later,...b.later},seen:{...a.seen,...b.seen},packInit:!!(a.packInit||b.packInit),packInit2:!!(a.packInit2||b.packInit2),packInit3:!!(a.packInit3||b.packInit3),packInit4:!!(a.packInit4||b.packInit4),packInit5:!!(a.packInit5||b.packInit5),packInit6:!!(a.packInit6||b.packInit6),subStars:(()=>{const o={};[a.subStars,b.subStars].forEach(x=>{for(const k in (x||{}))o[k]=Object.assign(o[k]||{},x[k])});return o})(),wants:u(a.wants,b.wants),sched:u(a.sched,b.sched),pack:u(a.pack,b.pack),todo:u(a.todo||[],b.todo||[]),notes:u(a.notes,b.notes),consider:Object.assign({},a.consider||{},b.consider||{}),entry:(()=>{const f=e=>{e=e||{};const n=Object.assign({},e.nos||{});if(e.no&&!Object.keys(n).length)n[e.day||'d1']=e.no;return {nos:n,day:e.day||''}};const x=f(a.entry),y=f(b.entry);return {nos:Object.assign({},x.nos,y.nos),day:y.day||x.day}})(),
     order:(b.order&&b.order.length?b.order:a.order)||[],budget:b.budget||a.budget||0,deletedMemos:[...new Set([...(a.deletedMemos||[]),...(b.deletedMemos||[])])]});}
 function errState(e){return e&&e.code==='invalid_argument'?'noperm':'error'}
 let pushT=null,pushing=false,dirty=false;
