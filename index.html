@@ -216,7 +216,7 @@ html[data-layout="pc"] .tiles{max-width:640px}
 .plank .wlp{flex:0 0 calc(100% - 34px);box-sizing:border-box;min-width:0;margin:2px 0 2px 34px;padding:8px 10px;background:rgba(255,255,255,.55);border-radius:8px;font-size:14px}.plank .wlpi{padding:3px 0;line-height:1.4}.plank .wlpy{display:block;color:#4a3a22;font-size:12px}
 .plank .sub{display:block;color:#4a3a22;font-size:12px}
 .plank.done{opacity:.6}.plank.done .nm{text-decoration:line-through}
-.plank.lift{z-index:5;box-shadow:0 10px 18px rgba(0,0,0,.45);transition:none;scale:1.02}
+.plank.lift{z-index:5;box-shadow:0 6px 10px rgba(0,0,0,.4);transition:none;will-change:transform}
 .grip{font:700 24px/1 var(--body);width:36px;height:44px;flex:none;border:0;background:transparent;color:#2b2a20;touch-action:none;cursor:grab;display:grid;place-items:center;border-radius:4px}
 .grip:focus-visible{outline:3px solid var(--accent)}
 .plank .chk{accent-color:var(--forest)}
@@ -625,7 +625,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v34<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v35<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -1234,9 +1234,10 @@ function setupDrag(){
         while(next&&c>next.getBoundingClientRect().top+next.getBoundingClientRect().height/2){board.insertBefore(next,row);startY+=next.getBoundingClientRect().height;next=row.nextElementSibling}
         row.style.transform=`translateY(${lastY-startY}px)`;
       };
-      const mv=ev=>{lastY=ev.clientY;place();
-        const vh=window.innerHeight;if(ev.clientY<90)window.scrollBy(0,-12);else if(ev.clientY>vh-70)window.scrollBy(0,12)};
-      const up=()=>{g.removeEventListener('pointermove',mv);g.removeEventListener('pointerup',up);g.removeEventListener('pointercancel',up);
+      /* 指を動かすたびに並べ替え計算をすると重いので、1画面描画につき1回だけ計算する */
+      const frame=()=>{raf=0;place();const vh=window.innerHeight;if(lastY<90)window.scrollBy(0,-12);else if(lastY>vh-70)window.scrollBy(0,12)};
+      const mv=ev=>{lastY=ev.clientY;if(!raf)raf=requestAnimationFrame(frame)};
+      const up=()=>{if(raf){cancelAnimationFrame(raf);raf=0}g.removeEventListener('pointermove',mv);g.removeEventListener('pointerup',up);g.removeEventListener('pointercancel',up);
         row.classList.remove('lift');row.style.transform='';commit()};
       g.addEventListener('pointermove',mv);g.addEventListener('pointerup',up);g.addEventListener('pointercancel',up);
     });
