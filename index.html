@@ -271,6 +271,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--forest)}
 .tabs button[data-tab="guide"][aria-selected="true"]{background:#3b6ea5}
 .tabs button[data-tab="events"][aria-selected="true"]{background:#d1495b}
 .scday{margin:14px 0 6px;font-size:15px;color:var(--forest)}
+.wbn{display:block;font-size:18px;font-weight:700;line-height:1.3;margin-top:3px;overflow-wrap:anywhere}
 .tabs button[data-tab="notes"][aria-selected="true"]{background:#6f7a45}
 .tabs button[data-tab="pack"][aria-selected="true"]{background:#8a5a2b}
 .tabs button[data-tab="check"][aria-selected="true"]{background:#1f7f73}
@@ -626,7 +627,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v41<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v42<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -1273,7 +1274,7 @@ function renderWants(){
   if(!ord.length){$('wlist').innerHTML='<div class="empty">欲しいものを追加すると、予算の合計が出ます。</div>';return}
   const pl={1:'絶対',2:'悩み',3:'我慢'};
   $('wlist').innerHTML=ord.map(w=>`<div class="row ${w.got?'done':''}"><input class="chk" type="checkbox" data-got="${w.id}" ${w.got?'checked':''} aria-label="${esc(w.name)}を買った">
-    <div class="nm" data-wedit="${w.id}" style="cursor:pointer"><span class="prio p${w.prio}">${pl[w.prio]}</span>${esc(w.name)}<span class="sub">${w.got?'予定 '+(w.yen?yen(w.yen):'なし'):(w.yen?yen(w.yen):'予算未入力')}${w.brand?' ／ '+esc(w.brand):''}${w.booth&&BY[w.booth]?(wLabel(w.booth,w.sub)?' ／ '+esc(wLabel(w.booth,w.sub)):''):(w.got||w.brand?'':' ／ ブース未定')}</span>${w.got?`<span class="act"><label for="b${w.id}">ブランド・店名</label><input type="text" id="b${w.id}" data-wbr="${w.id}" value="${esc(w.brand||'')}" placeholder="買ってから入力OK"><label for="o${w.id}">ブース番号</label><input type="text" id="o${w.id}" data-wbo="${w.id}" inputmode="numeric" value="${esc(w.booth||'')}" placeholder="例：403"><label for="a${w.id}">実際の価格（円）</label><input type="text" data-comma id="a${w.id}" data-act="${w.id}" inputmode="numeric" pattern="[0-9,]*" autocomplete="off" value="${fmtY2(w.actual!=null?w.actual:(w.yen||''))}"></span>`:`<span class="act"><button class="btn sub2" type="button" data-wbuy="${w.id}">買った（写真・金額・ブランドを入れる）</button></span>`}${wRow(w.id)}</div>
+    <div class="nm" data-wedit="${w.id}" style="cursor:pointer"><span class="prio p${w.prio}">${pl[w.prio]}</span>${esc(w.name)}<span class="sub">${w.got?'予定 '+(w.yen?yen(w.yen):'なし'):(w.yen?yen(w.yen):'予算未入力')}</span>${wbn(w)}${w.got?`<span class="act"><label for="b${w.id}">ブランド・店名</label><input type="text" id="b${w.id}" data-wbr="${w.id}" value="${esc(w.brand||'')}" placeholder="買ってから入力OK"><label for="o${w.id}">ブース番号</label><input type="text" id="o${w.id}" data-wbo="${w.id}" inputmode="numeric" value="${esc(w.booth||'')}" placeholder="例：403"><label for="a${w.id}">実際の価格（円）</label><input type="text" data-comma id="a${w.id}" data-act="${w.id}" inputmode="numeric" pattern="[0-9,]*" autocomplete="off" value="${fmtY2(w.actual!=null?w.actual:(w.yen||''))}"></span>`:`<span class="act"><button class="btn sub2" type="button" data-wbuy="${w.id}">買った（写真・金額・ブランドを入れる）</button></span>`}${wRow(w.id)}</div>
     ${w.booth&&BY[w.booth]?badge(w.booth):''}<button class="x" data-wdel="${w.id}" aria-label="削除">✕</button></div>`).join('');
   $('wlist').querySelectorAll('[data-wfile]').forEach(i=>i.onchange=async()=>{const n=await wSaveImgs(i.dataset.wfile,[...i.files]);toast(n?`✔ 画像を${n}枚追加しました`:'画像を保存できませんでした');renderWants()});
   $('wlist').querySelectorAll('[data-wedit]').forEach(n=>n.onclick=e=>{if(e.target.closest('input,label,button,select,textarea,img,.act,.wth-row'))return;startEdit(n.dataset.wedit)});
@@ -1411,6 +1412,8 @@ const ckBrands=k=>{if(!BY[k])return[String(k)];if(!subsOf(k).length)return[short
 const brandOf=k=>ckBrands(k)[0];
 /* 欲しい物などに出すブース名: 選んだ店（ブランド）があればそれだけ。M16のような合同ブースの名前は出さない */
 const wLabel=(k,sub)=>sub?sub:(BY[k]?(subsOf(k).length?'':BY[k].name.replace(/（.*$/,'')):'');
+/* 欲しい物の行に出すブース名（店・ブランド名を1回だけ、大きく） */
+const wbn=w=>{const l=(w.booth&&BY[w.booth]?wLabel(w.booth,w.sub):'')||w.brand||'',t=l||(w.got||(w.booth&&BY[w.booth])?'':'ブース未定');return t?`<span class="wbn">${esc(t)}</span>`:''};
 const shortName=k=>{const n=BY[k]?BY[k].name:'';return subsOf(k).length?n.slice(0,n.indexOf('（')).trim()||n:n};
 const subOn=(k,b)=>!!((S.subStars||{})[k]&&S.subStars[k][b]);
 function toggleSub(k,b){
