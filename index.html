@@ -270,6 +270,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--forest)}
 .tabs button[data-tab="memo"][aria-selected="true"]{background:#f2c14e;color:#2b2a20}
 .tabs button[data-tab="guide"][aria-selected="true"]{background:#3b6ea5}
 .tabs button[data-tab="events"][aria-selected="true"]{background:#d1495b}
+.scday{margin:14px 0 6px;font-size:15px;color:var(--forest)}
 .tabs button[data-tab="notes"][aria-selected="true"]{background:#6f7a45}
 .tabs button[data-tab="pack"][aria-selected="true"]{background:#8a5a2b}
 .tabs button[data-tab="check"][aria-selected="true"]{background:#1f7f73}
@@ -612,7 +613,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
     <button role="tab" id="t-memo" aria-selected="false" data-tab="memo">写真<span class="n" id="n-memo">0</span></button>
     <button role="tab" id="t-notes" aria-selected="false" data-tab="notes">メモ</button>
     <button role="tab" id="t-pack" aria-selected="false" data-tab="pack">持ち物<span class="n" id="n-pack"></span></button>
-    <button role="tab" id="t-events" aria-selected="false" data-tab="events">イベント</button>
+    <button role="tab" id="t-events" aria-selected="false" data-tab="events">スケジュール</button>
   </div>
   <div class="tbar">
     <button role="tab" id="t-home" aria-selected="true" data-tab="home">ホーム</button>
@@ -625,7 +626,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v38<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v39<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -807,7 +808,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 <section id="guide" hidden>
   <h2>使い方</h2>
   <div class="guide">
-    <div class="step"><span class="ord">1</span><div><b>前日までに準備</b><p>「持ち物」で荷物を登録（候補をタップで追加）。見たいステージは「イベント」で「気になる」を付けておきます。</p></div></div>
+    <div class="step"><span class="ord">1</span><div><b>前日までに準備</b><p>「持ち物」で荷物を登録（候補をタップで追加）。行きたいイベントは「スケジュール」で「行く」を付けておきます。</p></div></div>
     <div class="step"><span class="ord">2</span><div><b>行きたいブースを決める</b><p>「マップ」で見たいブースの☆をタップ（検索もできます）。買いたい物が決まっていれば「欲しい物」に品名・予算・ブース番号を入れます。</p></div></div>
     <div class="step"><span class="ord">3</span><div><b>優先順位を決める</b><p>「優先順位」で左の「≡」をつかんで上下に動かすと、回りたい順に並べ替えられます。その番号が「マップ」のピンの番号になります。</p></div></div>
     <div class="step"><span class="ord">4</span><div><b>当日はマップで探す</b><p>「マップ」でC・D・E・Fのボタンを押すとそのホールが大きくなります。ブースをタップで名前、もう一度タップで詳細（欲しい物・オンラインショップ・Instagram）。上の枠に近くのブース番号を入れて「現在地」（着いたばかりのときは「入口・出口から現在地を選ぶ」）、詳細の「ここへの道順」で通路に沿った道順が出ます。</p></div></div>
@@ -883,18 +884,16 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </section>
 
 <section id="events" hidden>
-  <h2>イベント</h2>
-  <div class="dayseg" id="evsw" style="margin:0 0 10px"><button class="chip" type="button" data-evv="list" aria-pressed="true">イベントリスト</button><button class="chip" type="button" data-evv="perk" aria-pressed="false">ブース限定情報</button></div>
-  <div id="ev-list">
-  <div class="note" style="margin:0 0 6px">見たいイベントは「☆ 気になる」を押すと印が付きます（もう一度押すと外れます）。公式サイト（2026/11/8時点）の情報です。変更の可能性があるので、当日は会場の案内も確認してください。</div>
+  <h2>スケジュール</h2>
+  <div class="note" id="sc-note" style="margin:0 0 6px"></div>
+  <div class="tools"><button class="btn" type="button" id="sc-fetch">最新の情報を取得</button><button class="btn sub2" type="button" id="sc-prompt">収集用プロンプトをコピー</button></div>
+  <div class="note" id="sc-msg" style="margin:4px 0 8px" role="status"></div>
   <div class="tools" id="evday"></div>
   <div id="evlist"></div>
-  </div>
-  <div id="ev-perk" hidden>
-    <div class="note" id="pk-note" style="margin:0 0 6px"></div>
-    <div class="tools" id="pkf"></div>
-    <div id="pklist"></div>
-  </div>
+  <h2 style="margin-top:18px">通知（カレンダー）</h2>
+  <div class="note" style="margin:0 0 6px">「行く」にした予定のうち、時間が決まっているものを、iPhoneのカレンダーに入れます。開始の30分前に通知が鳴ります（アプリを閉じていても、電波がなくても鳴ります）。このアプリを開いている間は、画面にもお知らせが出ます。</div>
+  <div class="tools"><button class="btn" type="button" id="sc-ics">行く予定をカレンダーに追加</button></div>
+  <div class="note" id="sc-icsmsg" style="margin:4px 0 0" role="status"></div>
 </section>
 
 
@@ -959,6 +958,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 <script src="data-2026.js"></script>
 <script src="route-2026.js"></script>
 <script src="perks-2026.js"></script>
+<script src="schedule-2026.js"></script>
 <script>
 /* 年度の選択: URLの #y2026 → 保存した選択 → 最新年 の順 */
 const YEAR_KEYS=Object.keys(YEARS).map(Number).sort((a,b)=>a-b);
@@ -1042,7 +1042,7 @@ const GUIDE_HTML=`<div class="guide gp">
 <div class="step"><div><b>ブース</b><p>全ブースの一覧です。番号・名前で検索、ホールで絞り込めます。複数のブランドが入っているブースは「▼各ブランド」で、行きたいブランドだけ選べます。</p></div></div>
 <div class="step"><div><b>その他 ▸ 写真・メモ</b><p>買った物の写真と金額、気づいたことのメモです。ブースの詳細からも書けます。</p></div></div>
 <div class="step"><div><b>その他 ▸ 持ち物</b><p>チケットと現金は最初から入っています。そのほかは「＋ 候補から追加する」を押して、ジャンルから選びます。</p></div></div>
-<div class="step"><div><b>その他 ▸ イベント</b><p>ステージなどのイベントに「☆ 気になる」を付けておけます。</p></div></div>
+<div class="step"><div><b>その他 ▸ スケジュール</b><p>ステージやブースのイベントに「☆ 行く」を付けておけます。カレンダーに入れると、30分前に通知が鳴ります。</p></div></div>
 <div class="step"><div><b>その他 ▸ チェック</b><p>見たブース・買った物・持ち物の状況が1画面で見られます。</p></div></div>
 <div class="step"><div><b>その他 ▸ 検討</b><p>欲しい物のうち「買う！？」にチェックした物を買うと、予算がいくら減るかを試算できます。</p></div></div>
 </div>
@@ -1902,22 +1902,84 @@ function renderSched(){
 }
 /* ---- events ---- */
 let evFilter='all';
+const dayOfDate=d=>d==='2026-11-14'?'d1':d==='2026-11-15'?'d2':'';
+const SC_T={gacha:'ガチャ・抽選',first:'先行・初出し・限定',sale:'特価・割引',gift:'プレゼント・特典',exp:'体験',stage:'ステージ'};
+/* ステージ（EVENT.events）と、ブースのイベント（schedule-2026.js）を、同じ形にまとめる */
+function allEv(){
+  const a=(EVENT.events||[]).map(e=>Object.assign({},e,{kind:'stage',type:'stage',brand:'ステージ',booth:''}));
+  (window.SCHEDULE||[]).forEach(x=>a.push({id:x.id,day:dayOfDate(x.date),start:x.time||'',end:x.end||'',title:x.title,place:x.booth?'ブース '+x.booth:'',note:x.detail||'',cond:x.cond||'',kind:'booth',type:x.type,brand:x.brand||'',booth:x.booth||'',src:x.src||'',url:x.url||'',added:x.added||''}));
+  return a}
+const scLS=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}};
+const scSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+/* 前回までに見たことのあるイベントid。初めて開いた時は、今あるものを全部「見た」扱いにする */
+(function(){if(scLS('fs-sc-known',null)==null)scSet('fs-sc-known',(window.SCHEDULE||[]).map(x=>x.id));
+  const sv=scLS('fs-sc-data',null);   /* 取得ボタンで取り込んだ新しいデータが、ファイルより新しければそちらを使う */
+  if(sv&&sv.meta&&String(sv.meta.updated||'')>String((window.SCHEDULE_META||{}).updated||'')){window.SCHEDULE=sv.list;window.SCHEDULE_META=sv.meta}})();
+let scNew=new Set(scLS('fs-sc-new',[]));
+function scAdd(e){
+  const ex=S.sched.find(s=>s.evId===e.id);
+  if(ex)S.sched=S.sched.filter(s=>s.evId!==e.id);   /* もう一度押すと取り消し */
+  else{try{if('Notification' in window&&Notification.permission==='default')Notification.requestPermission()}catch(_){}
+    S.sched.push({id:uid(),evId:e.id,day:e.day||'d1',time:e.start||'',text:e.title+(e.place?'（'+e.place+'）':''),done:false});
+    if(e.booth&&BY[e.booth]&&!S.stars[e.booth])S.stars[e.booth]={prio:2};   /* ブースのイベントは、そのブースも回りたいブースに入れる */
+    if(scNew.has(e.id)){scNew.delete(e.id);scSet('fs-sc-new',[...scNew])}}
+  save();render()}
 function renderEvents(){
-  const evs=EVENT.events||[],dayLabel=k=>{const d=EVENT.days.find(x=>x.key===k);return d?d.label+'（'+d.md+'）':'日にち未確認'};
-  const opts=[['all','すべて'],...EVENT.days.filter(d=>evs.some(e=>e.day===d.key)).map(d=>[d.key,d.label]),['none','日にち未確認']];
-  $('evday').innerHTML=opts.map(([k,l])=>`<button class="chip" data-ef="${k}" aria-pressed="${evFilter===k}">${l}</button>`).join('');
+  const evs=allEv(),M=window.SCHEDULE_META||{},mine=id=>S.sched.some(s=>s.evId===id);
+  const dl={d1:'11/14（土）',d2:'11/15（日）'};
+  $('sc-note').textContent='最終更新：'+(M.updated||'不明')+'　ステージは公式サイト（2026/11/8時点）、ブースのイベントは各ブランドの投稿・公式情報から。変更の可能性があるので、当日は会場の案内も確認してください。';
+  const opts=[['all','すべて'],['my','行く（'+S.sched.filter(s=>evs.some(e=>e.id===s.evId)).length+'）'],['d1','11/14'],['d2','11/15'],['none','日にち未定・会期中']];
+  $('evday').innerHTML=opts.map(([k,l])=>`<button class="chip" data-ef="${k}" aria-pressed="${evFilter===k}">${l}</button>`).join('')+(scNew.size?`<button class="chip" data-ef="new" aria-pressed="${evFilter==='new'}">NEW（${scNew.size}）</button>`:'');
   $('evday').querySelectorAll('[data-ef]').forEach(b=>b.onclick=()=>{evFilter=b.dataset.ef;renderEvents()});
-  const list=evs.filter(e=>evFilter==='all'||(evFilter==='none'?!e.day:e.day===evFilter)).sort((a,b)=>{const ix=x=>x.day?EVENT.days.findIndex(d=>d.key===x.day):99;return ix(a)-ix(b)||(a.start||'99').localeCompare(b.start||'99')});
-  $('evlist').innerHTML=list.length?list.map(e=>{const add=S.sched.find(s=>s.evId===e.id);
-    return `<div class="ck" style="align-items:flex-start;${add?'border-left:6px solid var(--forest);':''}"><span class="stime" style="padding-top:2px">${e.start||'--:--'}</span><div class="nm"><b>${esc(e.title)}</b><span class="sub">${dayLabel(e.day)} ／ ${esc(e.place||'')}</span>${e.note?`<span class="sub">${esc(e.note)}</span>`:''}</div>
-      <button class="btn ${add?'':'sub2'}" aria-pressed="${!!add}" data-ev="${e.id}" style="padding:8px 10px;font-size:13px;min-height:44px;flex:none">${add?'★ 気になる':'☆ 気になる'}</button></div>`}).join(''):'<div class="empty">この日のイベントは登録されていません。</div>';
-  $('evlist').querySelectorAll('[data-ev]').forEach(b=>b.onclick=()=>{
-    const e=evs.find(x=>x.id===b.dataset.ev),ex=S.sched.find(s=>s.evId===e.id);
-    if(ex)S.sched=S.sched.filter(s=>s.evId!==e.id);   /* もう一度押すと取り消し */
-    else{try{if('Notification' in window&&Notification.permission==='default')Notification.requestPermission()}catch(_){}}
-    if(!ex)S.sched.push({id:uid(),evId:e.id,day:e.day||EVENT.days.find(d=>d.key!=='prev').key,time:e.start||'',text:e.title+(e.place?'（'+e.place+'）':''),done:false});
-    save();renderEvents();renderSched();renderEvMarks();renderEvAlert()});
+  const pick=e=>evFilter==='all'||(evFilter==='my'?mine(e.id):evFilter==='none'?!e.day:evFilter==='new'?scNew.has(e.id):e.day===evFilter);
+  const list=evs.filter(pick).sort((a,b)=>{const ix=x=>x.day==='d1'?1:x.day==='d2'?2:3;return ix(a)-ix(b)||(a.start||'99:99').localeCompare(b.start||'99:99')});
+  let h='',last=null;
+  list.forEach(e=>{
+    const g=e.day||'';if(g!==last){h+=`<h3 class="scday">${g?dl[g]||g:'日にち未定・会期中'}</h3>`;last=g}
+    const add=mine(e.id),tm=e.start?(e.start+(e.end?'–'+e.end:'')):'時間未定';
+    h+=`<div class="ck sci" style="align-items:flex-start;${add?'border-left:6px solid var(--forest);':''}"><span class="stime" style="padding-top:2px;min-width:52px">${esc(tm)}</span><div class="nm">${scNew.has(e.id)?'<span class="sub" style="font-weight:700;color:#c0392b">NEW　</span>':''}<span class="sub" style="font-weight:700">${esc(SC_T[e.type]||'')}</span><b>${esc(e.title)}</b><span class="sub">${esc(e.brand&&e.kind==='booth'?e.brand:'')}${e.place?(e.kind==='booth'&&e.brand?' ／ ':'')+esc(e.place):''}</span>${e.note?`<span class="sub">${esc(e.note)}</span>`:''}${e.cond?`<span class="sub">条件：${esc(e.cond)}</span>`:''}${e.url?`<span class="sub">出典：<a href="${esc(e.url)}" target="_blank" rel="noopener noreferrer">${esc(e.src||'リンク')}</a></span>`:''}</div>
+      <button class="btn ${add?'':'sub2'}" aria-pressed="${add}" data-ev="${esc(e.id)}" style="padding:8px 10px;font-size:13px;min-height:44px;flex:none">${add?'★ 行く':'☆ 行く'}</button></div>`});
+  $('evlist').innerHTML=h||'<div class="empty">この条件のスケジュールはありません。</div>';
+  $('evlist').querySelectorAll('[data-ev]').forEach(b=>b.onclick=()=>{const e=evs.find(x=>x.id===b.dataset.ev);if(e)scAdd(e)});
 }
+/* 最新の情報を取得：公開されているデータファイルを取り直し、前回から増えたものだけ「NEW」にする */
+async function scFetch(){
+  const msg=$('sc-msg');msg.textContent='取得中…';
+  try{
+    const r=await fetch('schedule-2026.js?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error(r.status);
+    const w={};new Function('window',await r.text())(w);
+    if(!Array.isArray(w.SCHEDULE))throw new Error('形式エラー');
+    const known=new Set(scLS('fs-sc-known',[])),before=(window.SCHEDULE||[]).length;
+    const nw=w.SCHEDULE.filter(x=>!known.has(x.id));
+    window.SCHEDULE=w.SCHEDULE;window.SCHEDULE_META=w.SCHEDULE_META||{};
+    nw.forEach(x=>scNew.add(x.id));scSet('fs-sc-new',[...scNew]);
+    scSet('fs-sc-known',w.SCHEDULE.map(x=>x.id));scSet('fs-sc-data',{meta:window.SCHEDULE_META,list:window.SCHEDULE});
+    msg.textContent=nw.length?`新しいイベントが ${nw.length} 件ありました（NEW 印）。`:'新しいイベントはありませんでした（最終更新：'+(window.SCHEDULE_META.updated||'不明')+'）。';
+    renderEvents();
+  }catch(e){msg.textContent='取得できませんでした。電波のある場所で、もう一度押してください。前回のデータをそのまま表示しています。'}
+}
+$('sc-fetch').onclick=scFetch;
+$('sc-prompt').onclick=async()=>{const t='schedule-2026.js の SCHEDULE_META.updated 以降に追加された、FIELDSTYLE EXPO 2026の各ブース・ステージのイベントを、公式Instagram・公式サイト・プレスリリースで調べ、既存のidと重複しないものだけ追加してください。出典URLを必ず付け、分からない時間・条件は推測せず空のままにしてください。';
+  try{await navigator.clipboard.writeText(t);$('sc-msg').textContent='コピーしました。パソコンのClaude Codeに貼り付けてください。'}catch(e){$('sc-msg').textContent='コピーできませんでした。'}};
+/* 行く予定を .ics（カレンダーの予定ファイル）にして、開始30分前のアラームを付ける */
+function icsEsc(s){return String(s||'').replace(/\\/g,'\\\\').replace(/;/g,'\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n')}
+function icsStamp(date,t){return date.replace(/-/g,'')+'T'+t.replace(':','')+'00'}
+function scIcs(){
+  const evs=allEv(),items=[];let nt=0;
+  S.sched.forEach(s=>{const e=evs.find(x=>x.id===s.evId);if(!e)return;const d=(EVENT.days.find(v=>v.key===e.day)||{}).date,t=e.start;
+    if(!d||!/^\d{1,2}:\d{2}$/.test(t||'')){nt++;return}items.push({e,d,t:t.padStart(5,'0')})});
+  if(!items.length){$('sc-icsmsg').textContent='時間が決まっている「行く」の予定がありません。'+(nt?'（時間未定の予定 '+nt+' 件は通知できません）':'');return}
+  const endOf=(d,t,end)=>{if(end&&/^\d{1,2}:\d{2}$/.test(end))return icsStamp(d,end.padStart(5,'0'));const x=new Date(d+'T'+t+':00+09:00').getTime()+30*60000,z=new Date(x+9*3600000);return z.toISOString().slice(0,19).replace(/[-:]/g,'')};
+  const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//fieldstyle-expo-2026//JP','CALSCALE:GREGORIAN'];
+  items.forEach(({e,d,t})=>{L.push('BEGIN:VEVENT','UID:'+e.id+'@fieldstyle-expo-2026','DTSTAMP:20261112T000000Z','DTSTART:'+icsStamp(d,t),'DTEND:'+endOf(d,t,e.end),
+    'SUMMARY:'+icsEsc((e.kind==='booth'&&e.brand?e.brand+' ':'')+e.title),'LOCATION:'+icsEsc('Aichi Sky Expo '+(e.place||'')),'DESCRIPTION:'+icsEsc((e.note||'')+(e.cond?' 条件：'+e.cond:'')),
+    'BEGIN:VALARM','TRIGGER:-PT30M','ACTION:DISPLAY','DESCRIPTION:'+icsEsc('あと30分: '+e.title),'END:VALARM','END:VEVENT')});
+  L.push('END:VCALENDAR');
+  const blob=new Blob([L.join('\r\n')+'\r\n'],{type:'text/calendar;charset=utf-8'}),u=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=u;a.download='fieldstyle-expo-2026.ics';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000);
+  $('sc-icsmsg').textContent=items.length+' 件の予定を渡しました。開いた画面で「カレンダーに追加」を押してください。'+(nt?'（時間未定の '+nt+' 件は含まれません）':'');
+}
+$('sc-ics').onclick=scIcs;
 
 /* ---- ブース別の限定情報 ---- */
 let evview='list',pkFilter='all';
@@ -2087,7 +2149,7 @@ function renderSpend(){
 }
 /* ---- イベント: マップ上の★と時間、30分前のお知らせ ---- */
 const EV_POS=EVENT.evPos||{'ホールE東側 特設ステージ':[1330,350]};   /* マップに印刷された「ステージ」付近。場所が地図にないイベントは印を出さない */
-const evItems=()=>(S.sched||[]).filter(x=>x.evId).map(x=>({x,e:(EVENT.events||[]).find(v=>v.id===x.evId)})).filter(o=>o.e);
+const evItems=()=>(S.sched||[]).filter(x=>x.evId).map(x=>({x,e:allEv().find(v=>v.id===x.evId)})).filter(o=>o.e);
 function evStartMs(o){const d=EVENT.days.find(v=>v.key===(o.x.day||o.e.day));const t=o.x.time||o.e.start;if(!d||!t||!/^\d{1,2}:\d{2}$/.test(t))return null;return new Date(d.date+'T'+t.padStart(5,'0')+':00+09:00').getTime()}
 function renderEvMarks(){
   const m=$('mapin');if(!m)return;m.querySelectorAll('.evm').forEach(e=>e.remove());
