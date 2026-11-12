@@ -625,7 +625,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v37<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v38<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -979,7 +979,7 @@ const BY = Object.fromEntries(BOOTHS.map(b=>[b.n,b]));
 for(const a in EVENT.alias)BY[a]=BY[EVENT.alias[a]];
 
 const KEY=EVENT.storageKey;
-const DEF=()=>({stars:{},later:{},subStars:{},packInit:false,packInit2:false,packInit3:false,packInit4:false,packInit5:false,packInit6:false,wants:[],seen:{},budget:0,order:[],sched:[],pack:[],todo:[],subOrder:{},notes:[],consider:{},entry:{nos:{},day:''},deletedMemos:[],_t:0});
+const DEF=()=>({stars:{},later:{},subStars:{},packInit:false,packInit2:false,packInit3:false,packInit4:false,packInit5:false,packInit6:false,wants:[],seen:{},budget:0,order:[],sched:[],pack:[],todo:[],subOrder:{},uorder:[],notes:[],consider:{},entry:{nos:{},day:''},deletedMemos:[],_t:0});
 
 const fmtY2=n=>(n===''||n==null)?'':(+n).toLocaleString('en-US');
 const ynum=v=>{const d=String(v).replace(/[^\d]/g,'');return d===''?null:+d};
@@ -1122,6 +1122,17 @@ function bindBRows(el){
 }
 document.addEventListener('change',e=>{const c=e.target;if(!c||!c.dataset||!c.dataset.cam)return;const t=document.getElementById(c.dataset.cam);if(!t)return;try{const dt=new DataTransfer();[...t.files,...c.files].forEach(f=>dt.items.add(f));t.files=dt.files}catch(x){}c.value='';t.dispatchEvent(new Event('change',{bubbles:true}))});
 const planOpen=new Set();
+function unitsOrdered(ks){
+  /* 並べ替えの単位は「ブランド1枚のカード」。別のブースのカードを、同じブースのカードの間に入れられる */
+  const def=[];ks.forEach((k,i)=>{const bl=ckBrands(k),multi=bl.length>1;bl.forEach((b,bi)=>def.push({k,b,i,bi,multi,id:multi?k+'|'+b:k}))});
+  const uo=S.uorder||[];let res=def;
+  if(uo.length){
+    const pos=id=>uo.indexOf(id);
+    res=def.filter(u=>pos(u.id)>=0).sort((a,b)=>pos(a.id)-pos(b.id));
+    let prev=null;def.forEach(u=>{if(pos(u.id)<0){const at=prev?res.findIndex(x=>x.id===prev.id):-1;res.splice(at+1,0,u)}prev=u})
+  }
+  return [...res.filter(u=>!doneOf(u.k)),...res.filter(u=>doneOf(u.k))];   /* 満足は一番下へ */
+}
 function renderPlan(){
   const ks=starList(), el=$('plan');
   $('n-plan').textContent=ks.length;
@@ -1131,11 +1142,11 @@ function renderPlan(){
   }
   const done=ks.filter(doneOf).length;
   let h=`<h2>優先順位</h2><div class="sum"><div>見たいブース<b>${ks.length}</b></div><div>見終わった<b>${done}</b></div></div><div class="note" style="margin:0 0 8px">左の「≡」をつかんで上下にドラッグすると、入れ替えられます。左の数字がマップのピン番号です。行の左端の色は、ブースに行く優先度（赤＝高、黄＝中、緑＝低、灰＝満足）です。カードが水色のブースは、欲しい物が入っています。</div><div class="board" id="board">`;
-  ks.forEach((k,i)=>{const d=doneOf(k),allW=openWants(k),bl=ckBrands(k),multi=bl.length>1;
-   bl.forEach((b,bi)=>{const ws=multi?allW.filter(w=>w.sub===b||(!w.sub&&bi===0)):allW,tid=multi?k+'|'+b:k;
+  unitsOrdered(ks).forEach(({k,b,i,bi,multi})=>{const d=doneOf(k),allW=openWants(k);
+   {const ws=multi?allW.filter(w=>w.sub===b||(!w.sub&&bi===0)):allW,tid=multi?k+'|'+b:k;
     const sub=ws.length?ws.map(w=>esc(w.name)+(w.yen?' '+yen(w.yen):'')).join('、'):'商品未定';
-    h+=`<div class="plank bp${boothPrio(k)} ${d?'done':''} st-${stOf(k)}${ws.length?' hasw':''}" data-k="${k}" data-b="${esc(b)}"><button class="grip" data-grip="${k}" aria-label="${esc(BY[k].name)}を並べ替え（上下キーでも動かせます）">≡</button><span class="ord">${i+1}</span>${badge(k)}<div class="nm" data-tog="${esc(tid)}" role="button" tabindex="0" aria-expanded="${planOpen.has(tid)}"><b class="pn">${esc(b)}</b><span class="sub">${planOpen.has(tid)?'▾':'▸'} ${sub}</span></div><select class="stsel" data-stsel="${k}" aria-label="${esc(BY[k].name)}の状態">${['none','done','later'].map(x=>`<option value="${x}" ${stOf(k)===x?'selected':''}>${ST_L[x]}</option>`).join('')}</select><button class="x" data-unstar="${k}" data-ub="${esc(b)}" aria-label="外す">✕</button>${planOpen.has(tid)?`<div class="wlp">${ws.length?ws.map(w=>`<div class="wlpi"><span class="prio p${w.prio}">${({1:'絶対',2:'悩み',3:'我慢'})[w.prio]||''}</span>${esc(w.name)}<span class="wlpy">${w.yen?yen(w.yen):'予算未入力'}${w.sub?' ／ 店：'+esc(w.sub):''}</span>${wImgs(w.id).length?`<div class="wth-row">${wImgs(w.id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wvp="${x.id}">`).join('')}</div>`:''}</div>`).join(''):'<div class="wlpi">このブースの欲しい物はまだありません。</div>'}</div>`:''}</div>`;
-   });
+    h+=`<div class="plank bp${boothPrio(k)} ${d?'done':''} st-${stOf(k)}${ws.length?' hasw':''}" data-k="${k}" data-b="${esc(b)}" data-u="${esc(tid)}"><button class="grip" data-grip="${k}" aria-label="${esc(BY[k].name)}を並べ替え（上下キーでも動かせます）">≡</button><span class="ord">${i+1}</span>${badge(k)}<div class="nm" data-tog="${esc(tid)}" role="button" tabindex="0" aria-expanded="${planOpen.has(tid)}"><b class="pn">${esc(b)}</b><span class="sub">${planOpen.has(tid)?'▾':'▸'} ${sub}</span></div><select class="stsel" data-stsel="${k}" aria-label="${esc(BY[k].name)}の状態">${['none','done','later'].map(x=>`<option value="${x}" ${stOf(k)===x?'selected':''}>${ST_L[x]}</option>`).join('')}</select><button class="x" data-unstar="${k}" data-ub="${esc(b)}" aria-label="外す">✕</button>${planOpen.has(tid)?`<div class="wlp">${ws.length?ws.map(w=>`<div class="wlpi"><span class="prio p${w.prio}">${({1:'絶対',2:'悩み',3:'我慢'})[w.prio]||''}</span>${esc(w.name)}<span class="wlpy">${w.yen?yen(w.yen):'予算未入力'}${w.sub?' ／ 店：'+esc(w.sub):''}</span>${wImgs(w.id).length?`<div class="wth-row">${wImgs(w.id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wvp="${x.id}">`).join('')}</div>`:''}</div>`).join(''):'<div class="wlpi">このブースの欲しい物はまだありません。</div>'}</div>`:''}</div>`;
+   }
   });
   h+='</div>';
   h+=`<div class="tools" style="margin-top:16px"><button class="btn sub2" id="copyplan">一覧をコピー</button>${RT?'<button class="btn" id="planroute">優先順位の道順をマップで見る</button>':''}</div><div class="note" id="copymsg"></div>`;
@@ -1213,7 +1224,7 @@ function bindOpt(){
 function setupDrag(){
   const board=$('board');if(!board)return;
   /* 並び順の確定：つかんだカードの位置を、そのブースの位置にする（同じブースの他のカードは動かさず1つにまとめる） */
-  const commit=(dk,row)=>{const seen=new Set(),o=[];board.querySelectorAll('.plank').forEach(p=>{const k=p.dataset.k;if(k===dk&&p!==row)return;if(!seen.has(k)){seen.add(k);o.push(k)}});S.order=o;const gb=[...board.querySelectorAll('.plank')].filter(p=>p.dataset.k===dk).map(p=>p.dataset.b);if(gb.length>1){S.subOrder=S.subOrder||{};S.subOrder[dk]=gb}save();render()};
+  const commit=(dk,row)=>{const ps=[...board.querySelectorAll('.plank')],seen=new Set(),o=[];ps.forEach(p=>{const k=p.dataset.k;if(!seen.has(k)){seen.add(k);o.push(k)}});S.order=o;S.uorder=ps.map(p=>p.dataset.u);save();render()};
   board.querySelectorAll('.grip').forEach(g=>{
     const row=g.closest('.plank');
     g.addEventListener('keydown',e=>{
@@ -2220,7 +2231,7 @@ const clone=o=>JSON.parse(JSON.stringify(o));
 const hasData=s=>s&&(Object.keys(s.stars||{}).length||(s.wants||[]).length||(s.sched||[]).length||(s.pack||[]).length||(s.budget||0)||Object.keys(s.seen||{}).length);
 function mergeStates(a,b){ /* 初回だけ: 両方にデータがあるときは足し合わせる */
   const u=(x,y)=>{const m=new Map();[...(x||[]),...(y||[])].forEach(i=>{if(!m.has(String(i.id)))m.set(String(i.id),i)});return [...m.values()]};
-  return Object.assign(DEF(),{stars:{...a.stars,...b.stars},later:{...a.later,...b.later},seen:{...a.seen,...b.seen},packInit:!!(a.packInit||b.packInit),packInit2:!!(a.packInit2||b.packInit2),packInit3:!!(a.packInit3||b.packInit3),packInit4:!!(a.packInit4||b.packInit4),packInit5:!!(a.packInit5||b.packInit5),packInit6:!!(a.packInit6||b.packInit6),subStars:(()=>{const o={};[a.subStars,b.subStars].forEach(x=>{for(const k in (x||{}))o[k]=Object.assign(o[k]||{},x[k])});return o})(),wants:u(a.wants,b.wants),sched:u(a.sched,b.sched),pack:u(a.pack,b.pack),todo:u(a.todo||[],b.todo||[]),subOrder:Object.assign({},a.subOrder||{},b.subOrder||{}),notes:u(a.notes,b.notes),consider:Object.assign({},a.consider||{},b.consider||{}),entry:(()=>{const f=e=>{e=e||{};const n=Object.assign({},e.nos||{});if(e.no&&!Object.keys(n).length)n[e.day||'d1']=e.no;return {nos:n,day:e.day||''}};const x=f(a.entry),y=f(b.entry);return {nos:Object.assign({},x.nos,y.nos),day:y.day||x.day}})(),
+  return Object.assign(DEF(),{stars:{...a.stars,...b.stars},later:{...a.later,...b.later},seen:{...a.seen,...b.seen},packInit:!!(a.packInit||b.packInit),packInit2:!!(a.packInit2||b.packInit2),packInit3:!!(a.packInit3||b.packInit3),packInit4:!!(a.packInit4||b.packInit4),packInit5:!!(a.packInit5||b.packInit5),packInit6:!!(a.packInit6||b.packInit6),subStars:(()=>{const o={};[a.subStars,b.subStars].forEach(x=>{for(const k in (x||{}))o[k]=Object.assign(o[k]||{},x[k])});return o})(),wants:u(a.wants,b.wants),sched:u(a.sched,b.sched),pack:u(a.pack,b.pack),todo:u(a.todo||[],b.todo||[]),subOrder:Object.assign({},a.subOrder||{},b.subOrder||{}),uorder:(b.uorder&&b.uorder.length?b.uorder:(a.uorder||[])),notes:u(a.notes,b.notes),consider:Object.assign({},a.consider||{},b.consider||{}),entry:(()=>{const f=e=>{e=e||{};const n=Object.assign({},e.nos||{});if(e.no&&!Object.keys(n).length)n[e.day||'d1']=e.no;return {nos:n,day:e.day||''}};const x=f(a.entry),y=f(b.entry);return {nos:Object.assign({},x.nos,y.nos),day:y.day||x.day}})(),
     order:(b.order&&b.order.length?b.order:a.order)||[],budget:b.budget||a.budget||0,deletedMemos:[...new Set([...(a.deletedMemos||[]),...(b.deletedMemos||[])])]});}
 function errState(e){return e&&e.code==='invalid_argument'?'noperm':'error'}
 let pushT=null,pushing=false,dirty=false;
