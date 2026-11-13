@@ -627,7 +627,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v42<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v43<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -1134,6 +1134,8 @@ function unitsOrdered(ks){
   }
   return [...res.filter(u=>!doneOf(u.k)),...res.filter(u=>doneOf(u.k))];   /* 満足は一番下へ */
 }
+/* カードの番号は、画面に並んでいる順（1,2,3…）。マップのピンは、そのブースの最初のカードの番号 */
+function unitNos(){const U=unitsOrdered(starList()),m={};U.forEach((u,i)=>{if(m[u.k]==null)m[u.k]=i+1});return m}
 function renderPlan(){
   const ks=starList(), el=$('plan');
   $('n-plan').textContent=ks.length;
@@ -1143,10 +1145,10 @@ function renderPlan(){
   }
   const done=ks.filter(doneOf).length;
   let h=`<h2>優先順位</h2><div class="sum"><div>見たいブース<b>${ks.length}</b></div><div>見終わった<b>${done}</b></div></div><div class="note" style="margin:0 0 8px">左の「≡」をつかんで上下にドラッグすると、入れ替えられます。左の数字がマップのピン番号です。行の左端の色は、ブースに行く優先度（赤＝高、黄＝中、緑＝低、灰＝満足）です。カードが水色のブースは、欲しい物が入っています。</div><div class="board" id="board">`;
-  unitsOrdered(ks).forEach(({k,b,i,bi,multi})=>{const d=doneOf(k),allW=openWants(k);
+  unitsOrdered(ks).forEach(({k,b,i,bi,multi},ui)=>{const d=doneOf(k),allW=openWants(k);
    {const ws=multi?allW.filter(w=>w.sub===b||(!w.sub&&bi===0)):allW,tid=multi?k+'|'+b:k;
     const sub=ws.length?ws.map(w=>esc(w.name)+(w.yen?' '+yen(w.yen):'')).join('、'):'商品未定';
-    h+=`<div class="plank bp${boothPrio(k)} ${d?'done':''} st-${stOf(k)}${ws.length?' hasw':''}" data-k="${k}" data-b="${esc(b)}" data-u="${esc(tid)}"><button class="grip" data-grip="${k}" aria-label="${esc(BY[k].name)}を並べ替え（上下キーでも動かせます）">≡</button><span class="ord">${i+1}</span>${badge(k)}<div class="nm" data-tog="${esc(tid)}" role="button" tabindex="0" aria-expanded="${planOpen.has(tid)}"><b class="pn">${esc(b)}</b><span class="sub">${planOpen.has(tid)?'▾':'▸'} ${sub}</span></div><select class="stsel" data-stsel="${k}" aria-label="${esc(BY[k].name)}の状態">${['none','done','later'].map(x=>`<option value="${x}" ${stOf(k)===x?'selected':''}>${ST_L[x]}</option>`).join('')}</select><button class="x" data-unstar="${k}" data-ub="${esc(b)}" aria-label="外す">✕</button>${planOpen.has(tid)?`<div class="wlp">${ws.length?ws.map(w=>`<div class="wlpi"><span class="prio p${w.prio}">${({1:'絶対',2:'悩み',3:'我慢'})[w.prio]||''}</span>${esc(w.name)}<span class="wlpy">${w.yen?yen(w.yen):'予算未入力'}${w.sub?' ／ 店：'+esc(w.sub):''}</span>${wImgs(w.id).length?`<div class="wth-row">${wImgs(w.id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wvp="${x.id}">`).join('')}</div>`:''}</div>`).join(''):'<div class="wlpi">このブースの欲しい物はまだありません。</div>'}</div>`:''}</div>`;
+    h+=`<div class="plank bp${boothPrio(k)} ${d?'done':''} st-${stOf(k)}${ws.length?' hasw':''}" data-k="${k}" data-b="${esc(b)}" data-u="${esc(tid)}"><button class="grip" data-grip="${k}" aria-label="${esc(BY[k].name)}を並べ替え（上下キーでも動かせます）">≡</button><span class="ord">${ui+1}</span>${badge(k)}<div class="nm" data-tog="${esc(tid)}" role="button" tabindex="0" aria-expanded="${planOpen.has(tid)}"><b class="pn">${esc(b)}</b><span class="sub">${planOpen.has(tid)?'▾':'▸'} ${sub}</span></div><select class="stsel" data-stsel="${k}" aria-label="${esc(BY[k].name)}の状態">${['none','done','later'].map(x=>`<option value="${x}" ${stOf(k)===x?'selected':''}>${ST_L[x]}</option>`).join('')}</select><button class="x" data-unstar="${k}" data-ub="${esc(b)}" aria-label="外す">✕</button>${planOpen.has(tid)?`<div class="wlp">${ws.length?ws.map(w=>`<div class="wlpi"><span class="prio p${w.prio}">${({1:'絶対',2:'悩み',3:'我慢'})[w.prio]||''}</span>${esc(w.name)}<span class="wlpy">${w.yen?yen(w.yen):'予算未入力'}${w.sub?' ／ 店：'+esc(w.sub):''}</span>${wImgs(w.id).length?`<div class="wth-row">${wImgs(w.id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wvp="${x.id}">`).join('')}</div>`:''}</div>`).join(''):'<div class="wlpi">このブースの欲しい物はまだありません。</div>'}</div>`:''}</div>`;
    }
   });
   h+='</div>';
@@ -1509,7 +1511,7 @@ function showPin(k,center,noScroll){
   document.querySelectorAll('.pin').forEach(e=>e.classList.toggle('sel',e.dataset.k===k));
   const items=ws.length?ws.map(w=>`<div class="item"><span>${esc(w.name)}</span><b>${w.yen?yen(w.yen):'値段未入力'}</b></div>`).join(''):'<div class="item"><span style="color:var(--muted)">'+(i>=0?'欲しい商品は未定（まず見に行くブース）':'このブースは未選択')+'</span></div>';
   const tot=ws.reduce((a,w)=>a+(+w.yen||0),0), np=memos.filter(m=>m.booth===k).length, bs=boothSpent(k);
-  $('pinfo').innerHTML=`<h3>${i>=0?`<span class="ord">${i+1}</span>`:''}${badge(k)}<span>${esc(b.name)}</span></h3><div class="note" style="margin:0 0 4px">${i>=0?'優先順位 '+(i+1)+'番目'+(doneOf(k)?' ／ 見終わった':''):'ホール'+b.hall}${(EVENT.alias[k]||Object.values(EVENT.alias).includes(k))?' ／ 同じブースに別の番号もあります':''}</div>${bs?`<div class="item"><span>このブースで使った金額</span><b>${yen(bs)}</b></div>`:''}${wantBlock(k,null)}${ws.length>1&&tot?`<div class="item"><span>合計</span><b>${yen(tot)}</b></div>`:''}
+  $('pinfo').innerHTML=`<h3>${i>=0?`<span class="ord">${unitNos()[k]||i+1}</span>`:''}${badge(k)}<span>${esc(b.name)}</span></h3><div class="note" style="margin:0 0 4px">${i>=0?'優先順位 '+(i+1)+'番目'+(doneOf(k)?' ／ 見終わった':''):'ホール'+b.hall}${(EVENT.alias[k]||Object.values(EVENT.alias).includes(k))?' ／ 同じブースに別の番号もあります':''}</div>${bs?`<div class="item"><span>このブースで使った金額</span><b>${yen(bs)}</b></div>`:''}${wantBlock(k,null)}${ws.length>1&&tot?`<div class="item"><span>合計</span><b>${yen(tot)}</b></div>`:''}
   ${i>=0?`<div class="bst" style="margin:8px 0 2px"><span class="note" style="margin:0 4px 0 0;align-self:center;width:100%">ブースを見たか</span>${['none','later','done'].map(x=>`<button type="button" class="chip" data-bs="${k}" data-st="${x}" aria-pressed="${stOf(k)===x}">${ST_L[x]}</button>`).join('')}</div>`:''}
   ${starred?bprioRow(k):''}<div class="acts"><button class="btn ${starred?'':'sub2'}" id="pi-star" aria-pressed="${starred}">${starred?'★ 見たいブースに選択中':'☆ 見たいブースに入れる'}</button><button class="btn sub2" id="pi-buy">買った物を撮る</button>${np?`<button class="btn sub2" id="pi-photo">写真メモを見る（${np}）</button>`:''}${RT?`<button class="btn sub2" id="pi-here">ここを現在地にする</button><button class="btn sub2" id="pi-go">ここへの道順</button>`:''}</div>
   <div style="margin-top:12px;font-weight:700;font-size:13px">このブースのメモ</div>${pinNotes(k)}
@@ -1877,14 +1879,15 @@ function renderMap(){
   const ks=starList();
   applyZoom();
   $('mapin').querySelectorAll('.pin').forEach(e=>e.remove());
+  const NO=unitNos();
   ks.forEach((k,i)=>{if(!POS[k])return;
-    const e=document.createElement('button');e.className='pin'+(doneOf(k)?' done':'');e.dataset.k=k;const _n=(routeOverride&&routeOverride.includes(k))?routeOverride.indexOf(k)+1:i+1;e.textContent=_n;
+    const e=document.createElement('button');e.className='pin'+(doneOf(k)?' done':'');e.dataset.k=k;const _n=(routeOverride&&routeOverride.includes(k))?routeOverride.indexOf(k)+1:(NO[k]||i+1);e.textContent=_n;
     e.style.left=(POS[k][0]/IW*100)+'%';e.style.top=(POS[k][1]/IH*100)+'%';
-    e.setAttribute('aria-label',`${i+1}番 ${k} ${BY[k].name}`);e.onclick=()=>tapBooth(k);$('mapin').appendChild(e)});
+    e.setAttribute('aria-label',`${NO[k]||i+1}番 ${k} ${BY[k].name}`);e.onclick=()=>tapBooth(k);$('mapin').appendChild(e)});
   if(selPin&&ks.includes(selPin))showPin(selPin,false);
   else{selPin=null;$('pinfo').innerHTML=ks.length?'':'<span class="note">「マップ」で★を付けるか、「欲しい物」にブース番号を入れると、ここに番号ピンが出ます。</span>'}
   $('mapnums').innerHTML=ks.map((k,i)=>{const ws=openWants(k);
-    return `<button class="numrow" data-k="${k}"><span class="ord">${i+1}</span>${badge(k)}<span class="t">${esc(BY[k].name)}<small>${ws.length?ws.map(w=>esc(w.name)+(w.yen?' '+yen(w.yen):'')).join('、'):'商品未定'}</small></span></button>`}).join('');
+    return `<button class="numrow" data-k="${k}"><span class="ord">${NO[k]||i+1}</span>${badge(k)}<span class="t">${esc(BY[k].name)}<small>${ws.length?ws.map(w=>esc(w.name)+(w.yen?' '+yen(w.yen):'')).join('、'):'商品未定'}</small></span></button>`}).join('');
   $('mapnums').querySelectorAll('.numrow').forEach(b=>b.onclick=()=>{showPin(b.dataset.k,true);$('mapbox').scrollIntoView({block:'nearest',behavior:'smooth'})});
 }
 
