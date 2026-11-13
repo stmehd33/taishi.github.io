@@ -627,7 +627,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v46<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v47<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -1297,7 +1297,12 @@ function renderWants(){
   $('bbar').classList.toggle('over',left<0);$('bfill').style.width=B?Math.min(100,(spent+tot)/B*100)+'%':'0';
   const high=open.filter(w=>intentOf(w)==='must').reduce((a,w)=>a+(+w.yen||0),0);
   $('wsum').innerHTML=`<div>うち絶対買う<b>${yen(high)}</b></div>`;
-  const ord=[...S.wants].sort((a,b)=>(a.got-b.got)||(a.prio-b.prio));
+  const wm=S.wsort||'intent';
+  if(!$('wsortbar')){const d=document.createElement('div');d.id='wsortbar';d.className='dayseg';d.style.cssText='margin:0 0 8px';$('wlist').parentNode.insertBefore(d,$('wlist'))}
+  $('wsortbar').innerHTML=[['intent','絶対買う順'],['plan','優先順位と同じ'],['add','入れた順']].map(([v,l])=>`<button type="button" class="chip" data-ws="${v}" aria-pressed="${wm===v}">${l}</button>`).join('');
+  $('wsortbar').querySelectorAll('[data-ws]').forEach(x=>x.onclick=()=>{S.wsort=x.dataset.ws;save();renderWants()});
+  const _un=unitsOrdered(starList()),_pi=w=>{if(!w.booth)return 1e6;const i=_un.findIndex(u=>u.k===w.booth&&(!u.multi||u.b===w.sub));return i<0?(_un.findIndex(u=>u.k===w.booth)<0?1e6:_un.findIndex(u=>u.k===w.booth)):i},_ix=new Map(S.wants.map((w,i)=>[w,i]));
+  const ord=[...S.wants].sort((a,b)=>(a.got-b.got)||(wm==='add'?_ix.get(a)-_ix.get(b):wm==='plan'?(_pi(a)-_pi(b)||_ix.get(a)-_ix.get(b)):((a.prio-b.prio)||0)));
   if(!ord.length){$('wlist').innerHTML='<div class="empty">欲しいものを追加すると、予算の合計が出ます。</div>';return}
   const pl={1:'絶対',2:'悩み',3:'我慢'};
   $('wlist').innerHTML=ord.map(w=>`<div class="row ${w.got?'done':''}"><input class="chk" type="checkbox" data-got="${w.id}" ${w.got?'checked':''} aria-label="${esc(w.name)}を買った">
