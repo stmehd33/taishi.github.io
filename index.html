@@ -627,7 +627,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v44<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v45<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -980,7 +980,7 @@ const BY = Object.fromEntries(BOOTHS.map(b=>[b.n,b]));
 for(const a in EVENT.alias)BY[a]=BY[EVENT.alias[a]];
 
 const KEY=EVENT.storageKey;
-const DEF=()=>({stars:{},later:{},subStars:{},packInit:false,packInit2:false,packInit3:false,packInit4:false,packInit5:false,packInit6:false,wants:[],seen:{},budget:0,order:[],sched:[],pack:[],todo:[],subOrder:{},uorder:[],notes:[],consider:{},entry:{nos:{},day:''},deletedMemos:[],_t:0});
+const DEF=()=>({stars:{},later:{},subStars:{},packInit:false,packInit2:false,packInit3:false,packInit4:false,packInit5:false,packInit6:false,wants:[],seen:{},seenU:{},laterU:{},prioU:{},budget:0,order:[],sched:[],pack:[],todo:[],subOrder:{},uorder:[],notes:[],consider:{},entry:{nos:{},day:''},deletedMemos:[],_t:0});
 
 const fmtY2=n=>(n===''||n==null)?'':(+n).toLocaleString('en-US');
 const ynum=v=>{const d=String(v).replace(/[^\d]/g,'');return d===''?null:+d};
@@ -1104,22 +1104,47 @@ function starList(){
 const doneOf=k=>!!S.seen[k];
 const stOf=k=>S.seen[k]?'done':((S.later||{})[k]?'later':'none');
 const ST_L={none:'見てない',later:'もう一度見る',done:'満足'};
-function snapState(){return JSON.stringify({stars:S.stars,seen:S.seen,later:S.later||{},subStars:S.subStars||{},wants:S.wants,order:S.order||[]})}
-function toastUndo(msg,snap){const e=$('toast');e.innerHTML='';const sp=document.createElement('span');sp.textContent=msg+'　';const b=document.createElement('button');b.type='button';b.textContent='↩ 取り消し';b.style.cssText='font:inherit;font-weight:700;color:inherit;background:transparent;border:2px solid currentColor;border-radius:999px;padding:6px 12px;min-height:40px;cursor:pointer';b.onclick=()=>{const o=JSON.parse(snap);S.stars=o.stars;S.seen=o.seen;S.later=o.later;S.subStars=o.subStars;S.wants=o.wants;if(o.order)S.order=o.order;save();e.hidden=true;render();if(typeof renderBooths==='function')renderBooths();if(typeof renderPlan==='function')try{renderPlan()}catch(x){}};e.appendChild(sp);e.appendChild(b);e.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{e.hidden=true},6000)}
-function setSt(k,st){const _sn=snapState();S.later=S.later||{};delete S.seen[k];delete S.later[k];if(st==='done')S.seen[k]=true;else if(st==='later')S.later[k]=true;save();render();toastUndo('「'+ST_L[st]+'」にしました',_sn)}
+/* 合同ブースは「ブランド1つ＝個別のブース」。状態（見た/もう一度/満足）と優先度はブランドごとに持つ */
+const unitsOfBooth=k=>{const bl=ckBrands(k),m=bl.length>1;return bl.map((b,bi)=>({k,b,bi,multi:m,id:m?k+'|'+b:k}))};
+const stU=u=>u.multi?((S.seenU||{})[u.id]?'done':((S.laterU||{})[u.id]?'later':'none')):stOf(u.k);
+const doneU=u=>stU(u)==='done';
+const unitPrio=u=>u.multi?((S.prioU||{})[u.id]||boothPrio(u.k)):boothPrio(u.k);
+function syncUnits(){
+  S.seenU=S.seenU||{};S.laterU=S.laterU||{};S.prioU=S.prioU||{};S.later=S.later||{};
+  const ks=planKeys().filter(k=>BY[k]);
+  if(!S.mig45){S.mig45=true;ks.forEach(k=>{const us=unitsOfBooth(k);if(us.length>1)us.forEach(u=>{if(S.seen[k])S.seenU[u.id]=true;else if(S.later[k])S.laterU[u.id]=true})})}
+  ks.forEach(k=>{const us=unitsOfBooth(k);if(us.length<2)return;
+    const all=us.every(u=>S.seenU[u.id]),any=us.some(u=>S.laterU[u.id]&&!S.seenU[u.id]);
+    if(all)S.seen[k]=true;else delete S.seen[k];if(!all&&any)S.later[k]=true;else delete S.later[k];
+    if(S.stars[k])S.stars[k].prio=Math.min(...us.map(unitPrio))})
+}
+function setPrioU(k,b,v){S.prioU=S.prioU||{};const us=unitsOfBooth(k);if(us.length<2){if(S.stars[k])S.stars[k].prio=v;return}
+  us.forEach(u=>{if(!S.prioU[u.id])S.prioU[u.id]=unitPrio(u)});const t=us.find(u=>u.b===b);if(t)S.prioU[t.id]=v;syncUnits()}
+const unitCount=()=>unitsOrdered(starList()).length;
+function unitCtl(k,only){
+  const all=unitsOfBooth(k),multi=all.length>1,starred=!!S.stars[k],ST=['none','later','done'];
+  if(only!=null&&subsOf(k).length&&!subOn(k,only))return '<div class="note" style="margin:8px 0 2px">このブランドを「回りたいブランド」に入れると、状態と優先度を付けられます。</div>';
+  if(!multi)return `<div class="bst" style="margin:8px 0 2px"><span class="note" style="margin:0 4px 0 0;align-self:center;width:100%">ブースを見たか</span>${ST.map(x=>`<button type="button" class="chip" data-bs="${k}" data-st="${x}" aria-pressed="${stOf(k)===x}">${ST_L[x]}</button>`).join('')}</div>`+(starred?bprioRow(k):'');
+  const us=only!=null?all.filter(u=>u.b===only):all;
+  return us.map(u=>{const st=stU(u),p=unitPrio(u);return `<div style="margin:8px 0 2px;padding:6px 8px;border:2px solid var(--line);border-radius:10px"><div style="font-weight:700;font-size:14px;overflow-wrap:anywhere">${esc(u.b)}</div><div class="bst" style="margin:4px 0 0">${ST.map(x=>`<button type="button" class="chip" data-bs="${k}" data-sb="${esc(u.b)}" data-st="${x}" aria-pressed="${st===x}">${ST_L[x]}</button>`).join('')}</div><div class="bst" style="margin:4px 0 0"><span class="note" style="margin:0 4px 0 0;align-self:center">優先度</span>${[[1,'高'],[2,'中'],[3,'低']].map(([v,l])=>`<button type="button" class="chip" data-bp="${v}" data-bpb="${esc(u.b)}" aria-pressed="${p===v}">${l}</button>`).join('')}</div></div>`}).join('')}
+function snapState(){return JSON.stringify({stars:S.stars,seen:S.seen,later:S.later||{},subStars:S.subStars||{},wants:S.wants,order:S.order||[],seenU:S.seenU||{},laterU:S.laterU||{},prioU:S.prioU||{},uorder:S.uorder||[]})}
+function toastUndo(msg,snap){const e=$('toast');e.innerHTML='';const sp=document.createElement('span');sp.textContent=msg+'　';const b=document.createElement('button');b.type='button';b.textContent='↩ 取り消し';b.style.cssText='font:inherit;font-weight:700;color:inherit;background:transparent;border:2px solid currentColor;border-radius:999px;padding:6px 12px;min-height:40px;cursor:pointer';b.onclick=()=>{const o=JSON.parse(snap);S.stars=o.stars;S.seen=o.seen;S.later=o.later;S.subStars=o.subStars;S.wants=o.wants;if(o.order)S.order=o.order;if(o.seenU){S.seenU=o.seenU;S.laterU=o.laterU;S.prioU=o.prioU}if(o.uorder)S.uorder=o.uorder;save();e.hidden=true;render();if(typeof renderBooths==='function')renderBooths();if(typeof renderPlan==='function')try{renderPlan()}catch(x){}};e.appendChild(sp);e.appendChild(b);e.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{e.hidden=true},6000)}
+function setSt(k,st,b){const _sn=snapState();S.later=S.later||{};S.seenU=S.seenU||{};S.laterU=S.laterU||{};
+  const us=unitsOfBooth(k),tg=us.length>1?(b?us.filter(u=>u.b===b):us):null;
+  if(tg)tg.forEach(u=>{delete S.seenU[u.id];delete S.laterU[u.id];if(st==='done')S.seenU[u.id]=true;else if(st==='later')S.laterU[u.id]=true});
+  else{delete S.seen[k];delete S.later[k];if(st==='done')S.seen[k]=true;else if(st==='later')S.later[k]=true}
+  syncUnits();save();render();toastUndo('「'+ST_L[st]+'」にしました',_sn)}
 const brOpen=new Set();
-function bRow(k,mode){
-  const subs=subsOf(k),st=stOf(k),open=brOpen.has(k),pop=mode==='pop',stBtns=`<div class="bst">${['none','later','done'].map(x=>`<button type="button" class="chip" data-bs="${k}" data-st="${x}" aria-pressed="${st===x}">${ST_L[x]}</button>`).join('')}</div>`;
-  const brands=subs.length?`<div class="bsub">どのブランドの詳細を開きますか？${subs.map(b=>`<button type="button" class="chip" data-bb="${esc(k)}" data-b="${esc(b)}">${esc(b)}</button>`).join('')}</div>`:'';
-  return `<div class="brow ${st}"><button type="button" class="hrow" data-bk="${k}"${pop?' data-pop="1"':''}>${badge(k)}<span class="nm">${esc(BY[k].name.replace(/（.*$/,''))}${subs.length?`<small> ／ ${subs.length}ブランド</small>`:''}${pop?`<small> ${open?'▴':'▾'}</small>`:(subs.length?`<small> ${open?'▴':'▾'}</small>`:'')}</span></button>`
-   +(mode===true?stBtns:'')
-   +(pop?(open?`<div class="bpop">${stBtns}${subs.length?brands:`<button type="button" class="chip" data-bg="${k}">詳細を見る ›</button>`}</div>`:''):(subs.length&&open?brands:''))+`</div>`}
+function bRow(u,mode){
+  const k=u.k,id=u.id,st=stU(u),open=brOpen.has(id),sb=u.multi?esc(u.b):'',
+   stBtns=`<div class="bst">${['none','later','done'].map(x=>`<button type="button" class="chip" data-bs="${k}" data-sb="${sb}" data-st="${x}" aria-pressed="${st===x}">${ST_L[x]}</button>`).join('')}</div>`;
+  return `<div class="brow ${st}"><button type="button" class="hrow" data-bk="${esc(id)}">${badge(k)}<span class="nm">${esc(u.b)}<small> ${open?'▴':'▾'}</small></span></button>`
+   +(open?`<div class="bpop">${stBtns}<button type="button" class="chip" data-bg="${k}" data-bgb="${sb}">詳細を見る ›</button></div>`:'')+`</div>`}
 function goBooth(k,b){show('map');render();if(b){showBrandPin(k,b,true)}else showPin(k,true)}
 function bindBRows(el){
-  el.querySelectorAll('[data-bg]').forEach(x=>x.onclick=()=>goBooth(x.dataset.bg));
-  el.querySelectorAll('[data-bk]').forEach(x=>x.onclick=()=>{const k=x.dataset.bk;if(x.dataset.pop){if(brOpen.has(k))brOpen.delete(k);else brOpen.add(k);render();return}if(subsOf(k).length){if(brOpen.has(k))brOpen.delete(k);else brOpen.add(k);render()}else goBooth(k)});
-  el.querySelectorAll('[data-bs]').forEach(x=>x.onclick=()=>setSt(x.dataset.bs,x.dataset.st));
-  el.querySelectorAll('[data-bb]').forEach(x=>x.onclick=()=>goBooth(x.dataset.bb,x.dataset.b));
+  el.querySelectorAll('[data-bg]').forEach(x=>x.onclick=()=>goBooth(x.dataset.bg,x.dataset.bgb||null));
+  el.querySelectorAll('[data-bk]').forEach(x=>x.onclick=()=>{const id=x.dataset.bk;if(brOpen.has(id))brOpen.delete(id);else brOpen.add(id);render()});
+  el.querySelectorAll('[data-bs]').forEach(x=>x.onclick=()=>setSt(x.dataset.bs,x.dataset.st,x.dataset.sb||undefined));
 }
 document.addEventListener('change',e=>{const c=e.target;if(!c||!c.dataset||!c.dataset.cam)return;const t=document.getElementById(c.dataset.cam);if(!t)return;try{const dt=new DataTransfer();[...t.files,...c.files].forEach(f=>dt.items.add(f));t.files=dt.files}catch(x){}c.value='';t.dispatchEvent(new Event('change',{bubbles:true}))});
 const planOpen=new Set();
@@ -1132,23 +1157,23 @@ function unitsOrdered(ks){
     res=def.filter(u=>pos(u.id)>=0).sort((a,b)=>pos(a.id)-pos(b.id));
     let prev=null;def.forEach(u=>{if(pos(u.id)<0){const at=prev?res.findIndex(x=>x.id===prev.id):-1;res.splice(at+1,0,u)}prev=u})
   }
-  return [...res.filter(u=>!doneOf(u.k)),...res.filter(u=>doneOf(u.k))];   /* 満足は一番下へ */
+  return [...res.filter(u=>!doneU(u)),...res.filter(u=>doneU(u))];   /* 満足は一番下へ */
 }
 /* カードの番号は、画面に並んでいる順（1,2,3…）。マップのピンは、そのブースの最初のカードの番号 */
 function unitNos(){const U=unitsOrdered(starList()),m={};U.forEach((u,i)=>{if(m[u.k]==null)m[u.k]=i+1});return m}
 function renderPlan(){
   const ks=starList(), el=$('plan');
-  $('n-plan').textContent=ks.length;
+  $('n-plan').textContent=unitCount();
   if(!ks.length){
     el.innerHTML=`<h2>優先順位</h2><div class="empty">まだ選んでいません。<br>「マップ」で見たいブースに★を付けるか、「欲しい物」にブース番号を入れると、優先順にここへ並びます。<br><br><button class="btn" id="go-b">ブースを選ぶ</button></div>`;
     $('go-b').onclick=()=>{show('booths');render()};return;
   }
-  const done=ks.filter(doneOf).length;
-  let h=`<h2>優先順位</h2><div class="sum"><div>見たいブース<b>${ks.length}</b></div><div>見終わった<b>${done}</b></div></div><div class="note" style="margin:0 0 8px">左の「≡」をつかんで上下にドラッグすると、入れ替えられます。左の数字がマップのピン番号です。行の左端の色は、ブースに行く優先度（赤＝高、黄＝中、緑＝低、灰＝満足）です。カードが水色のブースは、欲しい物が入っています。</div><div class="board" id="board">`;
-  unitsOrdered(ks).forEach(({k,b,i,bi,multi},ui)=>{const d=doneOf(k),allW=openWants(k);
+  const U0=unitsOrdered(ks),done=U0.filter(doneU).length;
+  let h=`<h2>優先順位</h2><div class="sum"><div>見たいブース<b>${U0.length}</b></div><div>見終わった<b>${done}</b></div></div><div class="note" style="margin:0 0 8px">左の「≡」をつかんで上下にドラッグすると、入れ替えられます。左の数字がマップのピン番号です。行の左端の色は、ブースに行く優先度（赤＝高、黄＝中、緑＝低、灰＝満足）です。カードが水色のブースは、欲しい物が入っています。</div><div class="board" id="board">`;
+  U0.forEach((u,ui)=>{const {k,b,i,bi,multi}=u,d=doneU(u),allW=openWants(k),stx=stU(u),pr=unitPrio(u);
    {const ws=multi?allW.filter(w=>w.sub===b||(!w.sub&&bi===0)):allW,tid=multi?k+'|'+b:k;
     const sub=ws.length?ws.map(w=>esc(w.name)+(w.yen?' '+yen(w.yen):'')).join('、'):'商品未定';
-    h+=`<div class="plank bp${boothPrio(k)} ${d?'done':''} st-${stOf(k)}${ws.length?' hasw':''}" data-k="${k}" data-b="${esc(b)}" data-u="${esc(tid)}"><button class="grip" data-grip="${k}" aria-label="${esc(BY[k].name)}を並べ替え（上下キーでも動かせます）">≡</button><span class="ord">${ui+1}</span>${badge(k)}<div class="nm" data-tog="${esc(tid)}" role="button" tabindex="0" aria-expanded="${planOpen.has(tid)}"><b class="pn">${esc(b)}</b><span class="sub">${planOpen.has(tid)?'▾':'▸'} ${sub}</span></div><select class="stsel" data-stsel="${k}" aria-label="${esc(BY[k].name)}の状態">${['none','done','later'].map(x=>`<option value="${x}" ${stOf(k)===x?'selected':''}>${ST_L[x]}</option>`).join('')}</select><button class="x" data-unstar="${k}" data-ub="${esc(b)}" aria-label="外す">✕</button>${planOpen.has(tid)?`<div class="wlp">${ws.length?ws.map(w=>`<div class="wlpi"><span class="prio p${w.prio}">${({1:'絶対',2:'悩み',3:'我慢'})[w.prio]||''}</span>${esc(w.name)}<span class="wlpy">${w.yen?yen(w.yen):'予算未入力'}${w.sub?' ／ 店：'+esc(w.sub):''}</span>${wImgs(w.id).length?`<div class="wth-row">${wImgs(w.id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wvp="${x.id}">`).join('')}</div>`:''}</div>`).join(''):'<div class="wlpi">このブースの欲しい物はまだありません。</div>'}</div>`:''}</div>`;
+    h+=`<div class="plank bp${pr} ${d?'done':''} st-${stx}${ws.length?' hasw':''}" data-k="${k}" data-b="${esc(b)}" data-u="${esc(tid)}"><button class="grip" data-grip="${k}" aria-label="${esc(b)}を並べ替え（上下キーでも動かせます）">≡</button><span class="ord">${ui+1}</span>${badge(k)}<div class="nm" data-tog="${esc(tid)}" role="button" tabindex="0" aria-expanded="${planOpen.has(tid)}"><b class="pn">${esc(b)}</b><span class="sub">${planOpen.has(tid)?'▾':'▸'} ${sub}</span></div><select class="stsel" data-stsel="${k}" data-sb="${esc(b)}" aria-label="${esc(b)}の状態">${['none','done','later'].map(x=>`<option value="${x}" ${stx===x?'selected':''}>${ST_L[x]}</option>`).join('')}</select><button class="x" data-unstar="${k}" data-ub="${esc(b)}" aria-label="外す">✕</button>${planOpen.has(tid)?`<div class="wlp">${ws.length?ws.map(w=>`<div class="wlpi"><span class="prio p${w.prio}">${({1:'絶対',2:'悩み',3:'我慢'})[w.prio]||''}</span>${esc(w.name)}<span class="wlpy">${w.yen?yen(w.yen):'予算未入力'}${w.sub?' ／ 店：'+esc(w.sub):''}</span>${wImgs(w.id).length?`<div class="wth-row">${wImgs(w.id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wvp="${x.id}">`).join('')}</div>`:''}</div>`).join(''):'<div class="wlpi">このブースの欲しい物はまだありません。</div>'}</div>`:''}</div>`;
    }
   });
   h+='</div>';
@@ -1158,7 +1183,7 @@ function renderPlan(){
   setupDrag();bindOpt();
   el.querySelectorAll('[data-wvp]').forEach(m=>m.onclick=e=>{e.stopPropagation();wViewer(m.dataset.wvp,renderPlan)});
   el.querySelectorAll('[data-tog]').forEach(n=>{const f=()=>{const k=n.dataset.tog;planOpen.has(k)?planOpen.delete(k):planOpen.add(k);renderPlan()};n.onclick=f;n.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();f()}}});
-  el.querySelectorAll('[data-stsel]').forEach(s=>s.onchange=()=>setSt(s.dataset.stsel,s.value));
+  el.querySelectorAll('[data-stsel]').forEach(s=>s.onchange=()=>setSt(s.dataset.stsel,s.value,s.dataset.sb));
   el.querySelectorAll('[data-unstar]').forEach(c=>c.onclick=()=>{const _sn=snapState();const k=c.dataset.unstar,ub=c.dataset.ub,ss=(S.subStars||{})[k]||{};
     if(ub&&ss[ub]&&Object.keys(ss).length>1){delete ss[ub];save();render();toastUndo('「'+ub+'」を外しました',_sn);return}
     delete S.stars[k],delete (S.subStars||{})[k];
@@ -1166,7 +1191,7 @@ function renderPlan(){
     S.wants.forEach(w=>{if(w.booth===k&&!w.got)w.booth=''});save();render();toastUndo('見たいブースから外しました',_sn)});
   if($('planroute'))$('planroute').onclick=()=>{routeOverride=null;if($('optbar'))$('optbar').hidden=true;allMode=true;show('map');rtDraw()};
   $('copyplan').onclick=async()=>{
-    const t='【優先順位】\n'+ks.map((k,i)=>`${doneOf(k)?'✔':'□'} ${i+1}. ${k} ${BY[k].name}${openWants(k).map(w=>' - '+w.name+(w.yen?' '+yen(w.yen):'')).join('')}`).join('\n')+
+    const t='【優先順位】\n'+unitsOrdered(ks).map((u,i)=>`${doneU(u)?'✔':'□'} ${i+1}. ${u.k} ${u.b}${openWants(u.k).filter(w=>!u.multi||w.sub===u.b||(!w.sub&&u.bi===0)).map(w=>' - '+w.name+(w.yen?' '+yen(w.yen):'')).join('')}`).join('\n')+
       '\n\n【欲しいもの】\n'+S.wants.map(w=>`${w.got?'✔':'□'} ${w.name}${w.yen?' '+yen(w.yen):''}${w.booth?' ('+w.booth+')':''}`).join('\n');
     try{await navigator.clipboard.writeText(t);$('copymsg').textContent='コピーしました。メモ帳などに貼り付けて保存できます。'}
     catch(e){$('copymsg').textContent='コピーできませんでした。画面を長押しして選択してください。'}
@@ -1214,7 +1239,7 @@ function renderOptBar(){
     <div class="note" style="margin:2px 0 6px">マップの番号は、提案どおりの順番です。まだ並べ替えていません。</div>
     <div class="acts" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="opt-apply" type="button"${r.same?' disabled':''}>この順に並べ替える</button><button class="btn sub2" id="opt-cancel" type="button">やめる</button></div>`;
   $('opt-lam').onchange=()=>{optLam=+$('opt-lam').value;const r2=optCompute();routeOverride=r2.q.slice();render();rtDraw();renderOptBar()};
-  $('opt-apply').onclick=()=>{const sn=snapState();let ix=0;S.order=r.full.map(k=>(doneOf(k)||!POS[k])?k:r.q[ix++]);routeOverride=null;save();render();rtDraw();renderOptBar();toastUndo('効率重視の順に並べ替えました',sn)};
+  $('opt-apply').onclick=()=>{const sn=snapState();let ix=0;S.uorder=[];S.order=r.full.map(k=>(doneOf(k)||!POS[k])?k:r.q[ix++]);routeOverride=null;save();render();rtDraw();renderOptBar();toastUndo('効率重視の順に並べ替えました',sn)};
   $('opt-cancel').onclick=()=>{routeOverride=null;render();rtDraw();renderOptBar()};
 }
 function bindOpt(){
@@ -1347,17 +1372,20 @@ function renderBooths(){
   let list=BOOTHS.filter(b=>(hall==='ALL'||(hall==='★'?S.stars[b.n]:b.hall===hall))&&(!q||b.n.startsWith(q)||b.name.toLowerCase().includes(q)));
   $('bcount').textContent=list.length+' 件';
   const ql=q;
-  $('blist').innerHTML=list.map(b=>{const subs=subsOf(b.n),st=!!S.stars[b.n];
-    const hit=ql?subs.filter(x=>x.toLowerCase().includes(ql)):[],open=boothOpen.has(b.n)||(ql&&hit.length&&!b.n.startsWith(ql));
-    const shown=open?(ql&&hit.length&&!boothOpen.has(b.n)?hit:subs):[],nsel=Object.keys((S.subStars||{})[b.n]||{}).length;
-    return `<div class="row">${badge(b.n)}<div class="nm"><button type="button" class="lnk" data-go="${b.n}">${esc(subs.length?shortName(b.n):b.name)} <small>›</small></button>${subs.length?`<span class="sub">${subs.length}ブランド${nsel?'（回りたい '+nsel+'）':''}</span>`:''}</div>${subs.length?`<button class="chip" data-bx="${b.n}" aria-expanded="${open}" style="min-height:44px">${open?'▴ 閉じる':'▾ 各ブランド'}</button>`:''}<button class="ic" data-star="${b.n}" aria-pressed="${st}" aria-label="${esc(b.name)}を見たいブースに${st?'から外す':'入れる'}">${st?'★':'☆'}</button></div>`
-     +shown.map(x=>{const on=subOn(b.n,x);return `<div class="row" style="padding-left:18px;background:color-mix(in srgb,var(--chip) 40%,transparent)"><div class="nm" style="font-size:14px"><button type="button" class="lnk" data-go="${b.n}" data-gb="${esc(x)}">${esc(x)} <small>›</small></button></div><button class="ic" data-sub="${b.n}" data-b="${esc(x)}" aria-pressed="${on}" aria-label="${esc(x)}を回りたいブランドに${on?'から外す':'入れる'}">${on?'★':'☆'}</button></div>`}).join('')}).join('')||'<div class="empty">該当するブースがありません。</div>';
+  const rows=[];
+  list.forEach(b=>{const subs=subsOf(b.n),st=!!S.stars[b.n];
+    if(subs.length){const ss=(S.subStars||{})[b.n]||{};
+      subs.filter(x=>hall==='★'?ss[x]:(!ql||b.n.startsWith(ql)||x.toLowerCase().includes(ql))).forEach(x=>{const on=subOn(b.n,x);
+        rows.push(`<div class="row">${badge(b.n)}<div class="nm"><button type="button" class="lnk" data-go="${b.n}" data-gb="${esc(x)}">${esc(x)} <small>›</small></button></div><button class="ic" data-sub="${b.n}" data-b="${esc(x)}" aria-pressed="${on}" aria-label="${esc(x)}を回りたいブランドに${on?'から外す':'入れる'}">${on?'★':'☆'}</button></div>`)});
+    }else rows.push(`<div class="row">${badge(b.n)}<div class="nm"><button type="button" class="lnk" data-go="${b.n}">${esc(b.name)} <small>›</small></button></div><button class="ic" data-star="${b.n}" aria-pressed="${st}" aria-label="${esc(b.name)}を見たいブースに${st?'から外す':'入れる'}">${st?'★':'☆'}</button></div>`)});
+  $('bcount').textContent=rows.length+' 件';
+  $('blist').innerHTML=rows.join('')||'<div class="empty">該当するブースがありません。</div>';
   $('blist').querySelectorAll('[data-go]').forEach(c=>c.onclick=()=>goBooth(c.dataset.go,c.dataset.gb||null));
   $('blist').querySelectorAll('[data-bx]').forEach(c=>c.onclick=()=>{const k=c.dataset.bx;if(boothOpen.has(k))boothOpen.delete(k);else boothOpen.add(k);renderBooths()});
-  $('blist').querySelectorAll('[data-sub]').forEach(c=>c.onclick=()=>{toggleSub(c.dataset.sub,c.dataset.b);$('n-plan').textContent=starList().length;renderBooths()});
+  $('blist').querySelectorAll('[data-sub]').forEach(c=>c.onclick=()=>{toggleSub(c.dataset.sub,c.dataset.b);$('n-plan').textContent=unitCount();renderBooths()});
   $('blist').querySelectorAll('[data-star]').forEach(c=>c.onclick=()=>{
     const _sn=snapState();const k=c.dataset.star;if(S.stars[k])delete S.stars[k],delete (S.subStars||{})[k];else S.stars[k]={done:false,prio:2};
-    save();const on=!!S.stars[k];c.setAttribute('aria-pressed',on);c.textContent=on?'★':'☆';$('n-plan').textContent=starList().length;toastUndo(on?'見たいブースに入れました':'見たいブースから外しました',_sn);
+    save();const on=!!S.stars[k];c.setAttribute('aria-pressed',on);c.textContent=on?'★':'☆';$('n-plan').textContent=unitCount();toastUndo(on?'見たいブースに入れました':'見たいブースから外しました',_sn);
   });
 }
 $('q').addEventListener('input',renderBooths);
@@ -1416,7 +1444,7 @@ const brandOf=k=>ckBrands(k)[0];
 const wLabel=(k,sub)=>sub?sub:(BY[k]?(subsOf(k).length?'':BY[k].name.replace(/（.*$/,'')):'');
 /* 欲しい物の行に出すブース名（店・ブランド名を1回だけ、大きく） */
 const wbn=w=>{const l=(w.booth&&BY[w.booth]?wLabel(w.booth,w.sub):'')||w.brand||'',t=l||(w.got||(w.booth&&BY[w.booth])?'':'ブース未定');return t?`<span class="wbn">${esc(t)}</span>`:''};
-const shortName=k=>{const n=BY[k]?BY[k].name:'';return subsOf(k).length?n.slice(0,n.indexOf('（')).trim()||n:n};
+const shortName=k=>{const n=BY[k]?BY[k].name:'';return subsOf(k).length&&n.indexOf('（')>0?n.slice(0,n.indexOf('（')).trim()||n:n};
 const subOn=(k,b)=>!!((S.subStars||{})[k]&&S.subStars[k][b]);
 function toggleSub(k,b){
   S.subStars=S.subStars||{};const o=S.subStars[k]=S.subStars[k]||{};
@@ -1434,7 +1462,7 @@ function brandCards(k){
       +`<div class="shops">${ig.map(h=>`<a class="ig" href="https://www.instagram.com/${h}/" target="_blank" rel="noopener noreferrer">公式 @${esc(h)} ↗</a>`).join('')}<span class="bp"><a href="${shopUrl(b)}" target="_blank" rel="noopener noreferrer">ショップ ↗</a><a class="ig" href="${igUrl(b)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(b)}のInstagramを探す">Instagramを探す</a></span></div></div>`}).join('');
 }
 function subsOf(k){
-  const b=BY[k];if(!b)return [];const n=b.name,i=n.indexOf('（'),j=n.lastIndexOf('）');if(i<0||j<i)return [];
+  const b=BY[k];if(!b)return [];if(EVENT.split&&EVENT.split[k])return EVENT.split[k].slice();const n=b.name,i=n.indexOf('（'),j=n.lastIndexOf('）');if(i<0||j<i)return [];
   const s=n.slice(i+1,j),out=[];let d=0,cur='';
   for(const ch of s){if(ch==='（')d++;if(ch==='）')d--;if(ch==='／'&&d===0){out.push(cur);cur=''}else cur+=ch}
   out.push(cur);
@@ -1483,7 +1511,7 @@ function showBrandPin(k,br,center){
   const items=ws.length?ws.map(w=>`<div class="item"><span>${esc(w.name)}</span><b>${w.yen?yen(w.yen):'値段未入力'}</b></div>`).join(''):'<div class="item"><span style="color:var(--muted)">このブランドの欲しい物は未登録です</span></div>';
   $('pinfo').innerHTML=`<button class="chip" id="bd-back" type="button" style="margin-bottom:8px">‹ ${esc(shortName(k))} の全ブランドへ</button>
   <h3>${badge(k)}<span>${esc(br)}</span></h3><div class="note" style="margin:0 0 4px">${esc(shortName(k))} 内のブランド${i>=0?' ／ このブースは優先順位 '+(i+1)+'番目':''}</div>${wantBlock(k,br)}
-  <div class="bst" style="margin:8px 0 2px"><span class="note" style="margin:0 4px 0 0;align-self:center">ブースの状態</span>${['none','later','done'].map(x=>`<button type="button" class="chip" data-bs="${k}" data-st="${x}" aria-pressed="${stOf(k)===x}">${ST_L[x]}</button>`).join('')}</div>
+  ${unitCtl(k,br)}
   <div class="acts"><button class="btn ${on?'':'sub2'}" id="bd-star" aria-pressed="${on}">${on?'★ 回りたいブランドに選択中':'☆ 回りたいブランドに入れる'}</button><button class="btn sub2" id="bd-buy">買った物を撮る</button>${np?`<button class="btn sub2" id="bd-photo">写真メモを見る（${np}）</button>`:''}${RT?`<button class="btn sub2" id="bd-here">ここを現在地にする</button><button class="btn sub2" id="bd-go">ここへの道順</button>`:''}</div>
   <div style="margin-top:12px;font-weight:700;font-size:13px">このブランドのメモ</div>
   ${ns.map(n=>`<div class="nt" style="padding:6px 0"><div class="top"><span class="note" style="margin:0;flex:1">${new Date(n.ts||Date.now()).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span><button class="x" data-bdx="${n.id}" aria-label="このメモを削除" style="width:36px;height:36px">✕</button></div><div class="txt">${esc(n.text)}</div></div>`).join('')||'<div class="note" style="margin:2px 0">まだメモはありません。</div>'}
@@ -1494,7 +1522,7 @@ function showBrandPin(k,br,center){
   const bt=$('bd-text');bt.value=(bnDraft.k===k&&bnDraft.b===br)?bnDraft.t:'';bt.oninput=()=>{bnDraft={k,b:br,t:bt.value}};
   $('bd-save').onclick=()=>{const t=bt.value.trim();if(!t){bt.focus();return}S.notes.unshift({id:uid(),text:t,booth:k,sub:br,ts:Date.now()});bnDraft={k:null,b:null,t:''};save();render();showBrandPin(k,br);toast('✔ メモを保存しました')};
   $('pinfo').querySelectorAll('[data-bdx]').forEach(x=>x.onclick=()=>{S.notes=S.notes.filter(n=>String(n.id)!==x.dataset.bdx);save();render();showBrandPin(k,br)});
-  $('pinfo').querySelectorAll('[data-bs]').forEach(x=>x.onclick=()=>{setSt(x.dataset.bs,x.dataset.st);showBrandPin(k,br)});
+  $('pinfo').querySelectorAll('[data-bs]').forEach(x=>x.onclick=()=>{setSt(x.dataset.bs,x.dataset.st,x.dataset.sb||undefined);showBrandPin(k,br)});
   bindWantBlock(k,br,()=>showBrandPin(k,br,false));
   $('bd-back').onclick=()=>{showPin(k,false,true);$('pinfo').scrollIntoView({block:'start',behavior:'smooth'})};
   $('bd-star').onclick=()=>{toggleSub(k,br);render();showBrandPin(k,br)};
@@ -1512,8 +1540,8 @@ function showPin(k,center,noScroll){
   const items=ws.length?ws.map(w=>`<div class="item"><span>${esc(w.name)}</span><b>${w.yen?yen(w.yen):'値段未入力'}</b></div>`).join(''):'<div class="item"><span style="color:var(--muted)">'+(i>=0?'欲しい商品は未定（まず見に行くブース）':'このブースは未選択')+'</span></div>';
   const tot=ws.reduce((a,w)=>a+(+w.yen||0),0), np=memos.filter(m=>m.booth===k).length, bs=boothSpent(k);
   $('pinfo').innerHTML=`<h3>${i>=0?`<span class="ord">${unitNos()[k]||i+1}</span>`:''}${badge(k)}<span>${esc(b.name)}</span></h3><div class="note" style="margin:0 0 4px">${i>=0?'優先順位 '+(i+1)+'番目'+(doneOf(k)?' ／ 見終わった':''):'ホール'+b.hall}${(EVENT.alias[k]||Object.values(EVENT.alias).includes(k))?' ／ 同じブースに別の番号もあります':''}</div>${bs?`<div class="item"><span>このブースで使った金額</span><b>${yen(bs)}</b></div>`:''}${wantBlock(k,null)}${ws.length>1&&tot?`<div class="item"><span>合計</span><b>${yen(tot)}</b></div>`:''}
-  ${i>=0?`<div class="bst" style="margin:8px 0 2px"><span class="note" style="margin:0 4px 0 0;align-self:center;width:100%">ブースを見たか</span>${['none','later','done'].map(x=>`<button type="button" class="chip" data-bs="${k}" data-st="${x}" aria-pressed="${stOf(k)===x}">${ST_L[x]}</button>`).join('')}</div>`:''}
-  ${starred?bprioRow(k):''}<div class="acts"><button class="btn ${starred?'':'sub2'}" id="pi-star" aria-pressed="${starred}">${starred?'★ 見たいブースに選択中':'☆ 見たいブースに入れる'}</button><button class="btn sub2" id="pi-buy">買った物を撮る</button>${np?`<button class="btn sub2" id="pi-photo">写真メモを見る（${np}）</button>`:''}${RT?`<button class="btn sub2" id="pi-here">ここを現在地にする</button><button class="btn sub2" id="pi-go">ここへの道順</button>`:''}</div>
+  ${i>=0?unitCtl(k):''}
+  <div class="acts"><button class="btn ${starred?'':'sub2'}" id="pi-star" aria-pressed="${starred}">${starred?'★ 見たいブースに選択中':'☆ 見たいブースに入れる'}</button><button class="btn sub2" id="pi-buy">買った物を撮る</button>${np?`<button class="btn sub2" id="pi-photo">写真メモを見る（${np}）</button>`:''}${RT?`<button class="btn sub2" id="pi-here">ここを現在地にする</button><button class="btn sub2" id="pi-go">ここへの道順</button>`:''}</div>
   <div style="margin-top:12px;font-weight:700;font-size:13px">このブースのメモ</div>${pinNotes(k)}
   ${igDirect(k).length?`<div class="shops" style="margin-top:12px">${igDirect(k).map(h=>`<a class="ig" href="https://www.instagram.com/${h}/" target="_blank" rel="noopener noreferrer">公式Instagram @${esc(h)} ↗</a>`).join('')}</div>`:''}${subsOf(k).length?brandCards(k):`<div style="margin-top:12px;font-weight:700;font-size:13px">オンラインショップ・Instagramを探す</div><div class="shops">${brandsOf(b.name).map(x=>`<span class="bp"><a href="${shopUrl(x)}" target="_blank" rel="noopener noreferrer">${esc(x)} ↗</a><a class="ig" href="${igUrl(x)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(x)}のInstagramを探す">Instagram</a></span>`).join('')}</div><div class="note">ブランド名の検索結果が開きます。左がオンラインショップ、右（）がInstagram。公式アカウントが出るとは限らないので、名前を見て確認してください。</div>`}`;
   const pt=$('pn-text');if(pt){pt.value=pinDraft.k===k?pinDraft.t:'';pt.oninput=()=>{pinDraft={k,t:pt.value}};
@@ -1522,7 +1550,7 @@ function showPin(k,center,noScroll){
     $('pinfo').querySelectorAll('[data-pnx]').forEach(x=>x.onclick=()=>{S.notes=S.notes.filter(n=>String(n.id)!==x.dataset.pnx);save();render();showPin(k,false,true)})}
   $('pinfo').querySelectorAll('[data-bd]').forEach(x=>x.onclick=()=>showBrandPin(x.dataset.bd,x.dataset.bn2));
   $('pinfo').querySelectorAll('[data-sub]').forEach(x=>x.onclick=()=>{toggleSub(x.dataset.sub,x.dataset.b);render();showPin(x.dataset.sub,false,true)});
-  $('pinfo').querySelectorAll('[data-bs]').forEach(x=>x.onclick=()=>{setSt(x.dataset.bs,x.dataset.st);showPin(k,false,true)});
+  $('pinfo').querySelectorAll('[data-bs]').forEach(x=>x.onclick=()=>{setSt(x.dataset.bs,x.dataset.st,x.dataset.sb||undefined);showPin(k,false,true)});
   $('pi-star').onclick=()=>{if(S.stars[k])delete S.stars[k],delete (S.subStars||{})[k];else S.stars[k]={done:false,prio:2};save();render();showPin(k,false,true)};
   bindWantBlock(k,null,()=>showPin(k,false,true));bindBPrio(k,()=>showPin(k,false,true));
   if($('pi-here'))$('pi-here').onclick=()=>{if(setHere(k)){scrollToImg(POS[k][0],POS[k][1],true);$('mapbox').scrollIntoView({block:'center',behavior:'smooth'})}};
@@ -1552,7 +1580,7 @@ function wantBlock(k,br){
    <button class="btn" id="wn-add" type="button" style="margin-top:8px;width:100%">リストに追加</button></details></div>`;
 }
 function bprioRow(k){const p=boothPrio(k);return `<div class="bst" style="margin:8px 0 2px"><span class="note" style="margin:0 4px 0 0;align-self:center">ブースに行く優先度</span>${[[1,'高'],[2,'中'],[3,'低']].map(([v,l])=>`<button type="button" class="chip" data-bp="${v}" aria-pressed="${p===v}">${l}</button>`).join('')}</div>`}
-function bindBPrio(k,re){document.querySelectorAll('#pinfo [data-bp]').forEach(b=>b.onclick=()=>{if(S.stars[k])S.stars[k].prio=+b.dataset.bp;save();render();re()})}
+function bindBPrio(k,re){document.querySelectorAll('#pinfo [data-bp]').forEach(b=>b.onclick=()=>{if(b.dataset.bpb)setPrioU(k,b.dataset.bpb,+b.dataset.bp);else if(S.stars[k])S.stars[k].prio=+b.dataset.bp;save();render();re()})}
 function wRow(id){return `<div class="wth-row">${wImgs(id).map(x=>`<img class="wth" src="${x.img}" alt="" data-wvi="${x.id}">`).join('')}<span class="pkpair"><label class="wadd">写真<input type="file" accept="image/*" capture="environment" data-wfile="${id}" hidden></label><label class="wadd">アルバム<input type="file" accept="image/*" multiple data-wfile="${id}" hidden></label></span></div>`}
 function wDelImgs(id){const del=wImgs(id);wimgs=wimgs.filter(x=>String(x.wantId)!==String(id));del.forEach(x=>{try{idbTx('readwrite',s=>s.delete(x.id))}catch(e){}})}
 async function wSaveImgs(wid,files){let n=0;for(const f of files){try{const img=await shrink(f);const rec={id:'wi'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),kind:'wimg',wantId:wid,img,ts:Date.now()};wimgs.push(rec);await idbTx('readwrite',s=>s.put(rec));n++}catch(e){}}return n}
@@ -1866,7 +1894,7 @@ function renderMemo(){
   $('mform').hidden=!!memoFilter&&!memoAdd;
   $('mhead').innerHTML=memoFilter?`<div class="row" style="flex-wrap:wrap">${badge(memoFilter)}<div class="nm"><b>${esc(BY[memoFilter].name)}</b><span class="sub">このブースの写真メモ ${list.length}件 ／ 使った金額 ${yen(boothSpent(memoFilter))}</span></div></div><div class="tools"><button class="chip" id="mh-add">＋ このブースに追加</button><button class="chip" id="mh-all">すべてのブースを見る</button></div>`:'';
   if(memoFilter){$('mh-add').onclick=()=>{memoAdd=true;$('m-booth').value=memoFilter;updMB();renderMemo();$('mform').scrollIntoView({behavior:'smooth'})};$('mh-all').onclick=()=>{memoFilter=null;memoAdd=true;renderMemo()}}
-  $('mlist').innerHTML=list.length?list.map(m=>`<div class="memo"><div class="top">${badge(m.booth)}<div class="nm">${esc(wLabel(m.booth,m.sub)||BY[m.booth].name.replace(/（.*$/,''))}</div>${m.yen!=null?`<b style="font-family:var(--display);font-size:20px;white-space:nowrap">${yen(m.yen)}</b>`:''}<button class="x" data-mdel="${m.id}" aria-label="削除">✕</button></div>${m.img?`<img class="photo" src="${m.img}" alt="${esc(BY[m.booth].name)}の写真">`:''}${m.text?`<div style="margin-top:6px;white-space:pre-wrap;overflow-wrap:anywhere">${esc(m.text)}</div>`:''}<div class="note" style="margin-top:4px">${new Date(m.ts).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div></div>`).join(''):'<div class="empty">気になったものを撮って、ブース番号を入れて保存します。</div>';
+  $('mlist').innerHTML=list.length?list.map(m=>`<div class="memo"><div class="top">${badge(m.booth)}<div class="nm">${esc(wLabel(m.booth,m.sub)||ckBrands(m.booth).join('・'))}</div>${m.yen!=null?`<b style="font-family:var(--display);font-size:20px;white-space:nowrap">${yen(m.yen)}</b>`:''}<button class="x" data-mdel="${m.id}" aria-label="削除">✕</button></div>${m.img?`<img class="photo" src="${m.img}" alt="${esc(BY[m.booth].name)}の写真">`:''}${m.text?`<div style="margin-top:6px;white-space:pre-wrap;overflow-wrap:anywhere">${esc(m.text)}</div>`:''}<div class="note" style="margin-top:4px">${new Date(m.ts).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div></div>`).join(''):'<div class="empty">気になったものを撮って、ブース番号を入れて保存します。</div>';
   $('mlist').querySelectorAll('[data-mdel]').forEach(c=>c.onclick=async()=>{
     const id=c.dataset.mdel,dm=memos.find(m=>String(m.id)===id);
     if(dm&&dm.wantId){const w=S.wants.find(x=>x.id===dm.wantId);if(w&&String(w.memoId)===String(dm.id)){w.got=false;delete w.memoId}}
@@ -1886,9 +1914,9 @@ function renderMap(){
     e.setAttribute('aria-label',`${NO[k]||i+1}番 ${k} ${BY[k].name}`);e.onclick=()=>tapBooth(k);$('mapin').appendChild(e)});
   if(selPin&&ks.includes(selPin))showPin(selPin,false);
   else{selPin=null;$('pinfo').innerHTML=ks.length?'':'<span class="note">「マップ」で★を付けるか、「欲しい物」にブース番号を入れると、ここに番号ピンが出ます。</span>'}
-  $('mapnums').innerHTML=ks.map((k,i)=>{const ws=openWants(k);
-    return `<button class="numrow" data-k="${k}"><span class="ord">${NO[k]||i+1}</span>${badge(k)}<span class="t">${esc(BY[k].name)}<small>${ws.length?ws.map(w=>esc(w.name)+(w.yen?' '+yen(w.yen):'')).join('、'):'商品未定'}</small></span></button>`}).join('');
-  $('mapnums').querySelectorAll('.numrow').forEach(b=>b.onclick=()=>{showPin(b.dataset.k,true);$('mapbox').scrollIntoView({block:'nearest',behavior:'smooth'})});
+  $('mapnums').innerHTML=unitsOrdered(ks).map((u,i)=>{const k=u.k,ws=openWants(k).filter(w=>!u.multi||w.sub===u.b||(!w.sub&&u.bi===0));
+    return `<button class="numrow" data-k="${k}" data-b="${u.multi?esc(u.b):''}"><span class="ord">${i+1}</span>${badge(k)}<span class="t">${esc(u.b)}<small>${ws.length?ws.map(w=>esc(w.name)+(w.yen?' '+yen(w.yen):'')).join('、'):'商品未定'}</small></span></button>`}).join('');
+  $('mapnums').querySelectorAll('.numrow').forEach(b=>b.onclick=()=>{if(b.dataset.b)showBrandPin(b.dataset.k,b.dataset.b,true);else showPin(b.dataset.k,true);$('mapbox').scrollIntoView({block:'nearest',behavior:'smooth'})});
 }
 
 /* ---- schedule ---- */
@@ -2053,15 +2081,15 @@ function renderPack(){
 /* ---- check overview (reads the same state as the other tabs) ---- */
 let ckView='booth';
 function renderCheck(){
-  const ks=starList(),seen=ks.filter(doneOf).length;
+  const ks=starList(),CU=unitsOrdered(ks),seen=CU.filter(doneU).length;
   const boughtExtra=memos.filter(m=>m.yen!=null&&!S.wants.some(w=>String(w.memoId)===String(m.id)));
   const wd=S.wants.filter(w=>w.got).length,wt=S.wants.length+boughtExtra.length,wb=wd+boughtExtra.length;
   const pd=S.pack.filter(p=>p.done).length;
   const tile=(label,a,b,v)=>`<button type="button" class="tile ${b&&a===b?'full':''}" data-cv="${v}" aria-pressed="${ckView===v}"><small>${label}</small><b>${a}/${b}</b><div class="bar"><i style="width:${b?a/b*100:0}%"></i></div></button>`;
-  $('ctiles').innerHTML=tile('見たブース',seen,ks.length,'booth')+tile('買った物',wb,wt,'buy');
+  $('ctiles').innerHTML=tile('見たブース',seen,CU.length,'booth')+tile('買った物',wb,wt,'buy');
   $('ctiles').querySelectorAll('[data-cv]').forEach(b=>b.onclick=()=>{ckView=b.dataset.cv;renderCheck()});
   [['cbooth','booth'],['h-cbooth','booth'],['cbuy','buy'],['h-cbuy','buy'],['cspend','buy'],['h-cspend','buy']].forEach(([id,v])=>{$(id).hidden=ckView!==v});
-  $('cbooth').innerHTML=ks.length?ks.flatMap((k,i)=>{const d=doneOf(k);return ckBrands(k).map(bn=>`<div class="ck ${d?'done':''}"><input class="chk" type="checkbox" data-cb="${k}" ${d?'checked':''} aria-label="${esc(BY[k].name)}を見た"><span class="ord">${i+1}</span>${badge(k)}<div class="nm">${esc(bn)}</div><span class="mk">${d?'✔':''}</span></div>`)}).join(''):'<div class="empty">見たいブースを選ぶとここに並びます。</div>';
+  $('cbooth').innerHTML=CU.length?CU.map((u,i)=>{const d=doneU(u);return `<div class="ck ${d?'done':''}"><input class="chk" type="checkbox" data-cb="${u.k}" data-cbb="${u.multi?esc(u.b):''}" ${d?'checked':''} aria-label="${esc(u.b)}を見た"><span class="ord">${i+1}</span>${badge(u.k)}<div class="nm">${esc(u.b)}</div><span class="mk">${d?'✔':''}</span></div>`}).join(''):'<div class="empty">見たいブースを選ぶとここに並びます。</div>';
   const wrow=w=>`<div class="ck ${w.got?'done':''}"><input class="chk" type="checkbox" data-cw="${w.id}" ${w.got?'checked':''} aria-label="${esc(w.name)}を買った"><div class="nm">${esc(w.name)}<span class="sub">${w.got?'実際 '+yen(w.actual!=null?w.actual:w.yen):(w.yen?'予定 '+yen(w.yen):'予算未入力')}${w.booth&&BY[w.booth]?' ／ '+w.booth+' '+esc(w.sub||brandOf(w.booth)):''}</span></div><span class="mk">${w.got?'✔':''}</span></div>`;
   const xrow=m=>`<div class="ck done"><span style="width:26px;flex:none"></span><div class="nm">${esc(m.text||'写真メモ')}<span class="sub">予定外 ${yen(m.yen)} ／ ${m.booth} ${esc(m.sub||brandOf(m.booth))}</span></div><span class="mk">✔</span></div>`;
   $('cbuy').innerHTML=(S.wants.length||boughtExtra.length)?S.wants.slice().sort((a,b)=>(a.got-b.got)||(a.prio-b.prio)).map(wrow).join('')+boughtExtra.map(xrow).join(''):'<div class="empty">欲しい物を入れるとここに並びます。</div>';
@@ -2071,7 +2099,7 @@ function renderCheck(){
   const rows=Object.entries(by).sort((a,b)=>b[1].sum-a[1].sum),noBooth=S.wants.filter(w=>w.got&&!w.memoId&&!w.booth).reduce((s,w)=>s+(+(w.actual!=null?w.actual:w.yen)||0),0);
   $('cspend').innerHTML=rows.length||noBooth?rows.map(([_,v])=>`<button class="ck" data-sp="${v.k}" style="width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer">${badge(v.k)}<div class="nm">${esc(v.sub||shortName(v.k))}<span class="sub">${v.items.map(esc).join('、')}</span></div><b style="font-family:var(--display);font-size:19px;white-space:nowrap">${yen(v.sum)}</b></button>`).join('')+(noBooth?`<div class="ck"><div class="nm">ブース未指定<span class="sub">欲しい物のチェックで「買った」にしたもの</span></div><b style="font-family:var(--display);font-size:19px">${yen(noBooth)}</b></div>`:'')+`<div class="ck done"><div class="nm"><b>合計</b></div><b style="font-family:var(--display);font-size:21px">${yen(spentTotal())}</b></div>`:'<div class="empty">買った物の写真と金額を保存すると、ブースごとの合計が出ます。</div>';
   $('cspend').querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{memoFilter=b.dataset.sp;memoAdd=false;show('memo');render();renderMemo()});
-  $('cbooth').querySelectorAll('[data-cb]').forEach(c=>c.onchange=()=>{if(c.checked)S.seen[c.dataset.cb]=true;else delete S.seen[c.dataset.cb];save();render()});
+  $('cbooth').querySelectorAll('[data-cb]').forEach(c=>c.onchange=()=>setSt(c.dataset.cb,c.checked?'done':'none',c.dataset.cbb||undefined));
   $('cbuy').querySelectorAll('[data-cw]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.cw);w.got=c.checked;if(c.checked)w.day=todayKey();if(c.checked&&w.actual==null)w.actual=+w.yen||0;save();render()});
 }
 /* ---- layout toggle ---- */
@@ -2204,7 +2232,7 @@ function renderNotes(){
   const q=($('n-q').value||'').trim().toLowerCase();
   $('n-save').textContent=noteEdit?'変更を保存':'メモを保存';$('n-cancel').hidden=!noteEdit;
   const list=(S.notes||[]).filter(n=>!q||n.text.toLowerCase().includes(q)||(n.booth&&BY[n.booth]&&BY[n.booth].name.toLowerCase().includes(q)));
-  $('nlist').innerHTML=list.length?list.map(n=>`<div class="nt"><div class="top">${n.booth&&BY[n.booth]?badge(n.booth)+`<span style="font-size:13px;flex:1;min-width:0;overflow-wrap:anywhere">${esc(BY[n.booth].name.replace(/（.*$/,''))}${subTag(n.sub)}</span>`:'<span style="flex:1"></span>'}<button class="chip" data-ne="${n.id}" style="min-height:36px;padding:4px 10px">編集</button><button class="x" data-nx="${n.id}" aria-label="削除">✕</button></div><div class="txt">${esc(n.text)}</div><div class="note" style="margin-top:4px">${new Date(n.edited||n.ts).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}${n.edited?'（編集）':''}</div></div>`).join(''):'<div class="empty">'+(q?'該当するメモがありません。':'気づいたことをここにメモできます。')+'</div>';
+  $('nlist').innerHTML=list.length?list.map(n=>`<div class="nt"><div class="top">${n.booth&&BY[n.booth]?badge(n.booth)+`<span style="font-size:13px;flex:1;min-width:0;overflow-wrap:anywhere">${esc(n.sub||ckBrands(n.booth).join('・'))}</span>`:'<span style="flex:1"></span>'}<button class="chip" data-ne="${n.id}" style="min-height:36px;padding:4px 10px">編集</button><button class="x" data-nx="${n.id}" aria-label="削除">✕</button></div><div class="txt">${esc(n.text)}</div><div class="note" style="margin-top:4px">${new Date(n.edited||n.ts).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}${n.edited?'（編集）':''}</div></div>`).join(''):'<div class="empty">'+(q?'該当するメモがありません。':'気づいたことをここにメモできます。')+'</div>';
   $('nlist').querySelectorAll('[data-ne]').forEach(b=>b.onclick=()=>{const n=S.notes.find(x=>String(x.id)===b.dataset.ne);noteEdit=n.id;$('n-text').value=n.text;$('n-booth').value=n.booth||'';fillSub('n-sub','n-subbox',n.booth||'',n.sub||'');nbName();renderNotes();$('nform').scrollIntoView({behavior:'smooth'})});
   $('nlist').querySelectorAll('[data-nx]').forEach(b=>b.onclick=()=>{S.notes=S.notes.filter(x=>String(x.id)!==b.dataset.nx);if(String(noteEdit)===b.dataset.nx){noteEdit=null;$('nform').reset()}save();renderNotes()});
 }
@@ -2219,14 +2247,14 @@ function renderPackWarn(){
 const brandName=k=>{const u=unitsOrdered(starList()).find(x=>x.k===k);return u?u.b:(ckBrands(k)[0]||shortName(k))};
 function renderNext(){
   const el=$('nextc');if(!el)return;
-  const all=starList(),rest=all.filter(k=>!doneOf(k)),pend=rest.filter(x=>stOf(x)!=='later'),U=unitsOrdered(all),uu=U.find(x=>!doneOf(x.k)&&stOf(x.k)!=='later')||U.find(x=>!doneOf(x.k)),k=uu?uu.k:(pend[0]||rest[0]),B=+S.budget||0,left=B-spentTotal();
-  let h='<div class="entry-h">次に行くブース'+(all.length?'（あと '+rest.length+' 件／全 '+all.length+' 件）':'')+'</div>';
+  const all=starList(),rest=all.filter(k=>!doneOf(k)),pend=rest.filter(x=>stOf(x)!=='later'),U=unitsOrdered(all),uu=U.find(x=>stU(x)==='none')||U.find(x=>!doneU(x)),k=uu?uu.k:(pend[0]||rest[0]),B=+S.budget||0,left=B-spentTotal();
+  let h='<div class="entry-h">次に行くブース'+(all.length?'（あと '+U.filter(x=>!doneU(x)).length+' 件／全 '+U.length+' 件）':'')+'</div>';
   if(k){const ws0=openWants(k),ws=uu&&uu.multi?ws0.filter(w=>w.sub===uu.b||(!w.sub&&uu.bi===0)):ws0;
     h+=`<div class="nx-name">${badge(k)}<span>${esc(uu?uu.b:shortName(k))}</span></div>`
-      +(stOf(k)==='later'?'<div class="entry-sub" style="color:var(--accent);font-weight:700">（「あとでもう一度」のブースだけ残っています）</div>':'')
+      +((uu?stU(uu):stOf(k))==='later'?'<div class="entry-sub" style="color:var(--accent);font-weight:700">（「あとでもう一度」のブースだけ残っています）</div>':'')
       +(ws.length?`<div class="nxws">${ws.map(w=>`<div class="nxw ${intentOf(w)==='skip'?'skip':''}"><span class="nxn"><i class="it it-${intentOf(w)}">${INT[intentOf(w)][0]}</i> ${esc(w.name)}</span><input type="text" data-comma inputmode="numeric" pattern="[0-9,]*" autocomplete="off" data-nxy="${w.id}" value="${fmtY2(w.yen||'')}" placeholder="金額" aria-label="${esc(w.name)}の金額"><button class="btn" type="button" data-nxbuy="${w.id}">買った</button></div>`).join('')}</div>`:'')
       +(B?`<div class="entry-sub">残り予算：<b>${left<0?'−':''}${yen(Math.abs(left))}</b></div>`:'')
-      +`<div class="acts"><button class="btn" id="nx-go" type="button">道順を出す</button><button class="btn sub2" id="nx-seen" type="button">✔ 見た</button>${stOf(k)==='later'?'':'<button class="btn sub2" id="nx-later" type="button">あとで</button>'}<button class="btn sub2" id="nx-map" type="button">マップで見る</button></div>`;
+      +`<div class="acts"><button class="btn" id="nx-go" type="button">道順を出す</button><button class="btn sub2" id="nx-seen" type="button">✔ 見た</button>${(uu?stU(uu):stOf(k))==='later'?'':'<button class="btn sub2" id="nx-later" type="button">あとで</button>'}<button class="btn sub2" id="nx-map" type="button">マップで見る</button></div>`;
   }else if(all.length){h+='<div class="entry-sub">見たいブースは、すべて見終わりました </div>'}
   else{h+='<div class="acts"><button class="btn" id="nx-pick" type="button">ブースを選ぶ</button></div>'}
   try{if(k&&rest.length>1){
@@ -2238,8 +2266,8 @@ function renderNext(){
   try{if($('nx-near')){const nk=(()=>{let n=null,bd=1e18;rest.forEach(x=>{if(!POS[x]||x===hereK)return;const d=pathLen(hereK,x);if(d<bd){bd=d;n=x}});return n})();$('nx-near').onclick=()=>{show('map');render();setGoal(nk)}}
     if($('nx-here'))$('nx-here').onclick=()=>{show('map');render();needHere()}}catch(e){}
   if($('nx-go'))$('nx-go').onclick=()=>{show('map');render();if(!hereK){needHere();return}setGoal(k)};
-  if($('nx-seen'))$('nx-seen').onclick=()=>setSt(k,'done');
-  if($('nx-later'))$('nx-later').onclick=()=>setSt(k,'later');
+  if($('nx-seen'))$('nx-seen').onclick=()=>setSt(k,'done',uu&&uu.multi?uu.b:undefined);
+  if($('nx-later'))$('nx-later').onclick=()=>setSt(k,'later',uu&&uu.multi?uu.b:undefined);
   el.querySelectorAll('[data-nxbuy]').forEach(b=>b.onclick=()=>{const w=S.wants.find(x=>x.id==b.dataset.nxbuy);if(!w)return;const inp=el.querySelector('[data-nxy="'+w.id+'"]'),v=ynum(inp.value),sn=snapState();w.got=true;w.day=todayKey();w.actual=(v==null?(+w.yen||0):v);save();render();toastUndo('「'+w.name+'」を買いました（'+yen(w.actual)+'）',sn)});
   if($('nx-map'))$('nx-map').onclick=()=>focusBooth(k);
   if($('nx-pick'))$('nx-pick').onclick=()=>{show('booths');render()};
@@ -2251,14 +2279,14 @@ function renderHome(){
   $('years').querySelectorAll('[data-y]').forEach(b=>b.onclick=()=>{const y=+b.dataset.y;if(y!==CUR_YEAR)switchYear(y)});
   const latest=YEAR_KEYS[YEAR_KEYS.length-1];
   $('ynote').innerHTML=`<b>${EVENT.year}年 ${esc(EVENT.name)}</b>（${esc(EVENT.dates)} ／ ${esc(EVENT.place)}）を表示中${CUR_YEAR<latest?'。<b>過去の記録</b>です':''}。`+(YEAR_KEYS.length===1?'<br>来年度版を作ると、ここに年が増えて、過去の年の記録もそのまま残ります。':'');
-  const ks=starList(),seen=ks.filter(doneOf).length,B=+S.budget||0,sp=spentTotal();
+  const ks=starList(),U1=unitsOrdered(ks),seen=U1.filter(doneU).length,B=+S.budget||0,sp=spentTotal();
   const tile=(l,a,b,go)=>`<button type="button" class="tile ${b&&a===b?'full':''} ${homeOpen===go?'on':''}" data-ht="${go}" aria-expanded="${homeOpen===go}" style="font:inherit;color:inherit;cursor:pointer"><small>${l} ${homeOpen===go?'▴':'▾'}</small><b>${a}/${b}</b><div class="bar"><i style="width:${b?a/b*100:0}%"></i></div></button>`;
-  $('htiles').innerHTML=tile('ブース',seen,ks.length,'booth')+tile('戦利品',S.wants.filter(w=>w.got).length,S.wants.length,'haul');
-  {const sk=starList(),gt=S.wants.filter(w=>w.got),g=st=>sk.filter(k=>stOf(k)===st);
+  $('htiles').innerHTML=tile('ブース',seen,U1.length,'booth')+tile('戦利品',S.wants.filter(w=>w.got).length,S.wants.length,'haul');
+  {const sk=starList(),gt=S.wants.filter(w=>w.got),g=st=>unitsOrdered(sk).filter(u=>stU(u)===st);
    const sec=(t,n,body,empty,go)=>`<div class="hbox"><div class="hh"><b>${t}</b><span>${n}</span>${go?`<button type="button" class="chip" data-hgo="${go}">全部 ›</button>`:''}</div><div class="hbody">${body||`<div class="note" style="margin:6px 0">${empty}</div>`}</div></div>`;
-   const bx=sec('見てないブース',g('none').length+'か所',g('none').map(k=>bRow(k,'pop')).join(''),'見たいブースがありません。「マップ」で☆を付けてください。','')
-    +sec('あとでもう一度見るブース',g('later').length+'か所',g('later').map(k=>bRow(k,'pop')).join(''),'ありません。','')
-    +sec('もう見なくていいブース',g('done').length+'か所',g('done').map(k=>bRow(k,'pop')).join(''),'まだありません。',''),
+   const bx=sec('見てないブース',g('none').length+'か所',g('none').map(u=>bRow(u,'pop')).join(''),'見たいブースがありません。「マップ」で☆を付けてください。','')
+    +sec('あとでもう一度見るブース',g('later').length+'か所',g('later').map(u=>bRow(u,'pop')).join(''),'ありません。','')
+    +sec('もう見なくていいブース',g('done').length+'か所',g('done').map(u=>bRow(u,'pop')).join(''),'まだありません。',''),
     hx=sec('戦利品',gt.length+'点',gt.map(w=>`<div class="hrow"><span class="nm">${esc(w.name)}${w.brand?'<small> ／ '+esc(w.brand)+'</small>':''}</span><span class="hy">${w.actual!=null?yen(w.actual):''}</span></div>`).join(''),'まだ買った物はありません。','haul');
    $('hlists').innerHTML=homeOpen==='booth'?bx:homeOpen==='haul'?hx:'';
    bindBRows($('hlists'));
@@ -2269,10 +2297,10 @@ function renderHome(){
    let msg='';if(B){const lf2=B-sp;if(must>lf2)msg=`<div class="hw-warn ng">「絶対買う」だけで予算を ${yen(must-lf2)} 超えます</div>`;else if(must+maybe>lf2)msg=`<div class="hw-warn">「悩み中」も全部買うと ${yen(must+maybe-lf2)} 超えます</div>`}
    $('hwant').innerHTML=op.length?`<div class="hw-row"><span class="hw hw-m"><small>絶対買う</small><b>${yen(must)}</b></span><span class="hw hw-y"><small>悩み中</small><b>${yen(maybe)}</b></span><span class="hw hw-s"><small>我慢</small><b>${yen(skip)}</b></span></div>${msg}`:''}
   {const jst=new Date(Date.now()+9*36e5),hr=jst.getUTCHours(),ml=S.wants.filter(w=>!w.got&&intentOf(w)==='must');
-   $('mustleft').innerHTML=ml.length?`<details class="mustleft" ${(isExpoDay()&&hr>=15)?'open':''}><summary>「絶対買う」でまだ買っていない：${ml.length}件</summary>${ml.map(w=>`<button type="button" class="hrow" data-ml="${w.booth||''}">${w.booth&&BY[w.booth]?badge(w.booth):'<span class="note" style="margin:0">ブース未定</span>'}<span class="nm">${esc(w.name)}${w.booth&&BY[w.booth]?'<small> ／ '+esc(shortName(w.booth))+'</small>':''}</span><span class="hy">${w.yen?yen(w.yen):''}</span></button>`).join('')}</details>`:'';
+   $('mustleft').innerHTML=ml.length?`<details class="mustleft" ${(isExpoDay()&&hr>=15)?'open':''}><summary>「絶対買う」でまだ買っていない：${ml.length}件</summary>${ml.map(w=>`<button type="button" class="hrow" data-ml="${w.booth||''}">${w.booth&&BY[w.booth]?badge(w.booth):'<span class="note" style="margin:0">ブース未定</span>'}<span class="nm">${esc(w.name)}${w.booth&&BY[w.booth]?'<small> ／ '+esc(wLabel(w.booth,w.sub)||shortName(w.booth))+'</small>':''}</span><span class="hy">${w.yen?yen(w.yen):''}</span></button>`).join('')}</details>`:'';
    $('mustleft').querySelectorAll('[data-ml]').forEach(b=>b.onclick=()=>{if(b.dataset.ml&&POS[b.dataset.ml])focusBooth(b.dataset.ml)});
    const dd=EVENT.days.find(v=>v.key===todayKey()),k0=starList();
-   $('dayhdr').innerHTML=`<b>${dd?esc(dd.md)+'　'+esc(dd.label):'当日'}</b><span>見たブース ${k0.filter(doneOf).length}/${k0.length}　戦利品 ${gotOn(dd?dd.key:'d1')}点　使った ${yen(spentOn(dd?dd.key:'d1'))}</span><span class="dayseg">${EVENT.days.filter(v=>v.key!=='prev').map(v=>`<button type="button" class="dayoff dsw" data-dsw="${v.key}" aria-pressed="${v.key===todayKey()}">${esc(v.label)}</button>`).join('')}</span><button type="button" class="dayoff" id="day-off">当日モードを切る</button>`;$('dayhdr').querySelectorAll('[data-dsw]').forEach(b=>b.onclick=()=>{const dj=new Date(Date.now()+9*36e5).toISOString().slice(0,10);UI.dayPick={d:dj,k:b.dataset.dsw};uiSave();const en=S.entry=S.entry||{nos:{},day:''};en.day=b.dataset.dsw;save();render()});$('day-off').onclick=()=>{UI.day='off';uiSave();applyUI();renderHome();toast('当日モードを切りました')}}
+   $('dayhdr').innerHTML=`<b>${dd?esc(dd.md)+'　'+esc(dd.label):'当日'}</b><span>見たブース ${unitsOrdered(k0).filter(doneU).length}/${unitsOrdered(k0).length}　戦利品 ${gotOn(dd?dd.key:'d1')}点　使った ${yen(spentOn(dd?dd.key:'d1'))}</span><span class="dayseg">${EVENT.days.filter(v=>v.key!=='prev').map(v=>`<button type="button" class="dayoff dsw" data-dsw="${v.key}" aria-pressed="${v.key===todayKey()}">${esc(v.label)}</button>`).join('')}</span><button type="button" class="dayoff" id="day-off">当日モードを切る</button>`;$('dayhdr').querySelectorAll('[data-dsw]').forEach(b=>b.onclick=()=>{const dj=new Date(Date.now()+9*36e5).toISOString().slice(0,10);UI.dayPick={d:dj,k:b.dataset.dsw};uiSave();const en=S.entry=S.entry||{nos:{},day:''};en.day=b.dataset.dsw;save();render()});$('day-off').onclick=()=>{UI.day='off';uiSave();applyUI();renderHome();toast('当日モードを切りました')}}
   {const dk=todayKey(),dm=(()=>{try{return dayOn()}catch(e){return false}})(),dl=(EVENT.days.find(v=>v.key===dk)||{}).label||'この日';
    $('h-spent-v').textContent=yen(dm?spentOn(dk):sp);
    $('h-spent').querySelector('small').textContent=dm?dl+'の使った金額 ›':'使った金額 ›';
@@ -2291,7 +2319,7 @@ function renderHaul(){
 document.querySelectorAll('#wsw [data-wv]').forEach(b=>b.onclick=()=>{wview=b.dataset.wv;applyWV();window.scrollTo({top:0})});
 $('haul-photo').onclick=()=>{memoFilter=null;memoAdd=false;show('memo');render();renderMemo()};
 $('haul-wants').onclick=()=>{wview='want';applyWV();window.scrollTo({top:0})};
-function render(){renderEvMarks();renderEvAlert();renderSeen();renderHaul();renderEntry();renderHome();renderSpend();if(!$('consider').hidden&&document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.coy)renderConsiderSummary();else renderConsider();renderNotes();renderPlan();renderWants();renderBooths();renderMap();renderSched();renderEvents();renderPerks();renderPack();renderCheck()}
+function render(){syncUnits();renderEvMarks();renderEvAlert();renderSeen();renderHaul();renderEntry();renderHome();renderSpend();if(!$('consider').hidden&&document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.coy)renderConsiderSummary();else renderConsider();renderNotes();renderPlan();renderWants();renderBooths();renderMap();renderSched();renderEvents();renderPerks();renderPack();renderCheck()}
 
 /* ================= クラウド同期（claude.ai の db 機能。使えない時は端末内のみ） =================
    自分専用の領域 data/users/<id>/ に保存するので、同じアカウントなら PC とスマホで同じ内容になる。
@@ -2303,7 +2331,7 @@ const clone=o=>JSON.parse(JSON.stringify(o));
 const hasData=s=>s&&(Object.keys(s.stars||{}).length||(s.wants||[]).length||(s.sched||[]).length||(s.pack||[]).length||(s.budget||0)||Object.keys(s.seen||{}).length);
 function mergeStates(a,b){ /* 初回だけ: 両方にデータがあるときは足し合わせる */
   const u=(x,y)=>{const m=new Map();[...(x||[]),...(y||[])].forEach(i=>{if(!m.has(String(i.id)))m.set(String(i.id),i)});return [...m.values()]};
-  return Object.assign(DEF(),{stars:{...a.stars,...b.stars},later:{...a.later,...b.later},seen:{...a.seen,...b.seen},packInit:!!(a.packInit||b.packInit),packInit2:!!(a.packInit2||b.packInit2),packInit3:!!(a.packInit3||b.packInit3),packInit4:!!(a.packInit4||b.packInit4),packInit5:!!(a.packInit5||b.packInit5),packInit6:!!(a.packInit6||b.packInit6),subStars:(()=>{const o={};[a.subStars,b.subStars].forEach(x=>{for(const k in (x||{}))o[k]=Object.assign(o[k]||{},x[k])});return o})(),wants:u(a.wants,b.wants),sched:u(a.sched,b.sched),pack:u(a.pack,b.pack),todo:u(a.todo||[],b.todo||[]),subOrder:Object.assign({},a.subOrder||{},b.subOrder||{}),uorder:(b.uorder&&b.uorder.length?b.uorder:(a.uorder||[])),notes:u(a.notes,b.notes),consider:Object.assign({},a.consider||{},b.consider||{}),entry:(()=>{const f=e=>{e=e||{};const n=Object.assign({},e.nos||{});if(e.no&&!Object.keys(n).length)n[e.day||'d1']=e.no;return {nos:n,day:e.day||''}};const x=f(a.entry),y=f(b.entry);return {nos:Object.assign({},x.nos,y.nos),day:y.day||x.day}})(),
+  return Object.assign(DEF(),{stars:{...a.stars,...b.stars},later:{...a.later,...b.later},seen:{...a.seen,...b.seen},seenU:{...a.seenU,...b.seenU},laterU:{...a.laterU,...b.laterU},prioU:{...a.prioU,...b.prioU},mig45:!!(a.mig45||b.mig45),packInit:!!(a.packInit||b.packInit),packInit2:!!(a.packInit2||b.packInit2),packInit3:!!(a.packInit3||b.packInit3),packInit4:!!(a.packInit4||b.packInit4),packInit5:!!(a.packInit5||b.packInit5),packInit6:!!(a.packInit6||b.packInit6),subStars:(()=>{const o={};[a.subStars,b.subStars].forEach(x=>{for(const k in (x||{}))o[k]=Object.assign(o[k]||{},x[k])});return o})(),wants:u(a.wants,b.wants),sched:u(a.sched,b.sched),pack:u(a.pack,b.pack),todo:u(a.todo||[],b.todo||[]),subOrder:Object.assign({},a.subOrder||{},b.subOrder||{}),uorder:(b.uorder&&b.uorder.length?b.uorder:(a.uorder||[])),notes:u(a.notes,b.notes),consider:Object.assign({},a.consider||{},b.consider||{}),entry:(()=>{const f=e=>{e=e||{};const n=Object.assign({},e.nos||{});if(e.no&&!Object.keys(n).length)n[e.day||'d1']=e.no;return {nos:n,day:e.day||''}};const x=f(a.entry),y=f(b.entry);return {nos:Object.assign({},x.nos,y.nos),day:y.day||x.day}})(),
     order:(b.order&&b.order.length?b.order:a.order)||[],budget:b.budget||a.budget||0,deletedMemos:[...new Set([...(a.deletedMemos||[]),...(b.deletedMemos||[])])]});}
 function errState(e){return e&&e.code==='invalid_argument'?'noperm':'error'}
 let pushT=null,pushing=false,dirty=false;

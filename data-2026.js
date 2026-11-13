@@ -30,7 +30,8 @@ const EVENT={
     yellowName:'黄色の【指定ブース】整列エリア',blueName:'水色の【優先入場】集合整列エリア',note:'整理番号が記載された紙チケットを必ず持参'},
   halls:['C','D','E','F'],                                   /* ホール表示順 */
   hallByDigit:{1:'C',2:'C',3:'D',4:'D',5:'E',6:'E',7:'F',8:'F'}, /* ブース番号の先頭1桁→ホール */
-  alias:{'502':'501'}                                        /* 同じブースを複数番号で共有する場合 */
+  alias:{'502':'501'},                                       /* 同じブースを複数番号で共有する場合 */
+  split:{'111':['GOCAF','GROUSE','HELLOS','HIGHGRNDZ'],'115':['DAMNGOOD!!','leiri hygge store'],'116':['38explore','TOREOTTO'],'216':['CIFRA','GOOLD GOLF ROCKERS'],'237':['DO THE POGO','COTTONWOOD'],'332':['Brennholz','Urban Forest','J unique wood','Campers agit'],'422':['M.c.y wood','RAMBLE POINT'],'430':['FOLBOT','BYCRUISE','ROUGHGRID','WORTH'],'506':['UNBY GENERAL GOODS STORE','Minimal Works'],'529':['Hitotoki Works','Hitotoki Base'],'533':['INOUT','PINOWORKS','IKIKI','ATOM DESIGN','gram eight'],'620':['HURIT','adum DESIGN and CRAFT'],'646':['OIWAKEPARK(夜景キャンプ場)','キャンプ旅(SNS情報メディア)'],'711':['POMEL','POSH MADE'],'720':['オカミドリショウテン','suwaneru'],'729':['LOCKFIELD EQUIPMENT','OVER THE ROCK GEAR DEPT.'],'744':['TASK','lcs.rhaplus'],'802':['Mystify','Vanderlust','ふとんファクトリー'],'803':['SG BASE','CUSTOM LINE']}   /* かっこのない合同ブースを、ブランドに分ける */
 };
 const RAW = `101|M16 camping equipment（MMF／WOOD and WOOD／NORAs／NMM／neru design／asimocrafts／サンゾー工務店（別枠405）／38explore（別枠116）／OLDMOUNTAIN／BGO／INAVANCE／TheArth／Ballistics／H&O／GRINDLODGE／LOV／SENDAI SUBURB SHOP）
 102|find.
