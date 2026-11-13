@@ -627,7 +627,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v43<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v44<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -2107,8 +2107,8 @@ function renderEntry(skip){renderTickets();
   const fb=firstBoothName(),yellow=fb&&P.yellow.some(n=>fb.includes(n)),dd=EVENT.days.find(d=>d.key===e.day);
   $('e-big').innerHTML=!e.day?'<small>入場日を選んでください</small>':curNo?`<small>${dd?esc(dd.label):''} 整理番号</small>${esc(curNo)}番`:'<small>整理番号を入れてください</small>';
   const area=!fb?`<span class="entry-area area-y">指定ブースの列</span><span class="entry-area area-b">優先入場の列</span>`
-    :yellow?`<span class="entry-area area-y">${P.yellowName}</span><span class="entry-first" style="display:block;margin-top:2px">（最初のブース：${esc(BY[starList()[0]].name.replace(/（.*$/,''))}）</span>`
-    :`<span class="entry-area area-b">${P.blueName}</span><span class="entry-first" style="display:block;margin-top:2px">（最初のブース：${esc(BY[starList()[0]].name.replace(/（.*$/,'').slice(0,24))}）</span>`;
+    :yellow?`<span class="entry-area area-y">${P.yellowName}</span><span class="entry-first" style="display:block;margin-top:2px">（最初のブース：${esc(brandName(starList()[0]))}）</span>`
+    :`<span class="entry-area area-b">${P.blueName}</span><span class="entry-first" style="display:block;margin-top:2px">（最初のブース：${esc(brandName(starList()[0]).slice(0,24))}）</span>`;
   $('e-sub').innerHTML=`<b>集合 ${dd?dd.md+' ':''}${P.time}</b>　${area}`;
 }
 $('e-no').addEventListener('input',()=>{const e=S.entry=S.entry||{nos:{},day:''};e.nos=e.nos||{};if(e.day){e.nos[e.day]=$('e-no').value.trim();save();renderEntry()}});
@@ -2215,12 +2215,14 @@ function renderPackWarn(){
   $('pw-state').innerHTML=ok?'<b style="color:var(--ok)">✔ 持ち物は、すべてそろいました（'+d+' / '+t+'）</b>':'持ち物：<b>'+d+' / '+t+'</b> そろった'+(t-d>0?'（あと '+(t-d)+' 件）':'');
   $('pw-go').onclick=()=>{show('pack');render()};
 }
+/* ホームなどに出すブース名: 合同ブース(M16等)ではなく、そのブースの最初のブランド名 */
+const brandName=k=>{const u=unitsOrdered(starList()).find(x=>x.k===k);return u?u.b:(ckBrands(k)[0]||shortName(k))};
 function renderNext(){
   const el=$('nextc');if(!el)return;
-  const all=starList(),rest=all.filter(k=>!doneOf(k)),pend=rest.filter(x=>stOf(x)!=='later'),k=pend[0]||rest[0],B=+S.budget||0,left=B-spentTotal();
+  const all=starList(),rest=all.filter(k=>!doneOf(k)),pend=rest.filter(x=>stOf(x)!=='later'),U=unitsOrdered(all),uu=U.find(x=>!doneOf(x.k)&&stOf(x.k)!=='later')||U.find(x=>!doneOf(x.k)),k=uu?uu.k:(pend[0]||rest[0]),B=+S.budget||0,left=B-spentTotal();
   let h='<div class="entry-h">次に行くブース'+(all.length?'（あと '+rest.length+' 件／全 '+all.length+' 件）':'')+'</div>';
-  if(k){const ws=openWants(k);
-    h+=`<div class="nx-name">${badge(k)}<span>${esc(BY[k].name.replace(/（.*$/,''))}</span></div>`
+  if(k){const ws0=openWants(k),ws=uu&&uu.multi?ws0.filter(w=>w.sub===uu.b||(!w.sub&&uu.bi===0)):ws0;
+    h+=`<div class="nx-name">${badge(k)}<span>${esc(uu?uu.b:shortName(k))}</span></div>`
       +(stOf(k)==='later'?'<div class="entry-sub" style="color:var(--accent);font-weight:700">（「あとでもう一度」のブースだけ残っています）</div>':'')
       +(ws.length?`<div class="nxws">${ws.map(w=>`<div class="nxw ${intentOf(w)==='skip'?'skip':''}"><span class="nxn"><i class="it it-${intentOf(w)}">${INT[intentOf(w)][0]}</i> ${esc(w.name)}</span><input type="text" data-comma inputmode="numeric" pattern="[0-9,]*" autocomplete="off" data-nxy="${w.id}" value="${fmtY2(w.yen||'')}" placeholder="金額" aria-label="${esc(w.name)}の金額"><button class="btn" type="button" data-nxbuy="${w.id}">買った</button></div>`).join('')}</div>`:'')
       +(B?`<div class="entry-sub">残り予算：<b>${left<0?'−':''}${yen(Math.abs(left))}</b></div>`:'')
@@ -2229,7 +2231,7 @@ function renderNext(){
   else{h+='<div class="acts"><button class="btn" id="nx-pick" type="button">ブースを選ぶ</button></div>'}
   try{if(k&&rest.length>1){
     if(typeof hereK!=='undefined'&&hereK&&POS[hereK]){let n=null,bd=1e18;rest.forEach(x=>{if(!POS[x]||x===hereK)return;const d=pathLen(hereK,x);if(d<bd){bd=d;n=x}});
-      if(n&&n!==k)h+=`<div class="entry-sub nearb">現在地（${esc(hereK)}）から一番近い：${badge(n)} <b>${esc(shortName(n))}</b></div><div class="acts"><button class="btn sub2" id="nx-near" type="button">そこへの道順</button></div>`;
+      if(n&&n!==k)h+=`<div class="entry-sub nearb">現在地（${esc(hereK)}）から一番近い：${badge(n)} <b>${esc(brandName(n))}</b></div><div class="acts"><button class="btn sub2" id="nx-near" type="button">そこへの道順</button></div>`;
       else if(n===k)h+=`<div class="entry-sub nearb">現在地から一番近いのも、このブースです</div>`}
     else if(typeof dayOn==='function'&&dayOn())h+=`<div class="entry-sub nearb">現在地を入れると、一番近いブースを出せます</div><div class="acts"><button class="btn sub2" id="nx-here" type="button">現在地を入れる</button></div>`}}catch(e){}
   el.innerHTML=h;
