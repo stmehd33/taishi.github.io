@@ -627,7 +627,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v45<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v46<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -1438,7 +1438,7 @@ function setRot(n){
 $('zin').onclick=()=>{zoom=Math.min(8,zoom+1);applyZoom()};
 $('zout').onclick=()=>{zoom=Math.max(1,zoom-1);applyZoom()};
 const IW=EVENT.mapW,IH=EVENT.mapH;
-const ckBrands=k=>{if(!BY[k])return[String(k)];if(!subsOf(k).length)return[shortName(k)];const ss=Object.keys((S.subStars||{})[k]||{});if(ss.length){const so=(S.subOrder||{})[k]||[];return ss.sort((a,b)=>{const x=so.indexOf(a),y=so.indexOf(b);return (x<0?1e3:x)-(y<0?1e3:y)})}const ws=[...new Set(S.wants.filter(w=>w.booth===k&&w.sub).map(w=>w.sub))];return ws.length?ws:[shortName(k)]};
+const ckBrands=k=>{if(!BY[k])return[String(k)];if(!subsOf(k).length)return[shortName(k)];const ss=Object.keys((S.subStars||{})[k]||{});if(ss.length){const so=(S.subOrder||{})[k]||[];return ss.sort((a,b)=>{const x=so.indexOf(a),y=so.indexOf(b);return (x<0?1e3:x)-(y<0?1e3:y)})}const ws=[...new Set(S.wants.filter(w=>w.booth===k&&w.sub).map(w=>w.sub))];return ws.length?ws:subsOf(k)};
 const brandOf=k=>ckBrands(k)[0];
 /* 欲しい物などに出すブース名: 選んだ店（ブランド）があればそれだけ。M16のような合同ブースの名前は出さない */
 const wLabel=(k,sub)=>sub?sub:(BY[k]?(subsOf(k).length?'':BY[k].name.replace(/（.*$/,'')):'');
