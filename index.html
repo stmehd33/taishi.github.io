@@ -627,7 +627,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v47<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v48<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -2324,7 +2324,10 @@ function renderHaul(){
 document.querySelectorAll('#wsw [data-wv]').forEach(b=>b.onclick=()=>{wview=b.dataset.wv;applyWV();window.scrollTo({top:0})});
 $('haul-photo').onclick=()=>{memoFilter=null;memoAdd=false;show('memo');render();renderMemo()};
 $('haul-wants').onclick=()=>{wview='want';applyWV();window.scrollTo({top:0})};
-function render(){syncUnits();renderEvMarks();renderEvAlert();renderSeen();renderHaul();renderEntry();renderHome();renderSpend();if(!$('consider').hidden&&document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.coy)renderConsiderSummary();else renderConsider();renderNotes();renderPlan();renderWants();renderBooths();renderMap();renderSched();renderEvents();renderPerks();renderPack();renderCheck()}
+function seedNY(){if(S.nyDone)return;S.notes=S.notes||[];const NY=[["ny26-1", "【前泊の駐車場所】\n・前日20時ごろに着いて、まだ会場に近い場所に停められた。\n・仮設トイレは、会場入口に向かって右の奥、植物が垂れ下がっている入口のさらに奥にある。そちら側に停めた方がいいか、来年検討する。\n・仮設トイレは、個室2つ・小便器1つ・水道2つで小さく、混んでいた。そこでの歯磨きはしにくそう。"], ["ny26-2", "【前日の食事・買い物】\n・空港の「ドリーム」の近くの、すぐ行けるコンビニは20時で閉まる。\n・ご飯も18〜19時ごろに閉まる。前乗りの日は、ご飯を食べてから駐車場に停める。\n・ご飯はT1への長い動く歩道の先で、かなり遠い。\n・可能なら、セントレアの有料道路の手前の左にあるセブンイレブンで買い物してから、トイレに行く。食べ物は匂いのないもの、飲み物はお茶500mlを2本。"], ["ny26-3", "【トイレ・歯磨き】\n・空港のトイレは個室が2つしかなく、朝も混む。\n・歯磨きは、ぎりぎりできるかどうか。"], ["ny26-4", "【車中泊の持ち物・気づき】\n・大きなゴミ袋、消臭スプレー、ゴミ袋用の消臭剤を持っていく。\n・サンシェードはきれいにはまらないので、養生テープなどで留める。\n・夜はあまり寒くなく、電気毛布も湯たんぽも使わなかった。\n・ポータブル電源は、一晩で2メモリくらい減った。\n・空港まで歩くと暑くて汗をかくので、スウェットは2枚あった方がいいかも。"], ["ny26-5", "【当日の並び方（2026年）】\n・並ぶのは7:30からで十分。\n・優先券を買った人のうち、M16の人は番号順の別の列があった。\n・8:05には中に入れて、途中でブースごとに並び直し。\n・整理番号826番で、グラインドロッジの列の後ろから15番目くらい。\n・グラインドロッジのトートバッグは100個、ミヤビは40個の限定だった。"], ["ny26-6", "【来年に向けて】\n・チケットを10枚くらい買って、早い番号で入る方がいいか、本気で考えた。"]],t0=Date.now();
+  NY.forEach(([id,text],i)=>{if(!S.notes.some(n=>n.id===id))S.notes.push({id,text,booth:'',sub:'',ts:t0-i*1000})});
+  S.nyDone=true;save()}
+function render(){syncUnits();if(EVENT.year===2026)seedNY();renderEvMarks();renderEvAlert();renderSeen();renderHaul();renderEntry();renderHome();renderSpend();if(!$('consider').hidden&&document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.coy)renderConsiderSummary();else renderConsider();renderNotes();renderPlan();renderWants();renderBooths();renderMap();renderSched();renderEvents();renderPerks();renderPack();renderCheck()}
 
 /* ================= クラウド同期（claude.ai の db 機能。使えない時は端末内のみ） =================
    自分専用の領域 data/users/<id>/ に保存するので、同じアカウントなら PC とスマホで同じ内容になる。
@@ -2336,7 +2339,7 @@ const clone=o=>JSON.parse(JSON.stringify(o));
 const hasData=s=>s&&(Object.keys(s.stars||{}).length||(s.wants||[]).length||(s.sched||[]).length||(s.pack||[]).length||(s.budget||0)||Object.keys(s.seen||{}).length);
 function mergeStates(a,b){ /* 初回だけ: 両方にデータがあるときは足し合わせる */
   const u=(x,y)=>{const m=new Map();[...(x||[]),...(y||[])].forEach(i=>{if(!m.has(String(i.id)))m.set(String(i.id),i)});return [...m.values()]};
-  return Object.assign(DEF(),{stars:{...a.stars,...b.stars},later:{...a.later,...b.later},seen:{...a.seen,...b.seen},seenU:{...a.seenU,...b.seenU},laterU:{...a.laterU,...b.laterU},prioU:{...a.prioU,...b.prioU},mig45:!!(a.mig45||b.mig45),packInit:!!(a.packInit||b.packInit),packInit2:!!(a.packInit2||b.packInit2),packInit3:!!(a.packInit3||b.packInit3),packInit4:!!(a.packInit4||b.packInit4),packInit5:!!(a.packInit5||b.packInit5),packInit6:!!(a.packInit6||b.packInit6),subStars:(()=>{const o={};[a.subStars,b.subStars].forEach(x=>{for(const k in (x||{}))o[k]=Object.assign(o[k]||{},x[k])});return o})(),wants:u(a.wants,b.wants),sched:u(a.sched,b.sched),pack:u(a.pack,b.pack),todo:u(a.todo||[],b.todo||[]),subOrder:Object.assign({},a.subOrder||{},b.subOrder||{}),uorder:(b.uorder&&b.uorder.length?b.uorder:(a.uorder||[])),notes:u(a.notes,b.notes),consider:Object.assign({},a.consider||{},b.consider||{}),entry:(()=>{const f=e=>{e=e||{};const n=Object.assign({},e.nos||{});if(e.no&&!Object.keys(n).length)n[e.day||'d1']=e.no;return {nos:n,day:e.day||''}};const x=f(a.entry),y=f(b.entry);return {nos:Object.assign({},x.nos,y.nos),day:y.day||x.day}})(),
+  return Object.assign(DEF(),{stars:{...a.stars,...b.stars},later:{...a.later,...b.later},seen:{...a.seen,...b.seen},seenU:{...a.seenU,...b.seenU},laterU:{...a.laterU,...b.laterU},prioU:{...a.prioU,...b.prioU},mig45:!!(a.mig45||b.mig45),nyDone:!!(a.nyDone||b.nyDone),packInit:!!(a.packInit||b.packInit),packInit2:!!(a.packInit2||b.packInit2),packInit3:!!(a.packInit3||b.packInit3),packInit4:!!(a.packInit4||b.packInit4),packInit5:!!(a.packInit5||b.packInit5),packInit6:!!(a.packInit6||b.packInit6),subStars:(()=>{const o={};[a.subStars,b.subStars].forEach(x=>{for(const k in (x||{}))o[k]=Object.assign(o[k]||{},x[k])});return o})(),wants:u(a.wants,b.wants),sched:u(a.sched,b.sched),pack:u(a.pack,b.pack),todo:u(a.todo||[],b.todo||[]),subOrder:Object.assign({},a.subOrder||{},b.subOrder||{}),uorder:(b.uorder&&b.uorder.length?b.uorder:(a.uorder||[])),notes:u(a.notes,b.notes),consider:Object.assign({},a.consider||{},b.consider||{}),entry:(()=>{const f=e=>{e=e||{};const n=Object.assign({},e.nos||{});if(e.no&&!Object.keys(n).length)n[e.day||'d1']=e.no;return {nos:n,day:e.day||''}};const x=f(a.entry),y=f(b.entry);return {nos:Object.assign({},x.nos,y.nos),day:y.day||x.day}})(),
     order:(b.order&&b.order.length?b.order:a.order)||[],budget:b.budget||a.budget||0,deletedMemos:[...new Set([...(a.deletedMemos||[]),...(b.deletedMemos||[])])]});}
 function errState(e){return e&&e.code==='invalid_argument'?'noperm':'error'}
 let pushT=null,pushing=false,dirty=false;
