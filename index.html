@@ -627,7 +627,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v50<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v51<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -2324,13 +2324,14 @@ function renderHaul(){
 document.querySelectorAll('#wsw [data-wv]').forEach(b=>b.onclick=()=>{wview=b.dataset.wv;applyWV();window.scrollTo({top:0})});
 $('haul-photo').onclick=()=>{memoFilter=null;memoAdd=false;show('memo');render();renderMemo()};
 $('haul-wants').onclick=()=>{wview='want';applyWV();window.scrollTo({top:0})};
-function seedNY(){if(S.nyDone)return;S.notes=S.notes||[];const NY=[["ny26-1", "【前泊の駐車場所】\n・前日20時ごろに着いて、まだ会場に近い場所に停められた。\n・仮設トイレは、会場入口に向かって右の奥、植物が垂れ下がっている入口のさらに奥にある。そちら側に停めた方がいいか、来年検討する。\n・仮設トイレは、個室2つ・小便器1つ・水道2つで小さく、混んでいた。そこでの歯磨きはしにくそう。"], ["ny26-2", "【前日の食事・買い物】\n・空港の「ドリーム」の近くの、すぐ行けるコンビニは20時で閉まる。\n・ご飯も18〜19時ごろに閉まる。前乗りの日は、ご飯を食べてから駐車場に停める。\n・ご飯はT1への長い動く歩道の先で、かなり遠い。\n・可能なら、セントレアの有料道路の手前の左にあるセブンイレブンで買い物してから、トイレに行く。食べ物は匂いのないもの、飲み物はお茶500mlを2本。"], ["ny26-3", "【トイレ・歯磨き】\n・空港のトイレは個室が2つしかなく、朝も混む。\n・歯磨きは、ぎりぎりできるかどうか。"], ["ny26-4", "【車中泊の持ち物・気づき】\n・大きなゴミ袋、消臭スプレー、ゴミ袋用の消臭剤を持っていく。\n・サンシェードはきれいにはまらないので、養生テープなどで留める。\n・夜はあまり寒くなく、電気毛布も湯たんぽも使わなかった。\n・ポータブル電源は、一晩で2メモリくらい減った。\n・空港まで歩くと暑くて汗をかくので、スウェットは2枚あった方がいいかも。"], ["ny26-5", "【当日の並び方（2026年）】\n・並ぶのは7:30からで十分。\n・優先券を買った人のうち、M16の人は番号順の別の列があった。\n・8:05には中に入れて、途中でブースごとに並び直し。\n・整理番号826番で、グラインドロッジの列の後ろから15番目くらい。\n・グラインドロッジのトートバッグは100個、ミヤビは40個の限定だった。"], ["ny26-6", "【来年に向けて】\n・チケットを10枚くらい買って、早い番号で入る方がいいか、本気で考えた。"]],t0=Date.now();
+function seedNY(){if(S.nyDone)return;S.notes=S.notes||[];const NY=[["ny26-1", "【前泊の駐車場所】\n・前日20時ごろに着いて、まだ会場に近い場所に停められた。\n・仮設トイレは、会場入口に向かって右の奥、植物が垂れ下がっている入口のさらに奥にある。そちら側に停めた方がいいか、来年検討する。\n・仮設トイレは、個室2つ・小便器1つ・水道2つで小さく、混んでいた。そこでの歯磨きはしにくそう。"], ["ny26-2", "【前日の食事・買い物】\n・空港の「ドリーム」の近くの、すぐ行けるコンビニは20時で閉まる。\n・ご飯も18〜19時ごろに閉まる。前乗りの日は、ご飯を食べてから駐車場に停める。\n・ご飯はT1への長い動く歩道の先で、かなり遠い。\n・可能なら、セントレアの有料道路の手前の左にあるセブンイレブンで買い物してから、トイレに行く。食べ物は匂いのないもの、飲み物はお茶500mlを2本。"], ["ny26-3", "【トイレ・歯磨き】\n・空港のトイレは個室が2つしかなく、朝も混む。\n・歯磨きは、ぎりぎりできるかどうか。"], ["ny26-4", "【車中泊の持ち物・気づき】\n・大きなゴミ袋、消臭スプレー、ゴミ袋用の消臭剤を持っていく。\n・サンシェードはきれいにはまらないので、養生テープなどで留める。\n・夜はあまり寒くなく、電気毛布も湯たんぽも使わなかった。\n・ポータブル電源は、一晩で2メモリくらい減った。\n・空港まで歩くと暑くて汗をかくので、スウェットは2枚あった方がいいかも。"], ["ny26-5", "【当日の並び方（2026年）】\n・並ぶのは7:30からで十分。\n・優先券を買った人のうち、M16の人は番号順の別の列があった。\n・8:05には中に入れて、途中でブースごとに並び直し。\n・整理番号826番で、グラインドロッジの列の後ろから15番目くらい。\n・LOVのトートバッグは100個、38灯は40個の限定だった。"], ["ny26-6", "【来年に向けて】\n・チケットを10枚くらい買って、早い番号で入る方がいいか、本気で考えた。"]],t0=Date.now();
   NY.forEach(([id,text],i)=>{if(!S.notes.some(n=>n.id===id))S.notes.push({id,text,booth:'',sub:'',ts:t0-i*1000})});
   S.nyDone=true;save()}
 function seedNY2(){if(S.nyDone2)return;S.notes=S.notes||[];const NY=[["ny26-7", "【グラインドロッジ（2026年）】\n・買い物をすると、抽選のステッカーを引ける。裏に「sorry」と書いてあれば残念。日時が書いてあれば、生刷りが当たり。\n・ステッカー以外は、ほぼアパレルだった。次回からはなしにする。"], ["ny26-8", "【LOV】\n・目玉のトートバッグと、目玉の38灯は、グラインドロッジにあると思っていたが、LOVにあった。"], ["ny26-9", "【セントレア：風の湯・フードコート】\n・T1まで来たら、そのまま直進してエスカレーターのような動く歩道に乗り、エスカレーターに乗って4階のスカイテラスへ。\n・右手に入って奥に行くと、風の湯がある。\n・靴のロッカーの鍵を、受付で脱衣所のロッカーの鍵と交換する。\n・中のご飯屋さんは、現金だけかどうか不明。\n・スカイテラスのエスカレーターを上がったところから左側のフードコートに、CoCo壱がある。"], ["ny26-10", "【暑さ・着替え】\n・歩いたりして暑いので、車の中の扇風機は必須。\n・家で風呂に入って出発したなら、前泊の着替えは2つずつ、下着は1つずつでいい。"], ["ny26-11", "【出発時間】\n・今回は家を出たのが17時過ぎ。20時過ぎに着いたら、仮設トイレの近くは割と埋まっていた。次はもっと早く出る。"]],t0=Date.now()-6000;
   NY.forEach(([id,text],i)=>{if(!S.notes.some(n=>n.id===id))S.notes.push({id,text,booth:'',sub:'',ts:t0-i*1000})});
   S.nyDone2=true;save()}
-function fixNY(){const n=(S.notes||[]).find(x=>x.id==='ny26-8'),O="【LOV】\n・LOVのところに、目玉のトートバッグと、目玉の38灯の店があり、別の店舗だった。",N="【LOV】\n・目玉のトートバッグと、目玉の38灯は、グラインドロッジにあると思っていたが、LOVにあった。";if(n&&n.text===O){n.text=N;save()}}
+function fixNY5(){const n=(S.notes||[]).find(x=>x.id==='ny26-5'),O="・グラインドロッジのトートバッグは100個、ミヤビは40個の限定だった。",N="・LOVのトートバッグは100個、38灯は40個の限定だった。";if(n&&n.text.includes(O)){n.text=n.text.replace(O,N);save()}}
+function fixNY(){fixNY5();const n=(S.notes||[]).find(x=>x.id==='ny26-8'),O="【LOV】\n・LOVのところに、目玉のトートバッグと、目玉の38灯の店があり、別の店舗だった。",N="【LOV】\n・目玉のトートバッグと、目玉の38灯は、グラインドロッジにあると思っていたが、LOVにあった。";if(n&&n.text===O){n.text=N;save()}}
 function render(){syncUnits();if(EVENT.year===2026){seedNY();seedNY2();fixNY()}renderEvMarks();renderEvAlert();renderSeen();renderHaul();renderEntry();renderHome();renderSpend();if(!$('consider').hidden&&document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.coy)renderConsiderSummary();else renderConsider();renderNotes();renderPlan();renderWants();renderBooths();renderMap();renderSched();renderEvents();renderPerks();renderPack();renderCheck()}
 
 /* ================= クラウド同期（claude.ai の db 機能。使えない時は端末内のみ） =================
