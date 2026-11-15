@@ -627,7 +627,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v55<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v56<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -1330,7 +1330,8 @@ function startEdit(id){const w=S.wants.find(x=>x.id==id);if(!w)return;editW=w.id
   $('w-name').value=w.name;$('w-yen').value=w.yen?(+w.yen).toLocaleString('en-US'):'';$('w-prio').value=String(w.prio||2);$('w-bp').value=String(w.bp||boothPrio(w.booth)||2);
   $('w-img').value='';wPrev();$('w-imsg').textContent='';$('w-submit').textContent='変更を保存';$('w-cancel').hidden=false;
   $('wform').scrollIntoView({behavior:'smooth',block:'start'});toast('✎ 編集中：直して「変更を保存」を押してください')}
-function endEdit(){editW=null;$('w-submit').textContent='リストに追加';$('w-cancel').hidden=true}
+const wDelPend=new Set();
+function endEdit(){editW=null;wDelPend.clear();$('w-submit').textContent='リストに追加';$('w-cancel').hidden=true}
 function boothSwitch(nb){
   if(editW==null||!nb)return;const ew=S.wants.find(x=>x.id==editW);if(!ew||nb===ew.booth)return;
   const list=S.wants.filter(x=>x.booth===nb&&x.id!==ew.id&&!x.got);
@@ -1343,6 +1344,9 @@ $('w-booth').addEventListener('change',()=>boothSwitch(resolveBooth($('w-booth')
 $('w-cancel').onclick=()=>{endEdit();$('wform').reset();$('w-prio').value='2';$('w-imsg').textContent='';fillSub('w-sub','w-subbox','')};
 let wPrevUrls=[];
 function wPrev(){const box=$('w-prev'),inp=$('w-img');if(!box)return;wPrevUrls.forEach(u=>URL.revokeObjectURL(u));wPrevUrls=[];box.innerHTML='';
+  if(editW!=null)wImgs(editW).forEach(x=>{const w=document.createElement('div'),pend=wDelPend.has(x.id);w.style.cssText='position:relative;display:inline-block;margin:0 6px 6px 0;vertical-align:top';
+    w.innerHTML='<img class="wth" alt="登録済みの写真" style="width:96px;height:96px;'+(pend?'opacity:.3':'')+'"><div class="note" style="margin:2px 0 0;text-align:center">'+(pend?'保存で削除':'登録済み')+'</div><button type="button" class="x" aria-label="'+(pend?'この写真の削除を取り消す':'この登録済みの写真を削除する')+'" style="position:absolute;top:-6px;right:-6px;width:28px;height:28px;min-height:0;padding:0;border-radius:14px;background:var(--surface);border:2px solid var(--ink)">'+(pend?'↩':'✕')+'</button>';
+    w.querySelector('img').src=x.img;w.querySelector('button').onclick=()=>{if(wDelPend.has(x.id))wDelPend.delete(x.id);else wDelPend.add(x.id);wPrev()};box.appendChild(w)});
   const fs=[...inp.files];$('w-imsg').textContent=fs.length?fs.length+'枚 選択中（登録前の確認）':'';
   fs.forEach((f,i)=>{const u=URL.createObjectURL(f);wPrevUrls.push(u);const w=document.createElement('div');w.style.cssText='position:relative;display:inline-block';
     w.innerHTML='<img class="wth" alt="選択した写真" style="width:96px;height:96px"><button type="button" class="x" aria-label="この写真を外す" style="position:absolute;top:-6px;right:-6px;width:28px;height:28px;min-height:0;padding:0;border-radius:14px;background:var(--surface);border:2px solid var(--ink)">✕</button>';
@@ -1358,6 +1362,7 @@ $('wform').addEventListener('submit',async e=>{
   let newId=Date.now();const imgFiles=[...$('w-img').files];
   const rec={name,brand:booth?($('w-sub').value||shortName(booth)):rawB,yen:ynum($('w-yen').value)||0,booth,sub:$('w-sub').value||'',prio:+$('w-prio').value,intent:['','must','maybe','skip'][+$('w-prio').value],bp:+$('w-bp').value||2};
   const edW=editW!=null?S.wants.find(x=>x.id==editW):null;if(edW){Object.assign(edW,rec);newId=edW.id}else S.wants.push({id:newId,...rec,got:false});
+  if(edW&&wDelPend.size){[...wDelPend].forEach(id=>{wimgs=wimgs.filter(v=>v.id!==id);try{idbTx('readwrite',s=>s.delete(id))}catch(e){}})}
   const wasEdit=!!edW;endEdit();
   let newStar=false;if(booth){if(!S.stars[booth]){S.stars[booth]={done:false,prio:2};newStar=true}const sb=$('w-sub').value;if(sb){S.subStars=S.subStars||{};(S.subStars[booth]=S.subStars[booth]||{})[sb]=true}}
   if(booth)syncBoothPrio(booth);
