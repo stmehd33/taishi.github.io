@@ -627,7 +627,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v57<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v58<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -742,6 +742,14 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </div>
   <div id="wv-haul" hidden>
     <div class="note" id="haul-sum" style="margin:0 0 8px"></div>
+    <details class="wnew" id="hn-box" style="margin:0 0 10px"><summary>＋ 戦利品を直接追加（欲しい物に入れていない物）</summary>
+      <input type="text" id="hn-name" placeholder="品名（必須）" autocomplete="off" aria-label="品名">
+      <input type="text" id="hn-brand" placeholder="ブランド・店名（任意）" autocomplete="off" aria-label="ブランド・店名" style="margin-top:6px">
+      <input type="text" id="hn-booth" inputmode="numeric" placeholder="ブース番号（任意）例：403" autocomplete="off" aria-label="ブース番号" style="margin-top:6px">
+      <label class="wy" style="margin-top:6px">実際の金額 ¥<input type="text" data-comma id="hn-yen" inputmode="numeric" pattern="[0-9,]*" autocomplete="off" placeholder="未入力でOK"></label>
+      <div class="dayseg" id="hn-day" style="margin-top:6px"></div>
+      <span class="wth-row" style="margin:6px 0 0"><span class="pkpair"><label class="wadd">写真<input type="file" accept="image/*" capture="environment" data-cam="hn-file" hidden></label><label class="wadd" for="hn-file">アルバム</label></span></span><input type="file" id="hn-file" accept="image/*" multiple hidden><span class="note" id="hn-fn" style="margin:0 0 0 6px"></span>
+      <button class="btn" id="hn-add" type="button" style="margin-top:8px;width:100%">戦利品に追加</button></details>
     <div id="haul-list"></div>
     <div class="tools" style="margin-top:12px"><button class="chip" id="haul-photo" type="button">買った物の写真を見る ›</button><button class="chip" id="haul-wants" type="button">欲しい物リストへ ›</button></div>
   </div>
@@ -2543,6 +2551,20 @@ function wDetail(id){const w=S.wants.find(x=>String(x.id)===String(id));if(!w)re
    +`<button class="btn" type="button" id="wd-c" style="width:100%;margin-top:6px">閉じる</button></div>`;
   o.onclick=e=>{if(e.target===o)o.remove()};document.body.appendChild(o);o.querySelector('#wd-c').onclick=()=>o.remove()}
 document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('[data-wd]');if(!t||e.target.closest('input,select,textarea,label'))return;wDetail(t.dataset.wd)});
+
+/* 戦利品を直接追加 */
+(()=>{let hday=null;
+  const days=()=>EVENT.days.filter(v=>v.key!=='prev');
+  const drawDay=()=>{const box=$('hn-day');if(!box)return;if(!hday)hday=todayKey();box.innerHTML=days().map(v=>`<button type="button" class="chip" data-hd="${v.key}" aria-pressed="${v.key===hday}">${esc(v.label)}</button>`).join('');box.querySelectorAll('[data-hd]').forEach(x=>x.onclick=()=>{hday=x.dataset.hd;drawDay()})};
+  drawDay();$('hn-box').addEventListener('toggle',()=>{if($('hn-box').open){hday=todayKey();drawDay()}});
+  const f=$('hn-file');f.addEventListener('change',()=>{$('hn-fn').textContent=f.files.length?f.files.length+'枚 選択中':''});
+  $('hn-add').onclick=async()=>{const name=$('hn-name').value.trim();if(!name){$('hn-name').focus();return}
+    const rawB=$('hn-booth').value.trim(),booth=resolveBooth(rawB);if(rawB&&!booth){toast('そのブース番号は一覧にありません');$('hn-booth').focus();return}
+    const brand=$('hn-brand').value.trim(),id=Date.now(),act=ynum($('hn-yen').value);
+    S.wants.push({id,name,brand:brand||(booth?shortName(booth):''),yen:0,booth,sub:(booth&&subsOf(booth).includes(brand))?brand:'',prio:2,intent:'maybe',bp:2,got:true,day:hday||todayKey(),actual:act==null?null:act});
+    save();const files=[...f.files];let n=0;if(files.length)n=await wSaveImgs(id,files);
+    $('hn-name').value='';$('hn-brand').value='';$('hn-booth').value='';$('hn-yen').value='';f.value='';$('hn-fn').textContent='';
+    render();toast('✔ 戦利品に追加しました'+(files.length&&!n?'（画像は保存できませんでした）':''))}})();
 </script>
 
 <script>
