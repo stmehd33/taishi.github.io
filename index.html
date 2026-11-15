@@ -627,7 +627,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v56<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v57<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -1312,7 +1312,7 @@ function renderWants(){
   $('wlist').querySelectorAll('[data-wedit]').forEach(n=>n.onclick=e=>{if(e.target.closest('input,label,button,select,textarea,img,.act,.wth-row'))return;startEdit(n.dataset.wedit)});
   $('wlist').querySelectorAll('[data-wvi]').forEach(m=>m.onclick=()=>wViewer(m.dataset.wvi,renderWants));
   $('wlist').querySelectorAll('[data-act]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.act);w.actual=ynum(c.value);save();renderWants()});
-  $('wlist').querySelectorAll('[data-got]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.got);w.got=c.checked;if(c.checked)w.day=todayKey();if(c.checked&&w.actual==null)w.actual=+w.yen||0;save();render()});
+  $('wlist').querySelectorAll('[data-got]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.got);w.got=c.checked;if(c.checked)w.day=todayKey();if(c.checked&&w.actual==null&&+w.yen)w.actual=+w.yen;save();render()});
   $('wlist').querySelectorAll('[data-wbr]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.wbr);w.brand=c.value.trim();save();renderWants()});
   $('wlist').querySelectorAll('[data-wbo]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.wbo),v=c.value.trim();if(v&&!BY[v]){toast('そのブース番号は一覧にありません');c.value=w.booth||'';return}w.booth=v;if(!v)w.sub='';if(v&&!S.stars[v])S.stars[v]={done:false,prio:2};save();render()});
   $('wlist').querySelectorAll('[data-wbuy]').forEach(c=>c.onclick=()=>{const w=S.wants.find(x=>x.id==c.dataset.wbuy);memoFilter=null;memoAdd=true;show('memo');render();renderMemo();$('m-booth').value=w.booth||'';updMB();$('m-want').value=String(w.id);pickWant();$('mform').scrollIntoView({behavior:'smooth'})});
@@ -2110,7 +2110,7 @@ function renderCheck(){
   $('cspend').innerHTML=rows.length||noBooth?rows.map(([_,v])=>`<button class="ck" data-sp="${v.k}" style="width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer">${badge(v.k)}<div class="nm">${esc(v.sub||shortName(v.k))}<span class="sub">${v.items.map(esc).join('、')}</span></div><b style="font-family:var(--display);font-size:19px;white-space:nowrap">${yen(v.sum)}</b></button>`).join('')+(noBooth?`<div class="ck"><div class="nm">ブース未指定<span class="sub">欲しい物のチェックで「買った」にしたもの</span></div><b style="font-family:var(--display);font-size:19px">${yen(noBooth)}</b></div>`:'')+`<div class="ck done"><div class="nm"><b>合計</b></div><b style="font-family:var(--display);font-size:21px">${yen(spentTotal())}</b></div>`:'<div class="empty">買った物の写真と金額を保存すると、ブースごとの合計が出ます。</div>';
   $('cspend').querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{memoFilter=b.dataset.sp;memoAdd=false;show('memo');render();renderMemo()});
   $('cbooth').querySelectorAll('[data-cb]').forEach(c=>c.onchange=()=>setSt(c.dataset.cb,c.checked?'done':'none',c.dataset.cbb||undefined));
-  $('cbuy').querySelectorAll('[data-cw]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.cw);w.got=c.checked;if(c.checked)w.day=todayKey();if(c.checked&&w.actual==null)w.actual=+w.yen||0;save();render()});
+  $('cbuy').querySelectorAll('[data-cw]').forEach(c=>c.onchange=()=>{const w=S.wants.find(x=>x.id==c.dataset.cw);w.got=c.checked;if(c.checked)w.day=todayKey();if(c.checked&&w.actual==null&&+w.yen)w.actual=+w.yen;save();render()});
 }
 /* ---- layout toggle ---- */
 function setLayout(m){document.documentElement.dataset.layout=m;try{localStorage.setItem('fs-layout',m)}catch(e){}
@@ -2278,7 +2278,7 @@ function renderNext(){
   if($('nx-go'))$('nx-go').onclick=()=>{show('map');render();if(!hereK){needHere();return}setGoal(k)};
   if($('nx-seen'))$('nx-seen').onclick=()=>setSt(k,'done',uu&&uu.multi?uu.b:undefined);
   if($('nx-later'))$('nx-later').onclick=()=>setSt(k,'later',uu&&uu.multi?uu.b:undefined);
-  el.querySelectorAll('[data-nxbuy]').forEach(b=>b.onclick=()=>{const w=S.wants.find(x=>x.id==b.dataset.nxbuy);if(!w)return;const inp=el.querySelector('[data-nxy="'+w.id+'"]'),v=ynum(inp.value),sn=snapState();w.got=true;w.day=todayKey();w.actual=(v==null?(+w.yen||0):v);save();render();toastUndo('「'+w.name+'」を買いました（'+yen(w.actual)+'）',sn)});
+  el.querySelectorAll('[data-nxbuy]').forEach(b=>b.onclick=()=>{const w=S.wants.find(x=>x.id==b.dataset.nxbuy);if(!w)return;const inp=el.querySelector('[data-nxy="'+w.id+'"]'),v=ynum(inp.value),sn=snapState();w.got=true;w.day=todayKey();w.actual=(v==null?((+w.yen)||null):v);save();render();toastUndo('「'+w.name+'」を買いました（'+(w.actual!=null?yen(w.actual):'金額未入力')+'）',sn)});
   if($('nx-map'))$('nx-map').onclick=()=>focusBooth(k);
   if($('nx-pick'))$('nx-pick').onclick=()=>{show('booths');render()};
 }
@@ -2297,7 +2297,7 @@ function renderHome(){
    const bx=sec('見てないブース',g('none').length+'か所',g('none').map(u=>bRow(u,'pop')).join(''),'見たいブースがありません。「マップ」で☆を付けてください。','')
     +sec('あとでもう一度見るブース',g('later').length+'か所',g('later').map(u=>bRow(u,'pop')).join(''),'ありません。','')
     +sec('もう見なくていいブース',g('done').length+'か所',g('done').map(u=>bRow(u,'pop')).join(''),'まだありません。',''),
-    hx=sec('戦利品',gt.length+'点',gt.map(w=>`<div class="hrow"><span class="nm">${esc(w.name)}${w.brand?'<small> ／ '+esc(w.brand)+'</small>':''}</span><span class="hy">${w.actual!=null?yen(w.actual):''}</span></div>`).join(''),'まだ買った物はありません。','haul');
+    hx=sec('戦利品',gt.length+'点',gt.map(w=>`<div class="hrow" data-wd="${w.id}" style="cursor:pointer"><span class="nm">${esc(w.name)}${w.brand?'<small> ／ '+esc(w.brand)+'</small>':''}</span><span class="hy">${w.actual!=null?yen(w.actual):''}</span></div>`).join(''),'まだ買った物はありません。','haul');
    $('hlists').innerHTML=homeOpen==='booth'?bx:homeOpen==='haul'?hx:'';
    bindBRows($('hlists'));
    $('hlists').querySelectorAll('[data-hgo]').forEach(b=>b.onclick=()=>{show(b.dataset.hgo);render()})}
@@ -2323,7 +2323,7 @@ function renderHaul(){
   const got=S.wants.filter(w=>w.got),open=S.wants.filter(w=>!w.got);
   const sum=got.reduce((a,w)=>a+(+(w.actual!=null?w.actual:w.yen)||0),0);
   $('haul-sum').textContent=S.wants.length?`買った ${got.length} / 欲しい物 ${S.wants.length}　・　戦利品の合計 ${yen(sum)}`:'まだ欲しい物がありません。「欲しい物」で登録し、買ったら「買った」を付けると、ここに並びます。';
-  const row=w=>`<div class="ck"><div class="nm">${esc(w.name)}<span class="sub">${[w.brand,w.booth&&BY[w.booth]?w.booth+' '+wLabel(w.booth,w.sub):'',w.got?((EVENT.days.find(v=>v.key===recDay(w))||{}).label||'')+' '+(w.actual!=null?yen(w.actual):'金額未入力'):(w.yen?'予算 '+yen(w.yen):'')].filter(Boolean).map(esc).join(' ／ ')}</span></div></div>`;
+  const row=w=>`<div class="ck" data-wd="${w.id}" style="cursor:pointer"><div class="nm">${esc(w.name)}<span class="sub">${[w.brand,w.booth&&BY[w.booth]?w.booth+' '+wLabel(w.booth,w.sub):'',w.got?((EVENT.days.find(v=>v.key===recDay(w))||{}).label||'')+' '+(w.actual!=null?yen(w.actual):'金額未入力'):(w.yen?'予算 '+yen(w.yen):'')].filter(Boolean).map(esc).join(' ／ ')}</span></div></div>`;
   $('haul-list').innerHTML=(got.length?'<h3 class="sh">買った物</h3>'+got.map(row).join(''):'')+(open.length?'<h3 class="sh">まだ買っていない</h3>'+open.map(row).join(''):'');
 }
 document.querySelectorAll('#wsw [data-wv]').forEach(b=>b.onclick=()=>{wview=b.dataset.wv;applyWV();window.scrollTo({top:0})});
@@ -2524,6 +2524,25 @@ $('bk-in').onchange=async()=>{
       $('bk-conf').innerHTML='';$('bk-msg').textContent='読み込みました。';$('bk-in').value='';toast('✔ バックアップを読み込みました')}
   }catch(e){$('bk-msg').textContent='このファイルは読み込めません（このアプリのバックアップではありません）。'}
 };
+
+/* ✕（削除）は、押したら確認を出す */
+document.addEventListener('click',e=>{const x=e.target.closest&&e.target.closest('button.x[data-bdx],button.x[data-mdel],button.x[data-nx],button.x[data-pnx],button.x[data-px],button.x[data-sx],button.x[data-tx],button.x[data-unstar],button.x[data-wdel2],button.x[data-wdel]');if(!x)return;
+  const m=x.dataset.unstar!=null?'優先順位から外しますか？':x.dataset.mdel!=null?'この写真メモを削除しますか？':(x.dataset.nx!=null||x.dataset.pnx!=null||x.dataset.bdx!=null)?'このメモを削除しますか？':(x.dataset.wdel!=null||x.dataset.wdel2!=null)?'この欲しい物を削除しますか？（登録した写真も消えます）':'削除しますか？';
+  let ok=true;try{ok=confirm(m)}catch(_){}
+  if(!ok){e.stopImmediatePropagation();e.preventDefault()}},true);
+/* 戦利品：タップすると詳細と画像を出す */
+function wDetail(id){const w=S.wants.find(x=>String(x.id)===String(id));if(!w)return;
+  const imgs=[...wImgs(w.id).map(x=>x.img),...memos.filter(m=>String(m.wantId)===String(w.id)&&m.img).map(m=>m.img)];
+  const row=(l,v)=>v?`<div class="item"><span>${l}</span><b style="text-align:right;overflow-wrap:anywhere">${v}</b></div>`:'';
+  const bl=w.booth&&BY[w.booth]?w.booth+' '+esc(wLabel(w.booth,w.sub)||''):'';
+  const day=(EVENT.days.find(v=>v.key===recDay(w))||{}).label||'';
+  const o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center';
+  o.innerHTML=`<div role="dialog" aria-label="${esc(w.name)}の詳細" style="background:var(--surface);color:var(--ink);width:100%;max-width:640px;max-height:88vh;overflow:auto;border-radius:16px 16px 0 0;padding:16px"><h3 style="margin:0 0 8px;overflow-wrap:anywhere">${esc(w.name)}</h3>`
+   +row('ブランド・店',esc(w.brand||''))+row('ブース',bl)+row('予定の金額',w.yen?yen(w.yen):'')+(w.got?row('実際の金額',w.actual!=null?yen(w.actual):'金額未入力'):'')+row('買う気持ち',INT[intentOf(w)][0])+row('買った日',w.got?esc(day):'')
+   +(imgs.length?`<div style="margin-top:10px">${imgs.map(s=>`<img src="${s}" alt="" style="width:100%;border-radius:8px;margin-bottom:8px">`).join('')}</div>`:'<div class="note" style="margin:10px 0">画像はありません。</div>')
+   +`<button class="btn" type="button" id="wd-c" style="width:100%;margin-top:6px">閉じる</button></div>`;
+  o.onclick=e=>{if(e.target===o)o.remove()};document.body.appendChild(o);o.querySelector('#wd-c').onclick=()=>o.remove()}
+document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('[data-wd]');if(!t||e.target.closest('input,select,textarea,label'))return;wDetail(t.dataset.wd)});
 </script>
 
 <script>
