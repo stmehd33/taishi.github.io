@@ -627,7 +627,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v53<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v54<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -2338,7 +2338,10 @@ function seedNY3(){if(S.nyDone3)return;S.notes=S.notes||[];const NY=[["ny26-12",
 function seedNY4(){if(S.nyDone4)return;S.notes=S.notes||[];const NY=[["ny26-13", "【駐車場代】\n・最大料金は1000円だった。\n・日をまたぐと事前精算はできないので、出口で払う。\n・金曜の夜20時に停めて、日曜の16時ごろに出て、2000円だった。"], ["ny26-14", "【帰りの道順】\n・駐車場を出て、ぐるっと回ってすぐの信号を左に行き、空港側の道を左車線で行く。\n・りんくうの出口ですぐ降りるので、左車線にいること。\n・出口を降りてすぐ、1つ左の車線に入る（直進レーンの右側）。そのあと、一番左の車線に入ってまっすぐ行き、しばらく行ったら左折する。"]],t0=Date.now();
   NY.forEach(([id,text],i)=>{if(!S.notes.some(n=>n.id===id))S.notes.push({id,text,booth:'',sub:'',ts:t0-i*1000})});
   S.nyDone4=true;save()}
-function render(){syncUnits();if(EVENT.year===2026){seedNY();seedNY2();fixNY();seedNY3();seedNY4()}renderEvMarks();renderEvAlert();renderSeen();renderHaul();renderEntry();renderHome();renderSpend();if(!$('consider').hidden&&document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.coy)renderConsiderSummary();else renderConsider();renderNotes();renderPlan();renderWants();renderBooths();renderMap();renderSched();renderEvents();renderPerks();renderPack();renderCheck()}
+function seedNY5(){if(S.nyDone5)return;S.notes=S.notes||[];const NY=[["ny26-15", "【帰りの高速（大府あたり）】\n・帰りに、大府？のどこかで高速に乗るが、右に行くところを逃して失敗した。\n・来年までに、ストリートビューで確認しておく。"]],t0=Date.now();
+  NY.forEach(([id,text],i)=>{if(!S.notes.some(n=>n.id===id))S.notes.push({id,text,booth:'',sub:'',ts:t0-i*1000})});
+  S.nyDone5=true;save()}
+function render(){syncUnits();if(EVENT.year===2026){seedNY();seedNY2();fixNY();seedNY3();seedNY4();seedNY5()}renderEvMarks();renderEvAlert();renderSeen();renderHaul();renderEntry();renderHome();renderSpend();if(!$('consider').hidden&&document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.coy)renderConsiderSummary();else renderConsider();renderNotes();renderPlan();renderWants();renderBooths();renderMap();renderSched();renderEvents();renderPerks();renderPack();renderCheck()}
 
 /* ================= クラウド同期（claude.ai の db 機能。使えない時は端末内のみ） =================
    自分専用の領域 data/users/<id>/ に保存するので、同じアカウントなら PC とスマホで同じ内容になる。
@@ -2350,7 +2353,7 @@ const clone=o=>JSON.parse(JSON.stringify(o));
 const hasData=s=>s&&(Object.keys(s.stars||{}).length||(s.wants||[]).length||(s.sched||[]).length||(s.pack||[]).length||(s.budget||0)||Object.keys(s.seen||{}).length);
 function mergeStates(a,b){ /* 初回だけ: 両方にデータがあるときは足し合わせる */
   const u=(x,y)=>{const m=new Map();[...(x||[]),...(y||[])].forEach(i=>{if(!m.has(String(i.id)))m.set(String(i.id),i)});return [...m.values()]};
-  return Object.assign(DEF(),{stars:{...a.stars,...b.stars},later:{...a.later,...b.later},seen:{...a.seen,...b.seen},seenU:{...a.seenU,...b.seenU},laterU:{...a.laterU,...b.laterU},prioU:{...a.prioU,...b.prioU},mig45:!!(a.mig45||b.mig45),nyDone:!!(a.nyDone||b.nyDone),nyDone2:!!(a.nyDone2||b.nyDone2),nyDone3:!!(a.nyDone3||b.nyDone3),nyDone4:!!(a.nyDone4||b.nyDone4),packInit:!!(a.packInit||b.packInit),packInit2:!!(a.packInit2||b.packInit2),packInit3:!!(a.packInit3||b.packInit3),packInit4:!!(a.packInit4||b.packInit4),packInit5:!!(a.packInit5||b.packInit5),packInit6:!!(a.packInit6||b.packInit6),subStars:(()=>{const o={};[a.subStars,b.subStars].forEach(x=>{for(const k in (x||{}))o[k]=Object.assign(o[k]||{},x[k])});return o})(),wants:u(a.wants,b.wants),sched:u(a.sched,b.sched),pack:u(a.pack,b.pack),todo:u(a.todo||[],b.todo||[]),subOrder:Object.assign({},a.subOrder||{},b.subOrder||{}),uorder:(b.uorder&&b.uorder.length?b.uorder:(a.uorder||[])),notes:u(a.notes,b.notes),consider:Object.assign({},a.consider||{},b.consider||{}),entry:(()=>{const f=e=>{e=e||{};const n=Object.assign({},e.nos||{});if(e.no&&!Object.keys(n).length)n[e.day||'d1']=e.no;return {nos:n,day:e.day||''}};const x=f(a.entry),y=f(b.entry);return {nos:Object.assign({},x.nos,y.nos),day:y.day||x.day}})(),
+  return Object.assign(DEF(),{stars:{...a.stars,...b.stars},later:{...a.later,...b.later},seen:{...a.seen,...b.seen},seenU:{...a.seenU,...b.seenU},laterU:{...a.laterU,...b.laterU},prioU:{...a.prioU,...b.prioU},mig45:!!(a.mig45||b.mig45),nyDone:!!(a.nyDone||b.nyDone),nyDone2:!!(a.nyDone2||b.nyDone2),nyDone3:!!(a.nyDone3||b.nyDone3),nyDone4:!!(a.nyDone4||b.nyDone4),nyDone5:!!(a.nyDone5||b.nyDone5),packInit:!!(a.packInit||b.packInit),packInit2:!!(a.packInit2||b.packInit2),packInit3:!!(a.packInit3||b.packInit3),packInit4:!!(a.packInit4||b.packInit4),packInit5:!!(a.packInit5||b.packInit5),packInit6:!!(a.packInit6||b.packInit6),subStars:(()=>{const o={};[a.subStars,b.subStars].forEach(x=>{for(const k in (x||{}))o[k]=Object.assign(o[k]||{},x[k])});return o})(),wants:u(a.wants,b.wants),sched:u(a.sched,b.sched),pack:u(a.pack,b.pack),todo:u(a.todo||[],b.todo||[]),subOrder:Object.assign({},a.subOrder||{},b.subOrder||{}),uorder:(b.uorder&&b.uorder.length?b.uorder:(a.uorder||[])),notes:u(a.notes,b.notes),consider:Object.assign({},a.consider||{},b.consider||{}),entry:(()=>{const f=e=>{e=e||{};const n=Object.assign({},e.nos||{});if(e.no&&!Object.keys(n).length)n[e.day||'d1']=e.no;return {nos:n,day:e.day||''}};const x=f(a.entry),y=f(b.entry);return {nos:Object.assign({},x.nos,y.nos),day:y.day||x.day}})(),
     order:(b.order&&b.order.length?b.order:a.order)||[],budget:b.budget||a.budget||0,deletedMemos:[...new Set([...(a.deletedMemos||[]),...(b.deletedMemos||[])])]});}
 function errState(e){return e&&e.code==='invalid_argument'?'noperm':'error'}
 let pushT=null,pushing=false,dirty=false;
