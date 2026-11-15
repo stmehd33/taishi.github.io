@@ -627,7 +627,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v58<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v59<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -711,6 +711,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
   <div class="dayseg" id="wsw" style="margin:0 0 10px"><button class="chip" type="button" data-wv="want" aria-pressed="true">欲しい物</button><button class="chip" type="button" data-wv="haul" aria-pressed="false">戦利品</button><button class="chip" type="button" data-wv="consider" aria-pressed="false">検討</button></div>
   <div id="wv-want">
   <form class="form" id="wform">
+    <div class="full"><label style="display:flex;gap:10px;align-items:center;min-height:44px"><input class="chk" type="checkbox" id="w-got"> 買った物（戦利品）として追加する</label></div>
     <div class="full"><label for="w-booth">① ブース（番号か名前）　※未定なら空欄のまま追加できます</label><input type="text" id="w-booth" placeholder="例：403 か UNIFLAME（未定なら空欄）" autocomplete="off">
     <div class="note" id="w-bmsg" style="margin:2px 0 0"></div></div>
     <div class="full" id="w-subbox" hidden><label for="w-sub">ブース内のどの店？（複数の店・ブランドが入っています）</label><select id="w-sub"></select></div>
@@ -742,14 +743,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </div>
   <div id="wv-haul" hidden>
     <div class="note" id="haul-sum" style="margin:0 0 8px"></div>
-    <details class="wnew" id="hn-box" style="margin:0 0 10px"><summary>＋ 戦利品を直接追加（欲しい物に入れていない物）</summary>
-      <input type="text" id="hn-name" placeholder="品名（必須）" autocomplete="off" aria-label="品名">
-      <input type="text" id="hn-brand" placeholder="ブランド・店名（任意）" autocomplete="off" aria-label="ブランド・店名" style="margin-top:6px">
-      <input type="text" id="hn-booth" inputmode="numeric" placeholder="ブース番号（任意）例：403" autocomplete="off" aria-label="ブース番号" style="margin-top:6px">
-      <label class="wy" style="margin-top:6px">実際の金額 ¥<input type="text" data-comma id="hn-yen" inputmode="numeric" pattern="[0-9,]*" autocomplete="off" placeholder="未入力でOK"></label>
-      <div class="dayseg" id="hn-day" style="margin-top:6px"></div>
-      <span class="wth-row" style="margin:6px 0 0"><span class="pkpair"><label class="wadd">写真<input type="file" accept="image/*" capture="environment" data-cam="hn-file" hidden></label><label class="wadd" for="hn-file">アルバム</label></span></span><input type="file" id="hn-file" accept="image/*" multiple hidden><span class="note" id="hn-fn" style="margin:0 0 0 6px"></span>
-      <button class="btn" id="hn-add" type="button" style="margin-top:8px;width:100%">戦利品に追加</button></details>
+    <button class="btn" id="hn-go" type="button" style="margin:0 0 10px;width:100%">＋ 戦利品を追加（欲しい物と同じ入力）</button>
     <div id="haul-list"></div>
     <div class="tools" style="margin-top:12px"><button class="chip" id="haul-photo" type="button">買った物の写真を見る ›</button><button class="chip" id="haul-wants" type="button">欲しい物リストへ ›</button></div>
   </div>
@@ -1335,11 +1329,11 @@ function syncBoothPrio(k){const ws=S.wants.filter(w=>w.booth===k&&!w.got&&w.bp);
 function startEdit(id){const w=S.wants.find(x=>x.id==id);if(!w)return;editW=w.id;
   $('w-booth').value=w.booth||w.brand||'';$('w-booth').dispatchEvent(new Event('input',{bubbles:true}));
   if(w.booth)fillSub('w-sub','w-subbox',w.booth,w.sub||'');
-  $('w-name').value=w.name;$('w-yen').value=w.yen?(+w.yen).toLocaleString('en-US'):'';$('w-prio').value=String(w.prio||2);$('w-bp').value=String(w.bp||boothPrio(w.booth)||2);
+  $('w-got').checked=!!w.got;$('w-got').disabled=true;applyGot();$('w-name').value=w.name;{const v=w.got?w.actual:w.yen;$('w-yen').value=v?(+v).toLocaleString('en-US'):''};$('w-prio').value=String(w.prio||2);$('w-bp').value=String(w.bp||boothPrio(w.booth)||2);
   $('w-img').value='';wPrev();$('w-imsg').textContent='';$('w-submit').textContent='変更を保存';$('w-cancel').hidden=false;
   $('wform').scrollIntoView({behavior:'smooth',block:'start'});toast('✎ 編集中：直して「変更を保存」を押してください')}
 const wDelPend=new Set();
-function endEdit(){editW=null;wDelPend.clear();$('w-submit').textContent='リストに追加';$('w-cancel').hidden=true}
+function endEdit(){editW=null;wDelPend.clear();$('w-got').disabled=false;$('w-submit').textContent='リストに追加';$('w-cancel').hidden=true}
 function boothSwitch(nb){
   if(editW==null||!nb)return;const ew=S.wants.find(x=>x.id==editW);if(!ew||nb===ew.booth)return;
   const list=S.wants.filter(x=>x.booth===nb&&x.id!==ew.id&&!x.got);
@@ -1369,12 +1363,14 @@ $('wform').addEventListener('submit',async e=>{
   const rawB=$('w-booth').value.trim();let booth=resolveBooth(rawB);$('w-bmsg').textContent='';if(booth&&!$('w-sub').value){const ms=subMatch(rawB,booth);if(ms)fillSub('w-sub','w-subbox',booth,ms)}
   let newId=Date.now();const imgFiles=[...$('w-img').files];
   const rec={name,brand:booth?($('w-sub').value||shortName(booth)):rawB,yen:ynum($('w-yen').value)||0,booth,sub:$('w-sub').value||'',prio:+$('w-prio').value,intent:['','must','maybe','skip'][+$('w-prio').value],bp:+$('w-bp').value||2};
-  const edW=editW!=null?S.wants.find(x=>x.id==editW):null;if(edW){Object.assign(edW,rec);newId=edW.id}else S.wants.push({id:newId,...rec,got:false});
+  const edW=editW!=null?S.wants.find(x=>x.id==editW):null;const gotMode=$('w-got').checked;
+  if(gotMode){const a=ynum($('w-yen').value);rec.actual=a==null?null:a;rec.yen=a||0;rec.got=true;rec.prio=2;rec.intent='maybe';rec.bp=2;rec.day=(edW&&edW.day)||todayKey();if(edW&&edW.yen&&a==null){rec.yen=edW.yen}}
+  if(edW){Object.assign(edW,rec);newId=edW.id}else S.wants.push({id:newId,got:false,...rec});
   if(edW&&wDelPend.size){[...wDelPend].forEach(id=>{wimgs=wimgs.filter(v=>v.id!==id);try{idbTx('readwrite',s=>s.delete(id))}catch(e){}})}
   const wasEdit=!!edW;endEdit();
-  let newStar=false;if(booth){if(!S.stars[booth]){S.stars[booth]={done:false,prio:2};newStar=true}const sb=$('w-sub').value;if(sb){S.subStars=S.subStars||{};(S.subStars[booth]=S.subStars[booth]||{})[sb]=true}}
-  if(booth)syncBoothPrio(booth);
-  save();$('wform').reset();$('w-prio').value='2';$('w-bp').value='2';$('w-imsg').textContent='';fillSub('w-sub','w-subbox','');let ni=0;if(imgFiles.length)ni=await wSaveImgs(newId,imgFiles);render();if(imgFiles.length&&!ni)toast('画像は保存できませんでした（リストには追加済み）');else toast(wasEdit?'✔ 変更を保存しました':newStar?'✔ リストに追加しました（ブース '+booth+' も「回りたいブース」に入れました）':'✔ リストに追加しました');
+  let newStar=false;if(booth&&!gotMode){if(!S.stars[booth]){S.stars[booth]={done:false,prio:2};newStar=true}const sb=$('w-sub').value;if(sb){S.subStars=S.subStars||{};(S.subStars[booth]=S.subStars[booth]||{})[sb]=true}}
+  if(booth&&!gotMode)syncBoothPrio(booth);
+  save();$('wform').reset();$('w-prio').value='2';$('w-bp').value='2';$('w-imsg').textContent='';fillSub('w-sub','w-subbox','');let ni=0;if(imgFiles.length)ni=await wSaveImgs(newId,imgFiles);render();if(gotMode&&!wasEdit){wview='haul';applyWV();window.scrollTo({top:0})}if(imgFiles.length&&!ni)toast('画像は保存できませんでした（リストには追加済み）');else toast(gotMode&&!wasEdit?'✔ 戦利品に追加しました':wasEdit?'✔ 変更を保存しました':newStar?'✔ リストに追加しました（ブース '+booth+' も「回りたいブース」に入れました）':'✔ リストに追加しました');
 });
 
 /* booths */
@@ -2552,19 +2548,13 @@ function wDetail(id){const w=S.wants.find(x=>String(x.id)===String(id));if(!w)re
   o.onclick=e=>{if(e.target===o)o.remove()};document.body.appendChild(o);o.querySelector('#wd-c').onclick=()=>o.remove()}
 document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('[data-wd]');if(!t||e.target.closest('input,select,textarea,label'))return;wDetail(t.dataset.wd)});
 
-/* 戦利品を直接追加 */
-(()=>{let hday=null;
-  const days=()=>EVENT.days.filter(v=>v.key!=='prev');
-  const drawDay=()=>{const box=$('hn-day');if(!box)return;if(!hday)hday=todayKey();box.innerHTML=days().map(v=>`<button type="button" class="chip" data-hd="${v.key}" aria-pressed="${v.key===hday}">${esc(v.label)}</button>`).join('');box.querySelectorAll('[data-hd]').forEach(x=>x.onclick=()=>{hday=x.dataset.hd;drawDay()})};
-  drawDay();$('hn-box').addEventListener('toggle',()=>{if($('hn-box').open){hday=todayKey();drawDay()}});
-  const f=$('hn-file');f.addEventListener('change',()=>{$('hn-fn').textContent=f.files.length?f.files.length+'枚 選択中':''});
-  $('hn-add').onclick=async()=>{const name=$('hn-name').value.trim();if(!name){$('hn-name').focus();return}
-    const rawB=$('hn-booth').value.trim(),booth=resolveBooth(rawB);if(rawB&&!booth){toast('そのブース番号は一覧にありません');$('hn-booth').focus();return}
-    const brand=$('hn-brand').value.trim(),id=Date.now(),act=ynum($('hn-yen').value);
-    S.wants.push({id,name,brand:brand||(booth?shortName(booth):''),yen:0,booth,sub:(booth&&subsOf(booth).includes(brand))?brand:'',prio:2,intent:'maybe',bp:2,got:true,day:hday||todayKey(),actual:act==null?null:act});
-    save();const files=[...f.files];let n=0;if(files.length)n=await wSaveImgs(id,files);
-    $('hn-name').value='';$('hn-brand').value='';$('hn-booth').value='';$('hn-yen').value='';f.value='';$('hn-fn').textContent='';
-    render();toast('✔ 戦利品に追加しました'+(files.length&&!n?'（画像は保存できませんでした）':''))}})();
+
+/* 戦利品も「欲しい物」と同じフォームで入れる */
+function applyGot(){const g=$('w-got').checked,l=document.querySelector('label[for="w-yen"]');if(l)l.textContent=g?'③ 実際に買った金額（円・空欄でOK）':'③ 予算（円・空欄でOK）';
+  $('w-bp').closest('.full').hidden=g;$('w-prio').closest('.full').hidden=g;if(editW==null)$('w-submit').textContent=g?'戦利品に追加':'リストに追加'}
+$('w-got').addEventListener('change',applyGot);
+$('wform').addEventListener('reset',()=>setTimeout(applyGot,0));
+$('hn-go').onclick=()=>{wview='want';applyWV();window.scrollTo({top:0});if(editW!=null){endEdit();$('wform').reset()}$('w-got').checked=true;applyGot();$('wform').scrollIntoView({behavior:'smooth',block:'start'})};
 </script>
 
 <script>
