@@ -627,7 +627,7 @@ button.tile{font:inherit;color:inherit;text-align:center;cursor:pointer;width:10
 </nav>
 
 <section id="home">
-  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v59<span id="verst"></span></div>
+  <div class="note" id="verbar" style="margin:0 0 6px;font-weight:700">版 v60<span id="verst"></span></div>
   <h2>ホーム</h2>
   <div id="dayhdr"></div>
   <div id="evalert"></div>
@@ -2340,12 +2340,13 @@ function seedNY2(){if(S.nyDone2)return;S.notes=S.notes||[];const NY=[["ny26-7", 
   NY.forEach(([id,text],i)=>{if(!S.notes.some(n=>n.id===id))S.notes.push({id,text,booth:'',sub:'',ts:t0-i*1000})});
   S.nyDone2=true;save()}
 function fixNY5(){const n=(S.notes||[]).find(x=>x.id==='ny26-5'),O="・グラインドロッジのトートバッグは100個、ミヤビは40個の限定だった。",N="・LOVのトートバッグは100個、38灯は40個の限定だった。";if(n&&n.text.includes(O)){n.text=n.text.replace(O,N);save()}}
-function fixNY15(){const n=(S.notes||[]).find(x=>x.id==='ny26-15'),O="【帰りの高速（大府あたり）】\n・帰りに、大府？のどこかで高速に乗るが、右に行くところを逃して失敗した。\n・来年までに、ストリートビューで確認しておく。",N="【帰りの高速（大府あたり）】\n・帰りに、大府？のどこかで高速に乗る。\n・降り口は、左ルートの大山崎出口。左に行った後に、右の出口に行かないといけない。\n・今回は、その右に行くところを逃して失敗した。\n・来年までに、ストリートビューで確認しておく。";if(n&&n.text===O){n.text=N;save()}}
-function fixNY(){fixNY5();fixNY15();const n=(S.notes||[]).find(x=>x.id==='ny26-8'),O="【LOV】\n・LOVのところに、目玉のトートバッグと、目玉の38灯の店があり、別の店舗だった。",N="【LOV】\n・目玉のトートバッグと、目玉の38灯は、グラインドロッジにあると思っていたが、LOVにあった。";if(n&&n.text===O){n.text=N;save()}}
+function fixNY15(){const n=(S.notes||[]).find(x=>x.id==='ny26-15'),O="【帰りの高速（大府あたり）】\n・帰りに、大府？のどこかで高速に乗るが、右に行くところを逃して失敗した。\n・来年までに、ストリートビューで確認しておく。",N="【帰りの高速（大府あたり）】\n・りんくうICでは降りない。大府西か大府東？のICで降りて、左折してすぐ左側の大府ICから、湾岸線（伊勢湾岸道）に乗る。\n・降り口は、左ルートの大山崎出口。左に行った後に、右の出口に行かないといけない。\n・今回は、その右に行くところを逃して失敗した。\n・来年までに、ストリートビューで確認しておく。";if(n&&n.text===O){n.text=N;save()}}
+function fixNYb(id,O,N){const n=(S.notes||[]).find(x=>x.id===id);if(n&&n.text===O){n.text=N;save()}}
+function fixNY(){fixNY5();fixNY15();fixNYb('ny26-14',"【帰りの道順】\n・駐車場を出て、ぐるっと回ってすぐの信号を左に行き、空港側の道を左車線で行く。\n・りんくうの出口ですぐ降りるので、左車線にいること。\n・出口を降りてすぐ、1つ左の車線に入る（直進レーンの右側）。そのあと、一番左の車線に入ってまっすぐ行き、しばらく行ったら左折する。","【帰りの道順】\n・愛知スカイエキスポの駐車場を出て、ぐるっと回った最初の信号は、ナビが「左」と言ったが、まっすぐ行く。\n・セントレア東ICから高速に乗る。\n・りんくうICでは降りなくていい（ナビは降りろと言ったが、間違いだった）。");fixNYb('ny26-15',"【帰りの高速（大府あたり）】\n・帰りに、大府？のどこかで高速に乗る。\n・降り口は、左ルートの大山崎出口。左に行った後に、右の出口に行かないといけない。\n・今回は、その右に行くところを逃して失敗した。\n・来年までに、ストリートビューで確認しておく。","【帰りの高速（大府あたり）】\n・りんくうICでは降りない。大府西か大府東？のICで降りて、左折してすぐ左側の大府ICから、湾岸線（伊勢湾岸道）に乗る。\n・降り口は、左ルートの大山崎出口。左に行った後に、右の出口に行かないといけない。\n・今回は、その右に行くところを逃して失敗した。\n・来年までに、ストリートビューで確認しておく。");const n=(S.notes||[]).find(x=>x.id==='ny26-8'),O="【LOV】\n・LOVのところに、目玉のトートバッグと、目玉の38灯の店があり、別の店舗だった。",N="【LOV】\n・目玉のトートバッグと、目玉の38灯は、グラインドロッジにあると思っていたが、LOVにあった。";if(n&&n.text===O){n.text=N;save()}}
 function seedNY3(){if(S.nyDone3)return;S.notes=S.notes||[];const NY=[["ny26-12", "【LOVの並び方】\n・LOVのブースは、グラインドロッジの列と同じだった。\n・ただ、LOVはすぐに一般の人が入れる。グラインドロッジの列には並ばず、別の列が短いブースに並び、その後でLOVへ行くのがいい。"]],t0=Date.now();
   NY.forEach(([id,text],i)=>{if(!S.notes.some(n=>n.id===id))S.notes.push({id,text,booth:'',sub:'',ts:t0-i*1000})});
   S.nyDone3=true;save()}
-function seedNY4(){if(S.nyDone4)return;S.notes=S.notes||[];const NY=[["ny26-13", "【駐車場代】\n・最大料金は1000円だった。\n・日をまたぐと事前精算はできないので、出口で払う。\n・金曜の夜20時に停めて、日曜の16時ごろに出て、2000円だった。"], ["ny26-14", "【帰りの道順】\n・駐車場を出て、ぐるっと回ってすぐの信号を左に行き、空港側の道を左車線で行く。\n・りんくうの出口ですぐ降りるので、左車線にいること。\n・出口を降りてすぐ、1つ左の車線に入る（直進レーンの右側）。そのあと、一番左の車線に入ってまっすぐ行き、しばらく行ったら左折する。"]],t0=Date.now();
+function seedNY4(){if(S.nyDone4)return;S.notes=S.notes||[];const NY=[["ny26-13", "【駐車場代】\n・最大料金は1000円だった。\n・日をまたぐと事前精算はできないので、出口で払う。\n・金曜の夜20時に停めて、日曜の16時ごろに出て、2000円だった。"], ["ny26-14", "【帰りの道順】\n・愛知スカイエキスポの駐車場を出て、ぐるっと回った最初の信号は、ナビが「左」と言ったが、まっすぐ行く。\n・セントレア東ICから高速に乗る。\n・りんくうICでは降りなくていい（ナビは降りろと言ったが、間違いだった）。"]],t0=Date.now();
   NY.forEach(([id,text],i)=>{if(!S.notes.some(n=>n.id===id))S.notes.push({id,text,booth:'',sub:'',ts:t0-i*1000})});
   S.nyDone4=true;save()}
 function seedNY5(){if(S.nyDone5)return;S.notes=S.notes||[];const NY=[["ny26-15", "【帰りの高速（大府あたり）】\n・帰りに、大府？のどこかで高速に乗る。\n・降り口は、左ルートの大山崎出口。左に行った後に、右の出口に行かないといけない。\n・今回は、その右に行くところを逃して失敗した。\n・来年までに、ストリートビューで確認しておく。"]],t0=Date.now();
